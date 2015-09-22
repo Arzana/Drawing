@@ -6,6 +6,16 @@
 #include <SDL.h>
 #include <iostream>
 #include <math.h>
+#include <stdio.h>
+
+#ifdef WIN32
+#include <direct.h>
+#define GetCurrentDir _getcwd
+#else
+#include <unistd.h>
+#define GetCurrentDir getcwd;
+#endif
+
 #include "Line.h"
 #include "Map.h"
 #include "UtilDefs.h"
@@ -27,7 +37,8 @@ void InitMap();
 void ThrowFatalError(const char* message);
 void DestroyWindow();
 void RenderScreen();
-void WuLine(Line& line);
+void BresenhamLine(float x0, float y0, float x1, float y1);
+void WuLine(Line *line);
 void Plot(int x, int y, int color);
 void PlotA(int x, int y, float alpha);
 void ClearScreen(int color);

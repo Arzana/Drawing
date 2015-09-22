@@ -256,3 +256,11 @@ Vector3 Matrix::operator>>(const Vector3& v) const
 
 	return Vector3(x, y, z) * -w;
 }
+
+void Matrix::Transform(Matrix* m, Vector3* source, int length)
+{
+	for (int i = 0; i < length; i++)
+	{
+		source[i] = *m >> source[i];
+	}
+}

@@ -5,8 +5,8 @@
 
 #define PLANE_NEAR		0.1f
 #define PLANE_FAR		100.0f
-#define WINDOW_HEIGHT	900.0f
-#define WINDOW_WIDTH	1200.0f
+#define WINDOW_HEIGHT	600.0f
+#define WINDOW_WIDTH	800.0f
 
 struct Line
 {

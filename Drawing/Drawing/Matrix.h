@@ -26,7 +26,7 @@ public:
 	/* Create a view matrix. */
 	static Matrix View(const Vector3& cameraPosition, const Vector3& target, const Vector3& up);
 	/* Create a  perspective projection matrix using field of view. */
-	static Matrix Perspective(float fov, float aspr, float near, float far);
+	static Matrix Perspective(float fovY, float aspr, float near, float far);
 	/* Rotate the matrix around a specified axis. */
 	static Matrix RotateAxis(float radians, const Vector3& axis);
 	/* Rotate the matrix around the z-axis (pitch). */
@@ -41,6 +41,8 @@ public:
 	static Matrix Scale(const Vector3& scale);
 	/* Translate the matrix to a specified amount. */
 	static Matrix Translation(const Vector3& pos);
+	/* Transforms a array of vector3. */
+	static void Transform(Matrix* matrix, Vector3* source, int length);
 	/* Get the backward vector of the specified matrix. */
 	Vector3 GetBackward() const;
 	/* Get the down vector of the specified matrix. */

@@ -24,6 +24,11 @@ Sector* Map::GetSector(int index)
 	return &m_Sectors[index];
 }
 
+int Map::GetLength()
+{
+	return m_Count;
+}
+
 bool Map::Load(const char* loc)
 {
 	FILE* fp = fopen(loc, "r");			// Try open file with read only permission.
