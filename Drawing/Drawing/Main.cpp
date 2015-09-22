@@ -31,36 +31,36 @@ int main(int args, char* argv[])
 				break;
 			case(SDL_KEYDOWN) :
 				switch (ev.key.keysym.scancode)
-			{
-				case(SDL_SCANCODE_W) :
-					*player += rotation->GetForward();
-					break;
-				case(SDL_SCANCODE_S) :
-					*player += rotation->GetBackward();
-					break;
-				case(SDL_SCANCODE_A) :
-					*player += rotation->GetLeft();
-					break;
-				case(SDL_SCANCODE_D) :
-					*player += rotation->GetRight();
-					break;
-				case(SDL_SCANCODE_LEFT) :
-					playerR->Y -= 0.1f;
-					break;
-				case(SDL_SCANCODE_RIGHT) :
-					playerR->Y += 0.1f;
-					break;
-				case(SDL_SCANCODE_DOWN) :
-					playerR->X -= 0.1f;
-					break;
-				case(SDL_SCANCODE_UP) :
-					playerR->X += 0.1f;
-					break;
-				case(SDL_SCANCODE_ESCAPE) :
-					isRunning = false;
-					break;
-			}
-							  break;
+				{
+					case(SDL_SCANCODE_W) :
+						*player += rotation->GetForward();
+						break;
+					case(SDL_SCANCODE_S) :
+						*player += rotation->GetBackward();
+						break;
+					case(SDL_SCANCODE_A) :
+						*player += rotation->GetLeft();
+						break;
+					case(SDL_SCANCODE_D) :
+						*player += rotation->GetRight();
+						break;
+					case(SDL_SCANCODE_LEFT) :
+						playerR->Y -= 0.1f;
+						break;
+					case(SDL_SCANCODE_RIGHT) :
+						playerR->Y += 0.1f;
+						break;
+					case(SDL_SCANCODE_DOWN) :
+						playerR->X -= 0.1f;
+						break;
+					case(SDL_SCANCODE_UP) :
+						playerR->X += 0.1f;
+						break;
+					case(SDL_SCANCODE_ESCAPE) :
+						isRunning = false;
+						break;
+				}
+				break;
 			}
 		}
 
@@ -70,10 +70,7 @@ int main(int args, char* argv[])
 	}
 
 	DestroyWindow();
-	delete map;
-	delete player;
-	delete playerR;
-	delete rotation;
+	delete map, player, playerR, rotation;
 	return EXIT_SUCCESS;
 }
 
@@ -153,7 +150,7 @@ void RenderScreen()
 	}
 
 	Vector3 targ = *player + rotation->GetForward();
-	Matrix modelM = Matrix::Scale(2);
+	Matrix modelM = MTRX_Identity;
 	Matrix viewM = Matrix::View(*player, targ, rotation->GetUp());
 	Matrix projM = Matrix::Perspective(60, ASPR, PLANE_NEAR, PLANE_FAR);
 	Matrix mvp = modelM * viewM * projM;
@@ -173,7 +170,7 @@ void RenderScreen()
 
 		lineCount = Line::CheckVisiblity(lines, lineCount);
 
-		for (int lineIndex = 0; lineIndex < lineCount; lineIndex++) WuLine(&lines[lineIndex]);
+		for (int lineIndex = 0; lineIndex < lineCount; lineIndex++) WuLine(lines + lineIndex);
 
 		free(lines);
 	}
