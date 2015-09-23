@@ -170,7 +170,12 @@ void RenderScreen()
 
 		lineCount = Line::CheckVisiblity(lines, lineCount);
 
-		for (int lineIndex = 0; lineIndex < lineCount; lineIndex++) WuLine(lines + lineIndex);
+		for (int lineIndex = 0; lineIndex < lineCount; lineIndex++)
+		{
+			//WuLine(lines + lineIndex);
+			Line *cur = lines + lineIndex;
+			BresenhamLine(cur->A.X, cur->A.Y, cur->B.X, cur->B.Y);
+		}
 
 		free(lines);
 	}
@@ -183,6 +188,7 @@ void RenderScreen()
 void BresenhamLine(float x0, float y0, float x1, float y1)
 {
 	bool steep = abs(y1 - y0) > abs(x1 - x0);
+	int c = 0xFF00FF;
 
 	if (steep)
 	{
@@ -198,19 +204,20 @@ void BresenhamLine(float x0, float y0, float x1, float y1)
 
 	float deltaX = x1 - x0;
 	float deltaY = y1 - y0;
+	int sign = deltaY == 0 ? 0 : (deltaY > 0 ? 1 : -1);
 	float deltaErr = abs(deltaY / deltaX);
 
 	int y = y0;
 	float error = 0;
-	for (int x = x0; x < x1; x++)
+	for (int x = x0; x <= x1; x++)
 	{
-		Plot(x, y, 0xFF00FF);
+		Plot(x, y, c);
 		error += deltaErr;
 
 		while (error >= 0.5f)
 		{
-			Plot(x, y, 0x00FF00);
-			y += deltaY;
+			Plot(x, y, c);
+			y += sign;
 			error -= 1;
 		}
 	}
