@@ -89,6 +89,7 @@
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="Sector.cpp" />
+    <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +98,7 @@
     <ClInclude Include="Map.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Sector.h" />
+    <ClInclude Include="Triangle.h" />
     <ClInclude Include="UtilDefs.h" />
     <ClInclude Include="Vector3.h" />
   </ItemGroup>

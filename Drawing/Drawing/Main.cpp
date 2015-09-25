@@ -1,12 +1,13 @@
 #include "Main.h"
 
-SDL_Window* window = NULL;
-SDL_Surface* surface = NULL;
+SDL_Window *window = NULL;
+SDL_Surface *surface = NULL;
+int *pixels = NULL;
 
-Map* map = NULL;
-Vector3* player;
-Matrix* rotation;
-Vector3* playerR;
+Map *map = NULL;
+Vector3 *player;
+Matrix *rotation;
+Vector3 *playerR;
 
 int main(int args, char* argv[])
 {
@@ -31,36 +32,36 @@ int main(int args, char* argv[])
 				break;
 			case(SDL_KEYDOWN) :
 				switch (ev.key.keysym.scancode)
-				{
-					case(SDL_SCANCODE_W) :
-						*player += rotation->GetForward();
-						break;
-					case(SDL_SCANCODE_S) :
-						*player += rotation->GetBackward();
-						break;
-					case(SDL_SCANCODE_A) :
-						*player += rotation->GetLeft();
-						break;
-					case(SDL_SCANCODE_D) :
-						*player += rotation->GetRight();
-						break;
-					case(SDL_SCANCODE_LEFT) :
-						playerR->Y -= 0.1f;
-						break;
-					case(SDL_SCANCODE_RIGHT) :
-						playerR->Y += 0.1f;
-						break;
-					case(SDL_SCANCODE_DOWN) :
-						playerR->X -= 0.1f;
-						break;
-					case(SDL_SCANCODE_UP) :
-						playerR->X += 0.1f;
-						break;
-					case(SDL_SCANCODE_ESCAPE) :
-						isRunning = false;
-						break;
-				}
-				break;
+			{
+				case(SDL_SCANCODE_W) :
+					*player += rotation->GetForward();
+					break;
+				case(SDL_SCANCODE_S) :
+					*player += rotation->GetBackward();
+					break;
+				case(SDL_SCANCODE_A) :
+					*player += rotation->GetLeft();
+					break;
+				case(SDL_SCANCODE_D) :
+					*player += rotation->GetRight();
+					break;
+				case(SDL_SCANCODE_LEFT) :
+					playerR->Y -= 0.1f;
+					break;
+				case(SDL_SCANCODE_RIGHT) :
+					playerR->Y += 0.1f;
+					break;
+				case(SDL_SCANCODE_DOWN) :
+					playerR->X -= 0.1f;
+					break;
+				case(SDL_SCANCODE_UP) :
+					playerR->X += 0.1f;
+					break;
+				case(SDL_SCANCODE_ESCAPE) :
+					isRunning = false;
+					break;
+			}
+							  break;
 			}
 		}
 
@@ -134,8 +135,9 @@ void DestroyWindow()
 
 void RenderScreen()
 {
+	const int VerticesInTriangle = 3;
 	int mapLength = map->GetLength();
-	int vertexLength = 3 * mapLength;
+	int vertexLength = VerticesInTriangle * mapLength;
 	Vector3 *vertices = (Vector3*)malloc(sizeof(Vector3) * vertexLength);
 
 	int vertexIndex = 0;
@@ -144,7 +146,7 @@ void RenderScreen()
 		Sector *curSector = map->GetSector(sectorIndex);
 		const Vector3 **sectorVertices = curSector->GetVertices();
 
-		for (int i = 0; i < 3; i++) vertices[vertexIndex++] = Vector3(sectorVertices[i]->X, curSector->GetCeiling(), sectorVertices[i]->Z);
+		for (int i = 0; i < VerticesInTriangle; i++) vertices[vertexIndex++] = Vector3(sectorVertices[i]->X, curSector->GetCeiling(), sectorVertices[i]->Z);
 
 		delete sectorVertices;
 	}
@@ -158,37 +160,88 @@ void RenderScreen()
 	Matrix::Transform(&mvp, vertices, vertexLength);
 
 	// Start rendering
+	pixels = (int*)surface->pixels;
 	ClearScreen(0x000000);
-	for (int i = 0; i < vertexLength; i += 3)
+	for (int i = 0; i < vertexLength; i += VerticesInTriangle)
 	{
-		int lineCount = 3;
-		Line *lines = (Line*)malloc(sizeof(Line) * lineCount);
-
-		lines[0] = Line(vertices[i], vertices[i + 1]);
-		lines[1] = Line(vertices[i + 1], vertices[i + 2]);
-		lines[2] = Line(vertices[i], vertices[i + 2]);
-
-		lineCount = Line::CheckVisiblity(lines, lineCount);
-
-		for (int lineIndex = 0; lineIndex < lineCount; lineIndex++)
-		{
-			//WuLine(lines + lineIndex);
-			Line *cur = lines + lineIndex;
-			BresenhamLine(cur->A.X, cur->A.Y, cur->B.X, cur->B.Y);
-		}
-
-		free(lines);
+		Vector3 v0 = vertices[i], v1 = vertices[i + 1], v2 = vertices[i + 2];
+		// To do clip triangle inside viewport or don't draw.
+		RenderTriangle(v0.X, v0.Y, v1.X, v1.Y, v2.X, v2.Y);
 	}
 
 	// End rendering
 	SDL_UpdateWindowSurface(window);
+	pixels = NULL;
 	free(vertices);
+}
+
+void RenderTriangle(float x0, float y0, float x1, float y1, float x2, float y2)
+{
+	const int c = 0xFF00FF;
+	float x00 = x0, x01 = x0, y00 = y0, y01 = y0;
+
+	bool steepAB = abs(y1 - y00) > abs(x1 - x00);
+	bool steepAC = abs(y2 - y01) > abs(x2 - x01);
+
+	if (steepAB)
+	{
+		swap(x00, y00);
+		swap(x1, y1);
+	}
+
+	if (steepAC)
+	{
+		swap(x01, y01);
+		swap(x2, y2);
+	}
+
+	if (x00 > x1)
+	{
+		swap(x00, x1);
+		swap(y00, y1);
+	}
+
+	if (x01 > x2)
+	{
+		swap(x01, x2);
+		swap(y01, y2);
+	}
+
+	float delta_XAB = x1 - x00, delta_XAC = x2 - x01;
+	float deltaYAB = y1 - y00, deltaYAC = y2 - y01;
+	int signAB = deltaYAB == 0 ? 0 : (deltaYAB > 0 ? 1 : -1), signAC = deltaYAC == 0 ? 0 : (deltaYAC > 0 ? 1 : -1);
+	float gradientAB = abs(deltaYAB / delta_XAB), gradientAC = abs(deltaYAC / delta_XAC);
+
+	int errorAB = 0, errorAC = 0;
+	for (int aX = x00, bX = x01, aY = y00, bY = y01; aX <= (steepAB ? y1 : x1) && bX <= (steepAC ? y2 : x2);)
+	{
+		if (steepAB && steepAC) BresenhamLine(aY, aX, bY, bX);
+		else if (steepAB) BresenhamLine(aY, aX, bX, bY);
+		else if (steepAC) BresenhamLine(aX, aY, bY, bX);
+
+		errorAB += gradientAB, errorAC += gradientAC;
+
+		while (errorAB > 0.5f)
+		{
+			aY += signAB;
+			errorAB -= 1;
+		}
+
+		while (errorAC > 0.5f)
+		{
+			bY += signAC;
+			errorAC -= 1;
+		}
+
+		if (aX <= steepAB ? y1 : x1) aX++;
+		if (bX <= steepAC ? y2 : x2) bX++;
+	}
 }
 
 void BresenhamLine(float x0, float y0, float x1, float y1)
 {
+	const int c = 0xFF00FF;
 	bool steep = abs(y1 - y0) > abs(x1 - x0);
-	int c = 0xFF00FF;
 
 	if (steep)
 	{
@@ -205,20 +258,38 @@ void BresenhamLine(float x0, float y0, float x1, float y1)
 	float deltaX = x1 - x0;
 	float deltaY = y1 - y0;
 	int sign = deltaY == 0 ? 0 : (deltaY > 0 ? 1 : -1);
-	float deltaErr = abs(deltaY / deltaX);
+	float gradient = abs(deltaY / deltaX);
 
-	int y = y0;
 	float error = 0;
-	for (int x = x0; x <= x1; x++)
-	{
-		Plot(x, y, c);
-		error += deltaErr;
 
-		while (error >= 0.5f)
+	if (steep)
+	{
+		for (int x = x0, y = y0; x <= x1; x++)
+		{
+			Plot(y, x, c);
+			error += gradient;
+
+			while (error > 0.5f)
+			{
+				y += sign;
+				Plot(y, x, c);
+				error -= 1;
+			}
+		}
+	}
+	else
+	{
+		for (int x = x0, y = y0; x <= x1; x++)
 		{
 			Plot(x, y, c);
-			y += sign;
-			error -= 1;
+			error += gradient;
+
+			while (error >= 0.5f)
+			{
+				y += sign;
+				Plot(x, y, c);
+				error -= 1;
+			}
 		}
 	}
 }
@@ -301,11 +372,7 @@ void WuLine(Line *l)
 
 void Plot(int x, int y, int c)
 {
-	if (x > 0 && y > 0 && x < WINDOW_WIDTH && y < WINDOW_HEIGHT)
-	{
-		int* pix = (int*)surface->pixels;
-		pix[y * ipart(WINDOW_WIDTH) + x] = c;
-	}
+	if (x > 0 && x < WINDOW_WIDTH && y > 0 && y < WINDOW_HEIGHT) pixels[y * ipart(WINDOW_WIDTH) + x] = c;
 }
 
 void PlotA(int x, int y, float a)
@@ -315,6 +382,5 @@ void PlotA(int x, int y, float a)
 
 void ClearScreen(int c)
 {
-	int* pix = (int*)surface->pixels;
-	for (int i = 0; i < WINDOW_HEIGHT * WINDOW_WIDTH; i++) pix[i] = c;
+	for (int i = 0; i < WINDOW_HEIGHT * WINDOW_WIDTH; i++) pixels[i] = c;
 }
