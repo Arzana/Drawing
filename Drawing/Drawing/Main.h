@@ -16,9 +16,8 @@
 #define GetCurrentDir getcwd;
 #endif
 
-#include "Line.h"
 #include "Map.h"
-#include "UtilDefs.h"
+#include "Triangle.h"
 
 /* The aspect ratio of the screen. */
 #define ASPR				(WINDOW_WIDTH / WINDOW_HEIGHT)

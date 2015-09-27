@@ -52,12 +52,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Eigenaar\Documents\GitHub\Drawing\Third Party\SDL2-2.0.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Eigenaar\Documents\GitHub\Drawing\Third Party\SDL2-2.0.3\include;%(AdditionalIncludeDirectories);C:\Users\Fam. de Jong\Documents\GitHub\Drawing\Third Party\SDL2-2.0.3\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Eigenaar\Documents\GitHub\Drawing\Third Party\SDL2-2.0.3\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Eigenaar\Documents\GitHub\Drawing\Third Party\SDL2-2.0.3\lib\x86;%(AdditionalLibraryDirectories);C:\Users\Fam. de Jong\Documents\GitHub\Drawing\Third Party\SDL2-2.0.3\lib\x86</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/verbose:lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -71,14 +71,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Fam. de Jong\Documents\Visual Studio 2013\Projects\C++\SDL2-2.0.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Fam. de Jong\Documents\Visual Studio 2013\Projects\C++\SDL2-2.0.3\include;%(AdditionalIncludeDirectories);C:\Users\Fam. de Jong\Documents\GitHub\Drawing\Third Party\SDL2-2.0.3\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Users\Fam. de Jong\Documents\Visual Studio 2013\Projects\C++\SDL2-2.0.3\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Fam. de Jong\Documents\Visual Studio 2013\Projects\C++\SDL2-2.0.3\lib\x86;%(AdditionalLibraryDirectories);C:\Users\Fam. de Jong\Documents\GitHub\Drawing\Third Party\SDL2-2.0.3\lib\x86</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/verbose:lib %(AdditionalOptions)</AdditionalOptions>
     </Link>

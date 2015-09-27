@@ -14,6 +14,9 @@ public:
 
 	Triangle(const Vector3& a, const Vector3& b, const Vector3& c);
 	static int CheckVisibility(Triangle *triangles, int length);
+private:
+	static bool TriangleClip(Triangle& triangle);
+	std::vector<Vector3*> GetVertices();
 };
 
 #endif

@@ -164,9 +164,8 @@ void RenderScreen()
 	ClearScreen(0x000000);
 	for (int i = 0; i < vertexLength; i += VerticesInTriangle)
 	{
-		Vector3 v0 = vertices[i], v1 = vertices[i + 1], v2 = vertices[i + 2];
-		// To do clip triangle inside viewport or don't draw.
-		RenderTriangle(v0.X, v0.Y, v1.X, v1.Y, v2.X, v2.Y);
+		Triangle current = Triangle(vertices[i], vertices[i + 1], vertices[i + 2]);
+		if (Triangle::CheckVisibility(&current, 1)) RenderTriangle(current.A.X, current.A.Y, current.B.X, current.B.Y, current.C.X, current.C.Y);
 	}
 
 	// End rendering

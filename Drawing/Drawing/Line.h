@@ -19,11 +19,11 @@ public:
 	/*	Check is the lines are visible to the screen and change or remove them is they are not. 
 		Returns the new length of the line pointer. */
 	static int CheckVisiblity(Line* lines, int length);
+	/* Cohen-Sutherland clipping algorithm clips a line from P0 = (x0, y0) to P1 = (x1, y1) agains a rectangle with diagonal from (xMin, YMin) to (xMax, yMax). */
+	static bool CohenSutherlandLineClip(Line& l);
 private:
 	/* Compute the bit code for a point (x, y) using clip rectangle bounded diagonally by (xMin, yMin), and (yMax, yMax). */
 	static int ComputeOutCode(float x, float y);
-	/* Cohen-Sutherland clipping algorithm clips a line from P0 = (x0, y0) to P1 = (x1, y1) agains a rectangle with diagonal from (xMin, YMin) to (xMax, yMax). */
-	static bool CohenSutherlandLineClip(Line& l);
 };
 
 #endif
