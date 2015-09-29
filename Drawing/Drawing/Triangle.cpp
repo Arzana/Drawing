@@ -35,6 +35,8 @@ bool Triangle::TriangleClip(Triangle& triangle)
 	for (int j = 0; j < vertices.size(); j++)
 	{
 		Line edge = Line(*vertices[j], *vertices[(j + 1) % vertices.size()]);
+		if (edge.Get2DLength() == 0) return false;
+
 		bool visible = Line::CohenSutherlandLineClip(edge);
 
 		*vertices[j] = edge.A;
@@ -43,7 +45,7 @@ bool Triangle::TriangleClip(Triangle& triangle)
 		if (!visible)
 		{
 			failIndex++;
-			if (failIndex > 1) return false;
+			if (failIndex > 1) return false;	// 2 edges have already been deemed hidden wich meens all 3 vertices are hidden.
 		}
 	}
 

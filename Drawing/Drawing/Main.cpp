@@ -79,12 +79,12 @@ void InitWindow()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
-		ThrowFatalError(SDL_GetError());
+		ThrowFatalError(SDL_GetError());	// SDL failed to initialze the graphics so throw the last known error.
 		exit(EXIT_FAILURE);
 	}
 
 	window = SDL_CreateWindow("Drawing_Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-	surface = SDL_GetWindowSurface(window);
+	surface = SDL_GetWindowSurface(window);	// Create the new window in the center of the screen and show it.
 }
 
 void InitMap()
@@ -92,15 +92,15 @@ void InitMap()
 	map = new Map();
 	char cCurrentPath[FILENAME_MAX];
 	if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
-	{
+	{										// Could not get the current directory (Admin only?)
 		ThrowFatalError("Could not get current directory.");
 		exit(EXIT_FAILURE);
 	}
 
-	strcat_s(cCurrentPath, "\\map.txt");
+	strcat_s(cCurrentPath, "\\map.txt");	// Add the given string to the current path to get the map path.
 
 	if (!map->Load(cCurrentPath))
-	{
+	{										// An error occured while loading the map so throw the last known error.
 		ThrowFatalError(map->GetError());
 		exit(EXIT_FAILURE);
 	}
@@ -135,6 +135,7 @@ void DestroyWindow()
 
 void RenderScreen()
 {
+	/* Construct the vertex buffer. */
 	const int VerticesInTriangle = 3;
 	int mapLength = map->GetLength();
 	int vertexLength = VerticesInTriangle * mapLength;
@@ -144,31 +145,40 @@ void RenderScreen()
 	for (int sectorIndex = 0; sectorIndex < mapLength; sectorIndex++)
 	{
 		Sector *curSector = map->GetSector(sectorIndex);
+		float sectorCeiling = curSector->GetCeiling();
 		const Vector3 **sectorVertices = curSector->GetVertices();
 
-		for (int i = 0; i < VerticesInTriangle; i++) vertices[vertexIndex++] = Vector3(sectorVertices[i]->X, curSector->GetCeiling(), sectorVertices[i]->Z);
+		for (int i = 0; i < VerticesInTriangle; i++)
+		{
+			vertices[vertexIndex++] = Vector3(sectorVertices[i]->X, sectorCeiling, sectorVertices[i]->Z);
+		}
 
 		delete sectorVertices;
 	}
 
+	/* Initalize the matrices. */
 	Vector3 targ = *player + rotation->GetForward();
 	Matrix modelM = MTRX_Identity;
 	Matrix viewM = Matrix::View(*player, targ, rotation->GetUp());
 	Matrix projM = Matrix::Perspective(60, ASPR, PLANE_NEAR, PLANE_FAR);
 	Matrix mvp = modelM * viewM * projM;
 
+	/* Transform the vertices. */
 	Matrix::Transform(&mvp, vertices, vertexLength);
 
-	// Start rendering
+	/* Start rendering. */
 	pixels = (int*)surface->pixels;
 	ClearScreen(0x000000);
 	for (int i = 0; i < vertexLength; i += VerticesInTriangle)
 	{
 		Triangle current = Triangle(vertices[i], vertices[i + 1], vertices[i + 2]);
-		if (Triangle::CheckVisibility(&current, 1)) RenderTriangle(current.A.X, current.A.Y, current.B.X, current.B.Y, current.C.X, current.C.Y);
+		if (Triangle::CheckVisibility(&current, 1))
+		{
+			RenderTriangle(current.A.X, current.A.Y, current.B.X, current.B.Y, current.C.X, current.C.Y);
+		}
 	}
 
-	// End rendering
+	/* End rendering. */
 	SDL_UpdateWindowSurface(window);
 	pixels = NULL;
 	free(vertices);
@@ -176,11 +186,11 @@ void RenderScreen()
 
 void RenderTriangle(float x0, float y0, float x1, float y1, float x2, float y2)
 {
-	const int c = 0xFF00FF;
+	const int c = 0xFF00FF;							// Temp constant color.
 	float x00 = x0, x01 = x0, y00 = y0, y01 = y0;
 
-	bool steepAB = abs(y1 - y00) > abs(x1 - x00);
-	bool steepAC = abs(y2 - y01) > abs(x2 - x01);
+	bool steepAB = abs(y1 - y00) > abs(x1 - x00);	// Check if edge AB is steep.
+	bool steepAC = abs(y2 - y01) > abs(x2 - x01);	// Check if edge AC is steep.
 
 	if (steepAB)
 	{
@@ -206,17 +216,18 @@ void RenderTriangle(float x0, float y0, float x1, float y1, float x2, float y2)
 		swap(y01, y2);
 	}
 
-	float delta_XAB = x1 - x00, delta_XAC = x2 - x01;
-	float deltaYAB = y1 - y00, deltaYAC = y2 - y01;
-	int signAB = deltaYAB == 0 ? 0 : (deltaYAB > 0 ? 1 : -1), signAC = deltaYAC == 0 ? 0 : (deltaYAC > 0 ? 1 : -1);
-	float gradientAB = abs(deltaYAB / delta_XAB), gradientAC = abs(deltaYAC / delta_XAC);
+	float delta_XAB = x1 - x00, delta_XAC = x2 - x01;																	// Get the delta x for both edges.
+	float deltaYAB = y1 - y00, deltaYAC = y2 - y01;																		// Get the delta y for both edges.
+	int signAB = (deltaYAB == 0 ? 0 : (deltaYAB > 0 ? 1 : -1)), signAC = (deltaYAC == 0 ? 0 : (deltaYAC > 0 ? 1 : -1));	// Get the sign for both edges.
+	float gradientAB = abs(deltaYAB / delta_XAB), gradientAC = abs(deltaYAC / delta_XAC);								// Get the delta error for both edges.
 
 	int errorAB = 0, errorAC = 0;
-	for (int aX = x00, bX = x01, aY = y00, bY = y01; aX <= (steepAB ? y1 : x1) && bX <= (steepAC ? y2 : x2);)
+	for (int aX = x00, bX = x01, aY = y00, bY = y01; aX <= (steepAB ? y1 : x1) || bX <= (steepAC ? y2 : x2);)
 	{
 		if (steepAB && steepAC) BresenhamLine(aY, aX, bY, bX);
 		else if (steepAB) BresenhamLine(aY, aX, bX, bY);
 		else if (steepAC) BresenhamLine(aX, aY, bY, bX);
+		else BresenhamLine(aX, aY, bX, bY);
 
 		errorAB += gradientAB, errorAC += gradientAC;
 
@@ -224,23 +235,33 @@ void RenderTriangle(float x0, float y0, float x1, float y1, float x2, float y2)
 		{
 			aY += signAB;
 			errorAB -= 1;
+
+			if (steepAB && steepAC) BresenhamLine(aY, aX, bY, bX);
+			else if (steepAB) BresenhamLine(aY, aX, bX, bY);
+			else if (steepAC) BresenhamLine(aX, aY, bY, bX);
+			else BresenhamLine(aX, aY, bX, bY);
 		}
 
 		while (errorAC > 0.5f)
 		{
 			bY += signAC;
 			errorAC -= 1;
+
+			if (steepAB && steepAC) BresenhamLine(aY, aX, bY, bX);
+			else if (steepAB) BresenhamLine(aY, aX, bX, bY);
+			else if (steepAC) BresenhamLine(aX, aY, bY, bX);
+			else BresenhamLine(aX, aY, bX, bY);
 		}
 
-		if (aX <= steepAB ? y1 : x1) aX++;
-		if (bX <= steepAC ? y2 : x2) bX++;
+		if (aX <= (steepAB ? y1 : x1)) aX++;
+		if (bX <= (steepAC ? y2 : x2)) bX++;
 	}
 }
 
 void BresenhamLine(float x0, float y0, float x1, float y1)
 {
-	const int c = 0xFF00FF;
-	bool steep = abs(y1 - y0) > abs(x1 - x0);
+	const int c = 0xFF00FF;						// Temp constant color.
+	bool steep = abs(y1 - y0) > abs(x1 - x0);	// Check if the line is steep.
 
 	if (steep)
 	{
@@ -317,7 +338,7 @@ void WuLine(Line *l)
 	int xEnd = round(l->A.X);
 	double yEnd = l->A.Y + gradient * (xEnd - l->A.X);
 	double xGap = rfpart(l->A.X + 0.5);
-	int xPxL1 = xEnd;				// This will be used in the main loop.
+	int xPxL1 = xEnd;					// This will be used in the main loop.
 	int yPxL1 = ipart(yEnd);
 
 	if (steep)

@@ -15,6 +15,7 @@ public:
 	/* Get the error thrown by Load. */
 	const char* GetError();
 	Sector* GetSector(int index);
+	/* Get the sector count. */
 	int GetLength();
 
 private:

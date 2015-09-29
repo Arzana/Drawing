@@ -7,7 +7,7 @@
 #define WINDOW_WIDTH	800.0f
 
 /* Calculate the cotangent of x.*/
-#define cot(d)					(1 / tanf(d))
+#define cot(x)					(1 / tanf(x))
 /* Clamp x between a min and max. */
 #define clamp(mi, ma, x)		((x) < (mi) ? (mi) : ((x) > (ma) ? (ma) : (x)))
 /* Get x sqaured. */

@@ -123,3 +123,11 @@ void Line::operator *=(const Matrix& m)
 	A = m >> A;
 	B = m >> B;
 }
+
+float Line::Get2DLength() const
+{
+	float diffX = fmax(A.X, B.X) - fmin(A.X, B.X);
+	float diffY = fmax(A.Y, B.Y) - fmin(A.Y, B.Y);
+
+	return sqrtf(square(diffX) + square(diffY));
+}

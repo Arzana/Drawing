@@ -31,15 +31,25 @@
 /* Convert a RBGA value (with 0 ≤ a ≤ 1) to a packed integer color.*/
 #define pack(r, g, b, a)	((int(r * a) << 16) + (int(g * a) << 8) + int(b * a))
 
+/* Initialize the SDL window and surface. */
 void InitWindow();
+/* Initialize and load the map. */
 void InitMap();
+/* Show an error message in a new window. */
 void ThrowFatalError(const char* message);
+/* Destroy the SDL window and surface. */
 void DestroyWindow();
+/* Render the current screen surface. */
 void RenderScreen();
+/* Render a triangle that is visible to the camera (Not safe). */
 void RenderTriangle(float x0, float y0, float x1, float y1, float x2, float y2);
+/* Draw a line using Bresenham's algorithm (Not safe). */
 void BresenhamLine(float x0, float y0, float x1, float y1);
+/* Draw a line using Xiaolin Wu's algorithm (Not safe) */
 void WuLine(Line *line);
+/* Plot a pixel onto the screen. */
 void Plot(int x, int y, int color);
+/* Plot a pixel onto the screen with a given alpha. */
 void PlotA(int x, int y, float alpha);
 void ClearScreen(int color);
 

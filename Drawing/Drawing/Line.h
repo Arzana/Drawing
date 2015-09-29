@@ -21,6 +21,8 @@ public:
 	static int CheckVisiblity(Line* lines, int length);
 	/* Cohen-Sutherland clipping algorithm clips a line from P0 = (x0, y0) to P1 = (x1, y1) agains a rectangle with diagonal from (xMin, YMin) to (xMax, yMax). */
 	static bool CohenSutherlandLineClip(Line& l);
+	/* Get the length of the line. */
+	float Get2DLength() const;
 private:
 	/* Compute the bit code for a point (x, y) using clip rectangle bounded diagonally by (xMin, yMin), and (yMax, yMax). */
 	static int ComputeOutCode(float x, float y);
