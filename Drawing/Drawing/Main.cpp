@@ -160,7 +160,7 @@ void RenderScreen()
 	Vector3 targ = *player + rotation->GetForward();
 	Matrix modelM = MTRX_Identity;
 	Matrix viewM = Matrix::View(*player, targ, rotation->GetUp());
-	Matrix projM = Matrix::Perspective(60, ASPR, PLANE_NEAR, PLANE_FAR);
+	Matrix projM = Matrix::Perspective(60, ASPR, 0.1f, PLANE_FAR);
 	Matrix mvp = modelM * viewM * projM;
 
 	/* Transform the vertices. */
@@ -172,10 +172,7 @@ void RenderScreen()
 	for (int i = 0; i < vertexLength; i += VerticesInTriangle)
 	{
 		Triangle current = Triangle(vertices[i], vertices[i + 1], vertices[i + 2]);
-		if (Triangle::CheckVisibility(&current, 1))
-		{
-			RenderTriangle(current.A.X, current.A.Y, current.B.X, current.B.Y, current.C.X, current.C.Y);
-		}
+		if (Triangle::CheckVisibility(&current, 1)) RenderTriangle(&current, 0x00FF00);
 	}
 
 	/* End rendering. */
@@ -184,83 +181,58 @@ void RenderScreen()
 	free(vertices);
 }
 
-void RenderTriangle(float x0, float y0, float x1, float y1, float x2, float y2)
+void FillBottomFlatTriangle(Triangle *t, int c)
 {
-	const int c = 0xFF00FF;							// Temp constant color.
-	float x00 = x0, x01 = x0, y00 = y0, y01 = y0;
+	float invSlope1 = (t->B.X - t->A.X) / (t->B.Y - t->A.Y);
+	float invSlope2 = (t->C.X - t->A.X) / (t->C.Y - t->A.Y);
 
-	bool steepAB = abs(y1 - y00) > abs(x1 - x00);	// Check if edge AB is steep.
-	bool steepAC = abs(y2 - y01) > abs(x2 - x01);	// Check if edge AC is steep.
+	float curX1 = t->A.X;
+	float curX2 = t->A.X;
 
-	if (steepAB)
+	for (int scanLineY = t->A.Y; scanLineY <= t->B.Y; scanLineY++)
 	{
-		swap(x00, y00);
-		swap(x1, y1);
-	}
-
-	if (steepAC)
-	{
-		swap(x01, y01);
-		swap(x2, y2);
-	}
-
-	if (x00 > x1)
-	{
-		swap(x00, x1);
-		swap(y00, y1);
-	}
-
-	if (x01 > x2)
-	{
-		swap(x01, x2);
-		swap(y01, y2);
-	}
-
-	float delta_XAB = x1 - x00, delta_XAC = x2 - x01;																	// Get the delta x for both edges.
-	float deltaYAB = y1 - y00, deltaYAC = y2 - y01;																		// Get the delta y for both edges.
-	int signAB = (deltaYAB == 0 ? 0 : (deltaYAB > 0 ? 1 : -1)), signAC = (deltaYAC == 0 ? 0 : (deltaYAC > 0 ? 1 : -1));	// Get the sign for both edges.
-	float gradientAB = abs(deltaYAB / delta_XAB), gradientAC = abs(deltaYAC / delta_XAC);								// Get the delta error for both edges.
-
-	int errorAB = 0, errorAC = 0;
-	for (int aX = x00, bX = x01, aY = y00, bY = y01; aX <= (steepAB ? y1 : x1) || bX <= (steepAC ? y2 : x2);)
-	{
-		if (steepAB && steepAC) BresenhamLine(aY, aX, bY, bX);
-		else if (steepAB) BresenhamLine(aY, aX, bX, bY);
-		else if (steepAC) BresenhamLine(aX, aY, bY, bX);
-		else BresenhamLine(aX, aY, bX, bY);
-
-		errorAB += gradientAB, errorAC += gradientAC;
-
-		while (errorAB > 0.5f)
-		{
-			aY += signAB;
-			errorAB -= 1;
-
-			if (steepAB && steepAC) BresenhamLine(aY, aX, bY, bX);
-			else if (steepAB) BresenhamLine(aY, aX, bX, bY);
-			else if (steepAC) BresenhamLine(aX, aY, bY, bX);
-			else BresenhamLine(aX, aY, bX, bY);
-		}
-
-		while (errorAC > 0.5f)
-		{
-			bY += signAC;
-			errorAC -= 1;
-
-			if (steepAB && steepAC) BresenhamLine(aY, aX, bY, bX);
-			else if (steepAB) BresenhamLine(aY, aX, bX, bY);
-			else if (steepAC) BresenhamLine(aX, aY, bY, bX);
-			else BresenhamLine(aX, aY, bX, bY);
-		}
-
-		if (aX <= (steepAB ? y1 : x1)) aX++;
-		if (bX <= (steepAC ? y2 : x2)) bX++;
+		BresenhamLine(ipart(curX1), scanLineY, ipart(curX2), scanLineY, c);
+		curX1 += invSlope1;
+		curX2 += invSlope2;
 	}
 }
 
-void BresenhamLine(float x0, float y0, float x1, float y1)
+void FillTopFlatTriangle(Triangle *t, int c)
 {
-	const int c = 0xFF00FF;						// Temp constant color.
+	float invSlope1 = (t->C.X - t->A.X) / (t->C.Y - t->A.Y);
+	float invSlope2 = (t->C.X - t->B.X) / (t->C.Y - t->B.Y);
+
+	float curX1 = t->C.X;
+	float curx2 = t->C.X;
+
+	for (int scanlineY = t->C.Y; scanlineY > t->A.Y; scanlineY--)
+	{
+		curX1 -= invSlope1;
+		curx2 -= invSlope2;
+		BresenhamLine(ipart(curX1), scanlineY, ipart(curx2), scanlineY, c);
+	}
+}
+
+void RenderTriangle(Triangle *t, int c)
+{
+	t->SortVerticesByY();
+
+	if (t->B.Y == t->C.Y) FillBottomFlatTriangle(t, c);
+	else if (t->B.Y == t->A.Y) FillTopFlatTriangle(t, c);
+	else
+	{
+		Vector3 v4 = Vector3(ipart(t->A.X + ((float)(t->B.Y - t->A.Y) / (float)(t->C.Y - t->A.Y)) * (t->C.X - t->A.X)), t->B.Y, 0);
+
+		Triangle *temp = &Triangle(t->A, t->B, v4);
+		FillBottomFlatTriangle(temp, c);
+
+		t = &Triangle(t->B, v4, t->C);
+		FillTopFlatTriangle(t, c);
+	}
+}
+
+void BresenhamLine(float x0, float y0, float x1, float y1, int c)
+{
 	bool steep = abs(y1 - y0) > abs(x1 - x0);	// Check if the line is steep.
 
 	if (steep)
@@ -314,7 +286,7 @@ void BresenhamLine(float x0, float y0, float x1, float y1)
 	}
 }
 
-void WuLine(Line *l)
+void WuLine(Line *l, int c)
 {
 	bool steep = abs(l->B.Y - l->A.Y) > abs(l->B.X - l->A.X);
 
@@ -343,13 +315,13 @@ void WuLine(Line *l)
 
 	if (steep)
 	{
-		PlotA(yPxL1, xPxL1, rfpart(yEnd) * xGap);
-		PlotA(yPxL1 + 1, xPxL1, fpart(yEnd) * xGap);
+		PlotA(yPxL1, xPxL1, rfpart(yEnd) * xGap, c);
+		PlotA(yPxL1 + 1, xPxL1, fpart(yEnd) * xGap, c);
 	}
 	else
 	{
-		PlotA(xPxL1, yPxL1, rfpart(yEnd) * xGap);
-		PlotA(xPxL1, yPxL1 + 1, fpart(yEnd) * xGap);
+		PlotA(xPxL1, yPxL1, rfpart(yEnd) * xGap, c);
+		PlotA(xPxL1, yPxL1 + 1, fpart(yEnd) * xGap, c);
 	}
 
 	double intery = yEnd + gradient;	// First y-intersection for the main loop.
@@ -363,13 +335,13 @@ void WuLine(Line *l)
 
 	if (steep)
 	{
-		PlotA(yPxL2, xPxL2, rfpart(yEnd) * xGap);
-		PlotA(yPxL2 + 1, xPxL2, fpart(yEnd) * xGap);
+		PlotA(yPxL2, xPxL2, rfpart(yEnd) * xGap, c);
+		PlotA(yPxL2 + 1, xPxL2, fpart(yEnd) * xGap, c);
 	}
 	else
 	{
-		PlotA(xPxL2, yPxL2, rfpart(yEnd) * xGap);
-		PlotA(xPxL2, yPxL2 + 1, fpart(yEnd) * xGap);
+		PlotA(xPxL2, yPxL2, rfpart(yEnd) * xGap, c);
+		PlotA(xPxL2, yPxL2 + 1, fpart(yEnd) * xGap, c);
 	}
 
 	// Main loop.
@@ -377,13 +349,13 @@ void WuLine(Line *l)
 	{
 		if (steep)
 		{
-			PlotA(ipart(intery), x, rfpart(intery));
-			PlotA(ipart(intery) + 1, x, fpart(intery));
+			PlotA(ipart(intery), x, rfpart(intery), c);
+			PlotA(ipart(intery) + 1, x, fpart(intery), c);
 		}
 		else
 		{
-			PlotA(x, ipart(intery), rfpart(intery));
-			PlotA(x, ipart(intery) + 1, fpart(intery));
+			PlotA(x, ipart(intery), rfpart(intery), c);
+			PlotA(x, ipart(intery) + 1, fpart(intery), c);
 		}
 
 		intery += gradient;
@@ -395,9 +367,9 @@ void Plot(int x, int y, int c)
 	if (x > 0 && x < WINDOW_WIDTH && y > 0 && y < WINDOW_HEIGHT) pixels[y * ipart(WINDOW_WIDTH) + x] = c;
 }
 
-void PlotA(int x, int y, float a)
+void PlotA(int x, int y, float a, int c)
 {
-	Plot(x, y, pack(255, 0, 255, a));
+	Plot(x, y, pack(((c >> 16) & 255), (c & 255), ((c >> 8) & 255), a));
 }
 
 void ClearScreen(int c)

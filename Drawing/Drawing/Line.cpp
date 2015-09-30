@@ -14,6 +14,12 @@ Line::Line(const Vector3& a, const Vector3& b)
 	B = Vector3(b);
 }
 
+Line::Line(float x0, float y0, float x1, float y1)
+{
+	A = Vector3(x0, y0, 0);
+	B = Vector3(x1, y1, 0);
+}
+
 OutCode Line::ComputeOutCode(float x, float y)
 {
 	OutCode code = INSIDE;						// Initialised as being inside of the clip window.

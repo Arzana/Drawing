@@ -16,6 +16,7 @@ public:
 	/*	Check is the triangles are visible to the screen and change or remove them is they are not.
 	Returns the new length of the triangle pointer. */
 	static int CheckVisibility(Triangle *triangles, int length);
+	void SortVerticesByY();
 private:
 	static bool TriangleClip(Triangle& triangle);
 	std::vector<Vector3*> GetVertices();

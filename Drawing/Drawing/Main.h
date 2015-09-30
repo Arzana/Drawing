@@ -41,16 +41,20 @@ void ThrowFatalError(const char* message);
 void DestroyWindow();
 /* Render the current screen surface. */
 void RenderScreen();
+/* Render a triangle with a flat bottom. */
+void FillBottomFlatTriangle(Triangle *t, int color);
+/* Render a triangle with a flat top. */
+void FillTopFlatTriangle(Triangle *t, int color);
 /* Render a triangle that is visible to the camera (Not safe). */
-void RenderTriangle(float x0, float y0, float x1, float y1, float x2, float y2);
+void RenderTriangle(Triangle *t, int color);
 /* Draw a line using Bresenham's algorithm (Not safe). */
-void BresenhamLine(float x0, float y0, float x1, float y1);
+void BresenhamLine(float x0, float y0, float x1, float y1, int color);
 /* Draw a line using Xiaolin Wu's algorithm (Not safe) */
-void WuLine(Line *line);
+void WuLine(Line *line, int color);
 /* Plot a pixel onto the screen. */
 void Plot(int x, int y, int color);
 /* Plot a pixel onto the screen with a given alpha. */
-void PlotA(int x, int y, float alpha);
+void PlotA(int x, int y, float alpha, int color);
 void ClearScreen(int color);
 
 #endif

@@ -61,3 +61,30 @@ std::vector<Vector3*> Triangle::GetVertices()
 
 	return vertices;
 }
+
+void Triangle::SortVerticesByY()
+{
+	Vector3 high = A.Y < B.Y ? (A.Y < C.Y ? A : (B.Y < C.Y ? B : C)) : (B.Y < C.Y ? B : (C.Y < A.Y ? C : A));
+	Vector3 low = A.Y > B.Y ? (A.Y > C.Y ? A : (B.Y > C.Y ? B : C)) : (B.Y > C.Y ? B : (C.Y > A.Y ? C : A));
+	Vector3 mid;
+
+	if (high == A)
+	{
+		if (low == B) mid = C;
+		else mid = B;
+	}
+	else if (high == B)
+	{
+		if (low == A) mid = C;
+		else mid = A;
+	}
+	else
+	{
+		if (low == A) mid = B;
+		else mid = A;
+	}
+
+	A = high;
+	B = mid;
+	C = low;
+}

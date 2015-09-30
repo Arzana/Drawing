@@ -13,6 +13,7 @@ public:
 	void operator *=(const Matrix& m);
 
 	Line(const Vector3& a, const Vector3& b);
+	Line(float x0, float y0, float x1, float y1);
 
 	/* Multiplies the given line pointers by the givven specified matrix. */
 	static void Multiply(const Matrix& m, int length, Line* lines);
