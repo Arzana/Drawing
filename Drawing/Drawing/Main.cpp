@@ -138,7 +138,7 @@ void RenderScreen()
 	/* Construct the vertex buffer. */
 	const int VerticesInTriangle = 3;
 	int mapLength = map->GetLength();
-	int vertexLength = VerticesInTriangle * mapLength;
+	int vertexLength = VerticesInTriangle * mapLength * 2;
 	Vector3 *vertices = (Vector3*)malloc(sizeof(Vector3) * vertexLength);
 
 	int vertexIndex = 0;
@@ -151,6 +151,11 @@ void RenderScreen()
 		for (int i = 0; i < VerticesInTriangle; i++)
 		{
 			vertices[vertexIndex++] = Vector3(sectorVertices[i]->X, sectorCeiling, sectorVertices[i]->Z);
+		}
+
+		for (int i = 0; i < VerticesInTriangle; i++)
+		{
+			vertices[vertexIndex++] = *sectorVertices[i];
 		}
 
 		delete sectorVertices;
@@ -172,7 +177,7 @@ void RenderScreen()
 	for (int i = 0; i < vertexLength; i += VerticesInTriangle)
 	{
 		Triangle current = Triangle(vertices[i], vertices[i + 1], vertices[i + 2]);
-		if (Triangle::CheckVisibility(&current, 1)) RenderTriangle(&current, 0x00FF00);
+		if (/*Triangle::CheckVisibility(&current, 1)*/1) RenderTriangle(&current, 0x00FF00);
 	}
 
 	/* End rendering. */
@@ -191,7 +196,7 @@ void FillBottomFlatTriangle(Triangle *t, int c)
 
 	for (int scanLineY = t->A.Y; scanLineY <= t->B.Y; scanLineY++)
 	{
-		BresenhamLine(ipart(curX1), scanLineY, ipart(curX2), scanLineY, c);
+		BresenhamLine(round(curX1), scanLineY, round(curX2), scanLineY, c);
 		curX1 += invSlope1;
 		curX2 += invSlope2;
 	}
@@ -209,7 +214,7 @@ void FillTopFlatTriangle(Triangle *t, int c)
 	{
 		curX1 -= invSlope1;
 		curx2 -= invSlope2;
-		BresenhamLine(ipart(curX1), scanlineY, ipart(curx2), scanlineY, c);
+		BresenhamLine(round(curX1), scanlineY, round(curx2), scanlineY, c);
 	}
 }
 
@@ -364,7 +369,10 @@ void WuLine(Line *l, int c)
 
 void Plot(int x, int y, int c)
 {
-	if (x > 0 && x < WINDOW_WIDTH && y > 0 && y < WINDOW_HEIGHT) pixels[y * ipart(WINDOW_WIDTH) + x] = c;
+	if (x > 0 && x < WINDOW_WIDTH && y > 0 && y < WINDOW_HEIGHT)
+	{
+		pixels[y * ipart(WINDOW_WIDTH) + x] = c;
+	}
 }
 
 void PlotA(int x, int y, float a, int c)
