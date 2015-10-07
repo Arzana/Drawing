@@ -119,17 +119,6 @@ int Line::CheckVisiblity(Line* lines, int length)
 	return length;
 }
 
-void Line::Multiply(const Matrix& m, int length, Line* l)
-{
-	for (int i = 0; i < length; i++) l[i] *= m;
-}
-
-void Line::operator *=(const Matrix& m)
-{
-	A = m >> A;
-	B = m >> B;
-}
-
 float Line::Get2DLength() const
 {
 	float diffX = fmax(A.X, B.X) - fmin(A.X, B.X);

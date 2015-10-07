@@ -139,7 +139,7 @@ void RenderScreen()
 	const int VerticesInTriangle = 3;
 	int mapLength = map->GetLength();
 	int vertexLength = VerticesInTriangle * mapLength * 2;
-	Vector3 *vertices = (Vector3*)malloc(sizeof(Vector3) * vertexLength);
+	Vector3 *cartesianBuffer = (Vector3*)malloc(sizeof(Vector3) * vertexLength);
 
 	int vertexIndex = 0;
 	for (int sectorIndex = 0; sectorIndex < mapLength; sectorIndex++)
@@ -150,12 +150,12 @@ void RenderScreen()
 
 		for (int i = 0; i < VerticesInTriangle; i++)
 		{
-			vertices[vertexIndex++] = Vector3(sectorVertices[i]->X, sectorCeiling, sectorVertices[i]->Z);
+			cartesianBuffer[vertexIndex++] = Vector3(sectorVertices[i]->X, sectorCeiling, sectorVertices[i]->Z);
 		}
 
 		for (int i = 0; i < VerticesInTriangle; i++)
 		{
-			vertices[vertexIndex++] = *sectorVertices[i];
+			cartesianBuffer[vertexIndex++] = *sectorVertices[i];
 		}
 
 		delete sectorVertices;
@@ -169,21 +169,25 @@ void RenderScreen()
 	Matrix mvp = modelM * viewM * projM;
 
 	/* Transform the vertices. */
-	Matrix::Transform(&mvp, vertices, vertexLength);
+	Vector4 *homogenousBuffer = (Vector4*)malloc(sizeof(Vector4) * vertexLength);
+	Matrix::Transform(&mvp, cartesianBuffer, homogenousBuffer, vertexLength);
+
+	/* Clip the triangles. */
+	vertexLength = Triangle::CheckVisibility(homogenousBuffer, vertexLength);
+	Vector4::ToCartesian(homogenousBuffer, cartesianBuffer, vertexLength);
 
 	/* Start rendering. */
-	pixels = (int*)surface->pixels;
-	ClearScreen(0x000000);
-	for (int i = 0; i < vertexLength; i += VerticesInTriangle)
+	for (int i = 0; i < vertexLength;)
 	{
-		Triangle current = Triangle(vertices[i], vertices[i + 1], vertices[i + 2]);
-		if (/*Triangle::CheckVisibility(&current, 1)*/1) RenderTriangle(&current, 0x00FF00);
+		Triangle cur = Triangle(cartesianBuffer[i++], cartesianBuffer[i++], cartesianBuffer[i++]);
+		RenderTriangle(&cur, 0xFF00FF);
 	}
 
 	/* End rendering. */
-	SDL_UpdateWindowSurface(window);
 	pixels = NULL;
-	free(vertices);
+	free(homogenousBuffer);
+	free(cartesianBuffer);
+	SDL_UpdateWindowSurface(window);
 }
 
 void FillBottomFlatTriangle(Triangle *t, int c)
@@ -226,7 +230,7 @@ void RenderTriangle(Triangle *t, int c)
 	else if (t->B.Y == t->A.Y) FillTopFlatTriangle(t, c);
 	else
 	{
-		Vector3 v4 = Vector3(ipart(t->A.X + ((float)(t->B.Y - t->A.Y) / (float)(t->C.Y - t->A.Y)) * (t->C.X - t->A.X)), t->B.Y, 0);
+		Vector2 v4 = Vector2(ipart(t->A.X + ((float)(t->B.Y - t->A.Y) / (float)(t->C.Y - t->A.Y)) * (t->C.X - t->A.X)), t->B.Y);
 
 		Triangle *temp = &Triangle(t->A, t->B, v4);
 		FillBottomFlatTriangle(temp, c);

@@ -1,7 +1,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include "Vector3.h"
+#include "Vector4.h"
 
 struct Matrix
 {
@@ -13,7 +13,7 @@ public:
 
 	Matrix operator *(const Matrix& other) const;
 	void operator *=(const Matrix& other);
-	Vector3 operator >>(const Vector3& vect) const;
+	Vector4 operator >>(const Vector3& vect) const;
 
 	Matrix();
 	Matrix(float m11, float m12, float m13, float m14,
@@ -42,7 +42,7 @@ public:
 	/* Translate the matrix to a specified amount. */
 	static Matrix Translation(const Vector3& pos);
 	/* Transforms a array of vector3. */
-	static void Transform(Matrix* matrix, Vector3* source, int length);
+	static void Transform(Matrix *matrix, Vector3 *source, Vector4 *destination, int length);
 	/* Get the backward vector of the specified matrix. */
 	Vector3 GetBackward() const;
 	/* Get the down vector of the specified matrix. */

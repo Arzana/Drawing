@@ -247,20 +247,20 @@ void Matrix::operator*=(const Matrix& o)
 	M44	= m44;
 }
 
-Vector3 Matrix::operator>>(const Vector3& v) const
+Vector4 Matrix::operator>>(const Vector3& v) const
 {
 	float x = (v.X * M11) + (v.Y * M21) + (v.Z * M31) + M41;
 	float y = (v.X * M12) + (v.Y * M22) + (v.Z * M32) + M42;
 	float z = (v.X * M13) + (v.Y * M23) + (v.Z * M33) + M43;
 	float w = (v.X * M14) + (v.Y * M24) + (v.Z * M34) + M44;
 
-	return Vector3(x, y, z) * -w;
+	return Vector4(x, y, z, w);
 }
 
-void Matrix::Transform(Matrix* m, Vector3* source, int length)
+void Matrix::Transform(Matrix *m, Vector3 *source, Vector4 *dest, int length)
 {
 	for (int i = 0; i < length; i++)
 	{
-		source[i] = *m >> source[i];
+		dest[i] = *m >> source[i];
 	}
 }

@@ -10,13 +10,9 @@ public:
 	Vector3 A;
 	Vector3 B;
 
-	void operator *=(const Matrix& m);
-
 	Line(const Vector3& a, const Vector3& b);
 	Line(float x0, float y0, float x1, float y1);
 
-	/* Multiplies the given line pointers by the givven specified matrix. */
-	static void Multiply(const Matrix& m, int length, Line* lines);
 	/*	Check is the lines are visible to the screen and change or remove them is they are not. 
 		Returns the new length of the line pointer. */
 	static int CheckVisiblity(Line* lines, int length);
