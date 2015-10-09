@@ -1,7 +1,7 @@
 #include "Line.h"
 #include <vector>
 
-typedef int OutCode;
+typedef char OutCode;
 const OutCode INSIDE =	0;	//0000
 const OutCode LEFT =	1;	//0001
 const OutCode RIGHT =	2;	//0010

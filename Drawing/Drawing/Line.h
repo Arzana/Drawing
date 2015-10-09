@@ -22,7 +22,7 @@ public:
 	float Get2DLength() const;
 private:
 	/* Compute the bit code for a point (x, y) using clip rectangle bounded diagonally by (xMin, yMin), and (yMax, yMax). */
-	static int ComputeOutCode(float x, float y);
+	static char ComputeOutCode(float x, float y);
 };
 
 #endif

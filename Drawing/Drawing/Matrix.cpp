@@ -76,7 +76,7 @@ Matrix Matrix::Perspective(float fov, float asp, float n, float f)
 	return Matrix(
 		2 * n / (width - l),	0,						(width + l) / (width - l),		0,
 		0,						2 * n / (height - b),	(height + b) / (height - b),	0,
-		0,						0,						-(f + n) / (f - n),				(2 * f * n) / (f - n),
+		0,						0,						-(f + n) / (f - n),				-2 * f * n / (f - n),
 		0,						0,						-1,								0);
 }
 

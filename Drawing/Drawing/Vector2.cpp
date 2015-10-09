@@ -34,6 +34,11 @@ void Vector2::Clamp(const Vector2& mi, const Vector2& ma, Vector2 *v)
 	v->Y = clamp(mi.Y, ma.Y, v->Y);
 }
 
+float Vector2::Dot(const Vector2& a, const Vector2& b)
+{
+	return a.X * b.X + a.Y * b.Y;
+}
+
 float Vector2::GetLength() const
 {
 	return sqrtf(square(X) + square(Y));

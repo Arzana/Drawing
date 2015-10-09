@@ -174,9 +174,12 @@ void RenderScreen()
 
 	/* Clip the triangles. */
 	vertexLength = Triangle::CheckVisibility(homogenousBuffer, vertexLength);
+	memmove(cartesianBuffer, cartesianBuffer, sizeof(Vector3) * vertexLength);
 	Vector4::ToCartesian(homogenousBuffer, cartesianBuffer, vertexLength);
 
 	/* Start rendering. */
+	pixels = (int*)surface->pixels;
+	ClearScreen(0x000000);
 	for (int i = 0; i < vertexLength;)
 	{
 		Triangle cur = Triangle(cartesianBuffer[i++], cartesianBuffer[i++], cartesianBuffer[i++]);

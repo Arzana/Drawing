@@ -29,6 +29,8 @@ public:
 	/* Get the direct distance between 2 vectors. */
 	static float Distance(const Vector2& left, const Vector2& right);
 	static float DistanceSquared(const Vector2& left, const Vector2& right);
+	/* Get the dot product between 2 vectors. */
+	static float Dot(const Vector2& a, const Vector2& b);
 	/* Get the length of the vector. */
 	float GetLength() const;
 	float GetLenghtSquared() const;

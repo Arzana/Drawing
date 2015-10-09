@@ -16,14 +16,28 @@ Triangle::Triangle(const Vector3& a, const Vector3& b, const Vector3& c)
 
 int Triangle::CheckVisibility(Vector4 *s, int length)
 {
-	int result = length;
-
-	for (int i = 0; i < length; i++)
+	for (int i = 0; i < length;)
 	{
+		Vector4 *cur = s + i;
+		float w = cur->W;
+		float nW = -w;
+		bool needsClipping = false;
 
+		if (cur->X < nW || cur->X > w) needsClipping = true;
+		else if (cur->Y < nW || cur->Y > w) needsClipping = true;
+		else if (cur->Z < nW || cur->Y > w) needsClipping = true;
+
+		if (needsClipping)
+		{
+			if (--length == 0) return 0;
+
+			s[i] = s[length];
+			memmove(s, s, length * sizeof(s));
+		}
+		else i++;
 	}
 
-	return result;
+	return length;
 }
 
 std::vector<Vector2*> Triangle::GetVertices()
