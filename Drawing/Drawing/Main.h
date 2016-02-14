@@ -27,6 +27,7 @@
 #define round(x)			(ipart((x) + 0.5))
 /* Get the fractional part of x. */
 #define fpart(x)			(float((x) - int(x)))
+/* Get the reverse fractional part of x. */
 #define rfpart(x)			(float(1.0 - fpart(x)))
 /* Convert a RBGA value (with 0 ≤ a ≤ 1) to a packed integer color.*/
 #define pack(r, g, b, a)	((int(r * a) << 16) + (int(g * a) << 8) + int(b * a))
