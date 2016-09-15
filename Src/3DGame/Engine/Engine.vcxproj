@@ -19,7 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MathEx.h" />
     <ClInclude Include="Vect2.h" />
+    <ClInclude Include="Vect3.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MathEx.cpp" />
+    <ClCompile Include="Vect2.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{05FF6B09-EFD4-4C3C-B09F-F970558CF2C8}</ProjectGuid>
@@ -41,7 +47,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
