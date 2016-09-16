@@ -44,5 +44,8 @@
     <ClCompile Include="MathEx.cpp">
       <Filter>Source Files\Core\Math</Filter>
     </ClCompile>
+    <ClCompile Include="Vect3.cpp">
+      <Filter>Source Files\Core\Math</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,10 +1,10 @@
 #pragma once
 
-#define Vect2_ONE		Vector2(1)
-#define Vect2_UNITX		Vector2(1, 0)
-#define Vect2_UNITY		Vector2(0, 1)
-#define Vect2_ZERO		Vector2()
-#define Vect2_NEGATIVE	Vector2(-1)
+#define VECT2_ONE		Vector2(1)
+#define VECT2_UNITX		Vector2(1, 0)
+#define VECT2_UNITY		Vector2(0, 1)
+#define VECT2_ZERO		Vector2()
+#define VECT2_NEGATIVE	Vector2(-1)
 
 typedef struct Vector2
 {
@@ -50,8 +50,11 @@ public:
 	static bool Equals(const Vector2 *v1, const Vector2 *v2);
 	static Vector2 Hermite(const Vector2 *v1, const Vector2 *t1, const Vector2 *v2, const Vector2 *t2, float a);
 	float Length(void) const;
+	float LengthSquared(void) const;
 	static Vector2 Lerp(const Vector2 *min, const Vector2 *max, float a);
+	static Vector2 Lerp(const Vector2 *min, const Vector2 *max, const Vector2 *a);
 	static Vector2 InvLerp(const Vector2 *min, const Vector2 *max, float v);
+	static Vector2 InvLerp(const Vector2 *min, const Vector2 *max, const Vector2 *v);
 	static Vector2 Max(const Vector2 *v1, const Vector2 *v2);
 	static Vector2 Min(const Vector2 *v1, const Vector2 *v2);
 	static Vector2 Multiply(const Vector2 *v1, const Vector2 *v2);

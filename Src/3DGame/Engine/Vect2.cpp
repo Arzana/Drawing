@@ -164,7 +164,7 @@ float Vector2::Distance(const Vector2 * v1, const Vector2 * v2)
 
 float Vector2::DistanceSquared(const Vector2 * v1, const Vector2 * v2)
 {
-	return square(v2->X - v1->X) + square(v2->Y - v1->Y);
+	return square(abs(v2->X - v1->X)) + square(abs(v2->Y - v1->Y));
 }
 
 Vector2 Vector2::Divide(const Vector2 * v1, const Vector2 * v2)
@@ -204,18 +204,34 @@ Vector2 Vector2::Hermite(const Vector2 * v1, const Vector2 * t1, const Vector2 *
 
 float Vector2::Length(void) const
 {
-	return sqrtf(square(X) + square(Y));
+	return sqrtf(LengthSquared());
 }
 
-Vector2 Vector2::Lerp(const Vector2 * min, const Vector2 * max, float a)
+float Vector2::LengthSquared(void) const
+{
+	return square(X) + square(Y);
+}
+
+Vector2 Vector2::Lerp(const Vector2 * mi, const Vector2 * ma, float a)
 {
 	a = clamp(0.0f, 1.0f, a);
-	return Vect2(lerp(min->X, max->X, a), lerp(min->Y, max->Y, a));
+	return Vect2(lerp(mi->X, ma->X, a), lerp(mi->Y, ma->Y, a));
 }
 
-Vector2 Vector2::InvLerp(const Vector2 * min, const Vector2 * max, float v)
+Vector2 Vector2::Lerp(const Vector2 * mi, const Vector2 * ma, const Vector2 * a)
 {
-	return Vect2(invLerp(min->X, max->X, v), invLerp(min->Y, max->Y, v));
+	a = &Vect2::Clamp(&VECT2_ZERO, &VECT2_ONE, a);
+	return Vect2(lerp(mi->X, ma->X, a->X), lerp(mi->Y, ma->Y, a->Y));
+}
+
+Vector2 Vector2::InvLerp(const Vector2 * mi, const Vector2 * ma, float v)
+{
+	return Vect2(invLerp(mi->X, ma->X, v), invLerp(mi->Y, ma->Y, v));
+}
+
+Vector2 Vector2::InvLerp(const Vector2 * mi, const Vector2 * ma, const Vector2 * v)
+{
+	return Vect2(invLerp(mi->X, ma->X, v->X), invLerp(mi->Y, ma->Y, v->Y));
 }
 
 Vector2 Vector2::Max(const Vector2 * v1, const Vector2 * v2)

@@ -26,6 +26,7 @@
   <ItemGroup>
     <ClCompile Include="MathEx.cpp" />
     <ClCompile Include="Vect2.cpp" />
+    <ClCompile Include="Vect3.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{05FF6B09-EFD4-4C3C-B09F-F970558CF2C8}</ProjectGuid>
