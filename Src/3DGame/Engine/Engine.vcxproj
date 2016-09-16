@@ -22,6 +22,7 @@
     <ClInclude Include="MathEx.h" />
     <ClInclude Include="Vect2.h" />
     <ClInclude Include="Vect3.h" />
+    <ClInclude Include="Vect4.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MathEx.cpp" />
