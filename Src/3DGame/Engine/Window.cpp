@@ -6,6 +6,7 @@ GameWindow::GameWindow(const char * title, const uint width, const uint height)
 	this->title = title;
 	this->width = width;
 	this->height = height;
+	Draw = NULL;
 	InitWindow();
 }
 
@@ -47,6 +48,20 @@ void GameWindow::Plot_S(const uint x, const uint y, const Color c)
 	if (PointVisible(x, y)) Plot(x, y, c);
 }
 
+void GameWindow::Run(void)
+{
+	int *isRunning = new int(1);
+
+	while (*isRunning)
+	{
+		Tick(isRunning);
+		if (Draw) Draw();
+		SDL_UpdateWindowSurface(window);
+	}
+
+	delete isRunning;
+}
+
 void GameWindow::InitWindow(void)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != NULL)
@@ -69,4 +84,19 @@ void GameWindow::TerminateWindow(void)
 bool GameWindow::PointVisible(const uint x, const uint y) const
 {
 	return x > 0 && x < width && y > 0 && y < height;
+}
+
+void GameWindow::Tick(int * running)
+{
+	SDL_Event ev;
+
+	while (SDL_PollEvent(&ev))
+	{
+		switch (ev.type)
+		{
+		case SDL_QUIT:
+			*running = false;
+			break;
+		}
+	}
 }

@@ -11,6 +11,8 @@
 class GameWindow
 {
 public:
+	void (*Draw)(void);
+
 	GameWindow(const char *title, const uint width, const uint height);
 	~GameWindow();
 
@@ -19,6 +21,7 @@ public:
 	void Plot(const uint x, const uint y, const Color c);
 	void Plot_S(const Vect2 *v, const Color c);
 	void Plot_S(const uint x, const uint y, const Color c);
+	void Run(void);
 
 private:
 	typedef struct SDL_Window SDL_Window;
@@ -32,4 +35,5 @@ private:
 	void InitWindow(void);
 	void TerminateWindow(void);
 	bool PointVisible(const uint x, const uint y) const;
+	void Tick(int *running);
 };

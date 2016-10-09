@@ -17,7 +17,7 @@
 typedef unsigned char octet;
 typedef unsigned int uint;
 
-inline float barycentric(float v1, float v2, float v3, float b2, float b3);
-inline float catmullRom(float v1, float v2, float v3, float v4, float a);
-inline float lerp(float min, float max, float a);
-inline float invLerp(float min, float max, float v);
+float barycentric(float v1, float v2, float v3, float b2, float b3);
+float catmullRom(float v1, float v2, float v3, float v4, float a);
+float lerp(float min, float max, float a);
+float invLerp(float min, float max, float v);
