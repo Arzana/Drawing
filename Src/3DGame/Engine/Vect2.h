@@ -62,6 +62,7 @@ public:
 	static Vector2 Negate(const Vector2 *v);
 	void Normalize(void);
 	static Vector2 Normalize(const Vector2 *v);
+	static float PrepDot(const Vector2 *v1, const Vector2 *v2);
 	static Vector2 Reflect(const Vector2 *v, const Vector2 *n);
 	static Vector2 SmoothStep(const Vector2 *v1, const Vector2 *v2, float a);
 	static Vector2 Subtract(const Vector2 *v1, const Vector2 *v2);

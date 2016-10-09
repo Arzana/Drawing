@@ -39,6 +39,9 @@
     <ClInclude Include="Vect4.h">
       <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Color.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vect2.cpp">
@@ -49,6 +52,18 @@
     </ClCompile>
     <ClCompile Include="Vect3.cpp">
       <Filter>Source Files\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Vect4.cpp">
+      <Filter>Source Files\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Color.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

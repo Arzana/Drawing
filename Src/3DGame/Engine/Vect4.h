@@ -33,4 +33,38 @@ typedef struct Vector4
 
 	bool operator ==(const Vector4 &r) const;
 	bool operator !=(const Vector4 &r) const;
+
+	static Vector4 Abs(const Vector4 *v);
+	void Abs(void);
+	static Vector4 Add(const Vector4 *v1, const Vector4 *v2);
+	float Area(void) const;
+	static Vector4 Barycentric(const Vector4 *v1, const Vector4 *v2, const Vector4 *v4, float b2, float b4);
+	static Vector4 CatmullRom(const Vector4 *v1, const Vector4 *v2, const Vector4 *v3, const Vector4 *v4, float a);
+	static Vector4 Clamp(const Vector4 *min, const Vector4 *max, const Vector4 *v);
+	void Clamp(const Vector4 *min, const Vector4 *max);
+	static float Distance(const Vector4 *v1, const Vector4 *v2);
+	static float DistanceSquared(const Vector4 *v1, const Vector4 *v2);
+	static Vector4 Divide(const Vector4 *v1, float v2);
+	static Vector4 Divide(const Vector4 *v1, const Vector4 *v2);
+	static float Dot(const Vector4 *v1, const Vector4 *v2);
+	static bool Equals(const Vector4 *v1, const Vector4 *v2);
+	static Vector4 Hermite(const Vector4 *v1, const Vector4 *t1, const Vector4 *v2, const Vector4 *t2, float a);
+	float Length(void) const;
+	float LengthSquared(void) const;
+	static Vector4 Lerp(const Vector4 *min, const Vector4 *max, float a);
+	static Vector4 Lerp(const Vector4 *min, const Vector4 *max, const Vector4 *a);
+	static Vector4 InvLerp(const Vector4 *min, const Vector4 *max, float v);
+	static Vector4 InvLerp(const Vector4 *min, const Vector4 *max, const Vector4 *v);
+	static Vector4 Max(const Vector4 *v1, const Vector4 *v2);
+	static Vector4 Min(const Vector4 *v1, const Vector4 *v2);
+	static Vector4 Multiply(const Vector4 *v1, float v2);
+	static Vector4 Multiply(const Vector4 *v1, const Vector4 *v2);
+	static Vector4 Negate(const Vector4 *v);
+	void Normalize(void);
+	static Vector4 Normalize(const Vector4 *v);
+	static Vector4 Reflect(const Vector4 *v, const Vector4 *n);
+	static Vector4 SmoothStep(const Vector4 *v1, const Vector4 *v2, float a);
+	static Vector4 Subtract(const Vector4 *v1, const Vector4 *v2);
+	float Volume(void) const;
+	float Volume4D(void) const;
 } Vect4;

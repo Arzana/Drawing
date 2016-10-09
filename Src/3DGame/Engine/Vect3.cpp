@@ -141,6 +141,7 @@ Vector3 Vector3::Barycentric(const Vector3 * v1, const Vector3 * v2, const Vecto
 	float x = barycentric(v1->X, v2->X, v3->X, b2, b3);
 	float y = barycentric(v1->Y, v2->Y, v3->Y, b2, b3);
 	float z = barycentric(v1->Z, v2->Z, v3->Z, b2, b3);
+
 	return Vector3(x, y, z);
 }
 
@@ -301,15 +302,13 @@ Vector3 Vector3::Negate(const Vector3 * v)
 void Vector3::Normalize(void)
 {
 	float l = Length();
-	X /= l;
-	Y /= l;
-	Z /= l;
+	operator/=(l);
 }
 
 Vector3 Vector3::Normalize(const Vector3 * v)
 {
 	float l = v->Length();
-	return Vector3(v->X / l, v->Y / l, v->Z / l);
+	return Divide(v, l);
 }
 
 Vector3 Vector3::Reflect(const Vector3 * v, const Vector3 * n)
