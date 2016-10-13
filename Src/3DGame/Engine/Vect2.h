@@ -8,7 +8,6 @@
 
 typedef struct Vector2
 {
-public:
 	float X, Y;
 
 	Vector2(void);

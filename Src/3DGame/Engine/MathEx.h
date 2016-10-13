@@ -17,6 +17,8 @@
 typedef unsigned char octet;
 typedef unsigned int uint;
 
+const float DEG2RAD = 3.141593f / 180;
+
 float barycentric(float v1, float v2, float v3, float b2, float b3);
 float catmullRom(float v1, float v2, float v3, float v4, float a);
 float lerp(float min, float max, float a);

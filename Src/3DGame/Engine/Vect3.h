@@ -12,7 +12,6 @@
 
 typedef struct Vector3
 {
-public:
 	float X, Y, Z;
 
 	Vector3(void);
