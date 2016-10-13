@@ -4,15 +4,21 @@
 #include "Vect3.h"
 #include "Vect4.h"
 
+#define CLR_BLACK	Color(0, 0, 0)
+#define CLR_RED		Color(255, 0, 0)
+#define CLR_GREEN	Color(0, 255, 0)
+#define CLR_BLUE	Color(0, 0, 255)
+#define CLR_WHITE	Color(255, 255, 255)
+
 typedef struct Color
 {
-public:
 	/*
 	|--------|--------|--------|--------
 	A        R        G        B
 	*/
 	uint packed;
 
+	Color(void);
 	Color(const uint packed);
 	Color(const int r, const int g, const int b);
 	Color(const int r, const int g, const int b, const int a);
@@ -30,7 +36,7 @@ public:
 	inline octet GetR(void) const;
 	inline octet GetG(void) const;
 	inline octet GetB(void) const;
-	static Color Lerp(const Color *min, const Color *max, float a);
+	static Color Lerp(const Color min, const Color max, float a);
 	static Color Multiply(const Color *c, float multiplier);
 	Vect3 ToVect3(void) const;
 	Vect4 ToVect4(void) const;

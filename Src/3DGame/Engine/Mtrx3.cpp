@@ -1,6 +1,6 @@
 #include "Mtrx3.h"
+#include "Utils.h"
 #include <math.h>
-//#include <stdlib.h>
 
 Matrix3::Matrix3(void)
 {
@@ -99,7 +99,7 @@ Vector3 Matrix3::Transform(const Matrix3 * m, const Vector2 * v)
 
 Vector3 * Matrix3::Transform(const Matrix3 * m, const Vector2 * v, int length)
 {
-	Vector3 *result = new Vector3[length];
+	Vector3 *result = malloc_s(Vect3, length);
 
 	for (size_t i = 0; i < length; i++)
 	{

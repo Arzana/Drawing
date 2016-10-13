@@ -1,4 +1,5 @@
 #include "Mtrx4.h"
+#include "Utils.h"
 #include "MathEx.h"
 
 Matrix4::Matrix4(void)
@@ -245,7 +246,7 @@ Vector4 Matrix4::Transform(const Matrix4 * m, const Vector3 * v)
 
 Vector4* Matrix4::Transform(const Matrix4 * m, const Vector3 * v, int length)
 {
-	Vector4 *result = new Vector4[length];
+	Vector4 *result = malloc_s(Vect4, length);
 
 	for (size_t i = 0; i < length; i++)
 	{

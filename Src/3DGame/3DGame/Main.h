@@ -1,5 +1,7 @@
 #pragma once
 
-#include <Window.h>
+#include <Utils.h>
+#include <GF.h>
+#include <cstdio>
 
 void Render(void);

@@ -25,15 +25,18 @@
     <ClInclude Include="Mtrx3.h" />
     <ClInclude Include="Mtrx4.h" />
     <ClInclude Include="Shapes.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="Vect2.h" />
     <ClInclude Include="Vect3.h" />
     <ClInclude Include="Vect4.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="GF.cpp" />
     <ClCompile Include="MathEx.cpp" />
     <ClCompile Include="Mtrx3.cpp" />
     <ClCompile Include="Mtrx4.cpp" />
+    <ClCompile Include="Shapes.cpp" />
     <ClCompile Include="Vect2.cpp" />
     <ClCompile Include="Vect3.cpp" />
     <ClCompile Include="Vect4.cpp" />

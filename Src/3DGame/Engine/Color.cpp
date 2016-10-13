@@ -1,5 +1,10 @@
 #include "Color.h"
 
+Color::Color(void)
+{
+	packed = 0;
+}
+
 Color::Color(const uint packed)
 {
 	this->packed = packed;
@@ -35,11 +40,11 @@ Color::Color(const int r, const int g, const int b, const int a)
 }
 
 Color::Color(const float r, const float g, const float b)
-	:Color(ipart(r * 255), ipart(g * 255), ipart(b * 255))
+	:Color(ipart(r), ipart(g), ipart(b))
 {}
 
 Color::Color(const float r, const float g, const float b, const float a)
-	:Color(ipart(r * 255), ipart(g * 255), ipart(b * 255), ipart(a * 255))
+	:Color(ipart(r), ipart(g), ipart(b), ipart(a))
 {}
 
 Color::Color(const Vect3 * v)
@@ -90,13 +95,13 @@ inline octet Color::GetB(void) const
 	return octet(packed);
 }
 
-Color Color::Lerp(const Color * mi, const Color * ma, float a)
+Color Color::Lerp(const Color mi, const Color ma, float a)
 {
 	a = clamp(0, 1, a);
-	float r = lerp(mi->GetR(), ma->GetR(), a);
-	float g = lerp(mi->GetG(), ma->GetG(), a);
-	float b = lerp(mi->GetB(), ma->GetB(), a);
-	float alpha = lerp(mi->GetA(), ma->GetA(), a);
+	float r = lerp(mi.GetR(), ma.GetR(), a);
+	float g = lerp(mi.GetG(), ma.GetG(), a);
+	float b = lerp(mi.GetB(), ma.GetB(), a);
+	float alpha = lerp(mi.GetA(), ma.GetA(), a);
 
 	return Color(r, g, b, alpha);
 }

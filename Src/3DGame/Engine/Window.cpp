@@ -1,11 +1,14 @@
 #include "Window.h"
 #include <SDL.h>
 
+int *isRunning;
+
 GameWindow::GameWindow(const char * title, const uint width, const uint height)
 {
 	this->title = title;
 	this->width = width;
 	this->height = height;
+	isRunning = NULL;
 	Draw = NULL;
 	InitWindow();
 }
@@ -13,6 +16,7 @@ GameWindow::GameWindow(const char * title, const uint width, const uint height)
 GameWindow::~GameWindow()
 {
 	TerminateWindow();
+	if (isRunning) delete isRunning;
 }
 
 void GameWindow::Clear(const Color c)
@@ -50,24 +54,25 @@ void GameWindow::Plot_S(const uint x, const uint y, const Color c)
 
 void GameWindow::Run(void)
 {
-	int *isRunning = new int(1);
+	if (!isRunning) isRunning = new int(1);
+	else *isRunning = 1;
 
 	while (*isRunning)
 	{
-		Tick(isRunning);
+		Tick();
 		if (Draw) Draw();
 		SDL_UpdateWindowSurface(window);
 	}
+}
 
-	delete isRunning;
+void GameWindow::Terminate()
+{
+	*isRunning = 0;
 }
 
 void GameWindow::InitWindow(void)
 {
-	if (SDL_Init(SDL_INIT_VIDEO) != NULL)
-	{
-		exit(EXIT_FAILURE);
-	}
+	if (SDL_Init(SDL_INIT_VIDEO) != NULL) exit(EXIT_FAILURE);
 
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
 	surface = SDL_GetWindowSurface(window);
@@ -75,10 +80,13 @@ void GameWindow::InitWindow(void)
 
 void GameWindow::TerminateWindow(void)
 {
-	SDL_DestroyWindow(window);
-	window = NULL;
-	surface = NULL;
-	SDL_Quit();
+	if (window)
+	{
+		SDL_DestroyWindow(window);
+		window = NULL;
+		surface = NULL;
+		SDL_Quit();
+	}
 }
 
 bool GameWindow::PointVisible(const uint x, const uint y) const
@@ -86,7 +94,7 @@ bool GameWindow::PointVisible(const uint x, const uint y) const
 	return x > 0 && x < width && y > 0 && y < height;
 }
 
-void GameWindow::Tick(int * running)
+void GameWindow::Tick()
 {
 	SDL_Event ev;
 
@@ -95,7 +103,7 @@ void GameWindow::Tick(int * running)
 		switch (ev.type)
 		{
 		case SDL_QUIT:
-			*running = false;
+			*isRunning = 0;
 			break;
 		}
 	}

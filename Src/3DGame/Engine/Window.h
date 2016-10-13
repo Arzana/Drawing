@@ -22,6 +22,7 @@ public:
 	void Plot_S(const Vect2 *v, const Color c);
 	void Plot_S(const uint x, const uint y, const Color c);
 	void Run(void);
+	void Terminate();
 
 private:
 	typedef struct SDL_Window SDL_Window;
@@ -35,5 +36,5 @@ private:
 	void InitWindow(void);
 	void TerminateWindow(void);
 	bool PointVisible(const uint x, const uint y) const;
-	void Tick(int *running);
+	void Tick(void);
 };

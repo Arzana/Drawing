@@ -7,9 +7,11 @@ typedef struct Vertex
 {
 	Vect2 v;
 	Color c;
+
+	Vertex(Vect2 v, Color c);
 } Vrtx;
 
-typedef struct Line 
+struct Line 
 {
 	Vertex v0, v1;
 };
