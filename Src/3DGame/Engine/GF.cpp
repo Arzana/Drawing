@@ -1,29 +1,17 @@
+#define _USE_GF_INTERNAL
+
 #include "Utils.h"
 #include "GF.h"
 #include <cstdio>
 
 #define vrtxAt(i)	Vertex(vbuffer[(i)], cbuffer[(i)])
 
-void Raise(const char *msg);
-void GF_Line(const int x0, const int y0, const Color c0, const int x1, const int y1, const Color c1);
-void GF_Trgl(const Vertex v0, const Vertex v1, const Vertex v2);
-void GF_Points(void);
-void GF_Lines(void);
-void GF_LineStrip(void);
-void GF_LineLoop(void);
-void GF_Triangles(void);
-void GF_TriangleStrip(void);
-void GF_TriangleFan(void);
-
 GameWindow *w = NULL;
-
 int type = GF_POINTS;
 int startCalled = 0;
-
 size_t bufferLength;
 size_t bufferIndex;
-
-Vect2 *vbuffer = NULL;
+Vect3 *vbuffer = NULL;
 Color *cbuffer = NULL;
 
 void GF_SetWindow(GameWindow * window)
@@ -66,6 +54,9 @@ void GF_EndRender(void)
 	case GF_LINE_STRIP:
 		GF_LineStrip();
 		break;
+	case GF_LINE_LOOP:
+		GF_LineLoop();
+		break;
 	case GF_TRIANGLES:
 		GF_Triangles();
 		break;
@@ -95,11 +86,11 @@ void GF_SetBufferLength(size_t length)
 	}
 
 	bufferLength = length;
-	vbuffer = malloc_s(Vect2, length);
+	vbuffer = malloc_s(Vect3, length);
 	cbuffer = malloc_s(Color, length);
 }
 
-void GF_AddPoint(const float x, const float y, const Color c)
+void GF_AddPoint(const Vector3 v, const Color c)
 {
 	if (!startCalled || bufferIndex >= bufferLength)
 	{
@@ -108,16 +99,21 @@ void GF_AddPoint(const float x, const float y, const Color c)
 		if (bufferIndex >= bufferLength) Raise("Cannot add any more points to the buffer!");
 	}
 
-	vbuffer[bufferIndex] = Vect2(x, y);
+	vbuffer[bufferIndex] = v;
 	cbuffer[bufferIndex] = c;
 	++bufferIndex;
+}
+
+void GF_AddPoint(const float x, const float y, float z, const Color c)
+{
+	GF_AddPoint(Vect3(x, y, z), c);
 }
 
 void GF_Points(void)
 {
 	for (size_t i = 0; i < bufferLength; i++)
 	{
-		w->Plot(&vbuffer[i], cbuffer[i]);
+		w->TryPlot(&vbuffer[i], cbuffer[i]);
 	}
 }
 
@@ -125,7 +121,7 @@ void GF_Lines(void)
 {
 	for (size_t i = 0; i < bufferLength; i += 2)
 	{
-		Vect2 v0 = vbuffer[i], v1 = vbuffer[i + 1];
+		Vect3 v0 = vbuffer[i], v1 = vbuffer[i + 1];
 		GF_Line(v0.X, v0.Y, cbuffer[i], v1.X, v1.Y, cbuffer[i + 1]);
 	}
 }
@@ -134,7 +130,7 @@ void GF_LineStrip(void)
 {
 	for (size_t i = 0; i < bufferLength - 1; i++)
 	{
-		Vect2 v0 = vbuffer[i], v1 = vbuffer[i + 1];
+		Vect3 v0 = vbuffer[i], v1 = vbuffer[i + 1];
 		GF_Line(v0.X, v0.Y, cbuffer[i], v1.X, v1.Y, cbuffer[i + 1]);
 	}
 }
@@ -143,11 +139,11 @@ void GF_LineLoop(void)
 {
 	for (size_t i = 0; i < bufferLength - 1; i++)
 	{
-		Vect2 v0 = vbuffer[i], v1 = vbuffer[i + 1];
+		Vect3 v0 = vbuffer[i], v1 = vbuffer[i + 1];
 		GF_Line(v0.X, v0.Y, cbuffer[i], v1.X, v1.Y, cbuffer[i + 1]);
 	}
 
-	Vect2 v0 = vbuffer[bufferLength - 1], v1 = vbuffer[0];
+	Vect3 v0 = vbuffer[bufferLength - 1], v1 = vbuffer[0];
 	GF_Line(v0.X, v0.Y, cbuffer[bufferLength - 1], v1.X, v1.Y, cbuffer[0]);
 }
 

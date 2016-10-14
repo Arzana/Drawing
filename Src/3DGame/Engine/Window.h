@@ -21,6 +21,8 @@ public:
 	void Plot(const uint x, const uint y, const Color c);
 	void Plot_S(const Vect2 *v, const Color c);
 	void Plot_S(const uint x, const uint y, const Color c);
+	void TryPlot(const Vect3 *v, const Color c);
+	void TryPlot_S(const Vect3 *v, const Color c);
 	void Run(void);
 	void Terminate();
 
@@ -30,10 +32,12 @@ private:
 
 	SDL_Window *window;
 	SDL_Surface *surface;
+	float *zBuffer;
 	const char *title;
 	uint width, height;
 
 	void InitWindow(void);
+	void InitZBuffer(void);
 	void TerminateWindow(void);
 	bool PointVisible(const uint x, const uint y) const;
 	void Tick(void);

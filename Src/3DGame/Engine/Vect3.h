@@ -5,8 +5,8 @@
 #define VECT3_LEFT		Vector3(-1, 0, 0)
 #define VECT3_UP		Vector3(0, 1, 0)
 #define VECT3_DOWN		Vector3(0, -1, 0)
-#define VECT3_BACK		Vector3(0, 0, 1)
-#define VECT3_FORWARD	Vector3(0, 0, -1)
+#define VECT3_BACK		Vector3(0, 0, -1)
+#define VECT3_FORWARD	Vector3(0, 0, 1)
 #define VECT3_ZERO		Vector3()
 #define VECT3_NEGATIVE	Vector3(-1)
 

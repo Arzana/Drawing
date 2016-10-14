@@ -1,3 +1,4 @@
+#include "Utils.h"
 #include "Window.h"
 #include <SDL.h>
 
@@ -8,14 +9,18 @@ GameWindow::GameWindow(const char * title, const uint width, const uint height)
 	this->title = title;
 	this->width = width;
 	this->height = height;
+	zBuffer = NULL;
 	isRunning = NULL;
 	Draw = NULL;
+
 	InitWindow();
+	InitZBuffer();
 }
 
 GameWindow::~GameWindow()
 {
 	TerminateWindow();
+	if (zBuffer) free(zBuffer);
 	if (isRunning) delete isRunning;
 }
 
@@ -52,6 +57,17 @@ void GameWindow::Plot_S(const uint x, const uint y, const Color c)
 	if (PointVisible(x, y)) Plot(x, y, c);
 }
 
+void GameWindow::TryPlot(const Vect3 * v, const Color c)
+{
+	uint i = v->Y * width + v->X;
+	if (v->Z < zBuffer[i]) Plot(v->X, v->Y, c);
+}
+
+void GameWindow::TryPlot_S(const Vect3 * v, const Color c)
+{
+	if (PointVisible(v->X, v->Y)) TryPlot(v, c);
+}
+
 void GameWindow::Run(void)
 {
 	if (!isRunning) isRunning = new int(1);
@@ -76,6 +92,16 @@ void GameWindow::InitWindow(void)
 
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
 	surface = SDL_GetWindowSurface(window);
+}
+
+void GameWindow::InitZBuffer(void)
+{
+	uint length = width * height;
+	zBuffer = malloc_s(float, length);
+	for (size_t i = 0; i < length; i++)
+	{
+		zBuffer[i] = 0;
+	}
 }
 
 void GameWindow::TerminateWindow(void)

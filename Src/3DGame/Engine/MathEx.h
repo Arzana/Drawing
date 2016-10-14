@@ -1,5 +1,6 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #define abs(x)				((x) < 0 ? (x) * -1 : (x))
@@ -13,11 +14,10 @@
 #define fpart(x)			(float(x) - ipart(x))
 #define rfpart(x)			(float(1.0 - fpart(x))
 #define cot(x)				(1.0f - tanf(x))
+#define deg2rad(x)			((x) * M_PI / 180.0f)
 
 typedef unsigned char octet;
 typedef unsigned int uint;
-
-const float DEG2RAD = 3.141593f / 180;
 
 float barycentric(float v1, float v2, float v3, float b2, float b3);
 float catmullRom(float v1, float v2, float v3, float v4, float a);

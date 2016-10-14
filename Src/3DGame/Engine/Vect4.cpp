@@ -184,6 +184,11 @@ void Vector4::Clamp(const Vector4 * mi, const Vector4 * ma)
 	W = clamp(mi->W, ma->W, W);
 }
 
+bool Vector4::Clip(void) const
+{
+	return X < -W || Y < -W || Z < -W || X > W || Y > W || Z > W;
+}
+
 float Vector4::Distance(const Vector4 * v1, const Vector4 * v2)
 {
 	return sqrtf(DistanceSquared(v1, v2));
@@ -344,6 +349,11 @@ Vector4 Vector4::SmoothStep(const Vector4 * v1, const Vector4 * v2, float a)
 Vector4 Vector4::Subtract(const Vector4 * v1, const Vector4 * v2)
 {
 	return Vector4(v1->X - v2->X, v1->Y - v2->Y, v1->Z - v2->Z, v1->W - v2->W);
+}
+
+Vector3 Vector4::ToNDC(void) const
+{
+	return Vector3(X / W, Y / W, Z / W);
 }
 
 float Vector4::Volume(void) const

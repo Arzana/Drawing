@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Vect3.h"
+
 #define VECT4_ONE		Vector4(1)
 #define VECT4_UNITX		Vector4(1, 0, 0, 0)
 #define VECT4_UNITY		Vector4(0, 1, 0, 0)
@@ -42,6 +44,7 @@ typedef struct Vector4
 	static Vector4 CatmullRom(const Vector4 *v1, const Vector4 *v2, const Vector4 *v3, const Vector4 *v4, float a);
 	static Vector4 Clamp(const Vector4 *min, const Vector4 *max, const Vector4 *v);
 	void Clamp(const Vector4 *min, const Vector4 *max);
+	bool Clip(void) const;
 	static float Distance(const Vector4 *v1, const Vector4 *v2);
 	static float DistanceSquared(const Vector4 *v1, const Vector4 *v2);
 	static Vector4 Divide(const Vector4 *v1, float v2);
@@ -65,6 +68,7 @@ typedef struct Vector4
 	static Vector4 Reflect(const Vector4 *v, const Vector4 *n);
 	static Vector4 SmoothStep(const Vector4 *v1, const Vector4 *v2, float a);
 	static Vector4 Subtract(const Vector4 *v1, const Vector4 *v2);
+	Vector3 ToNDC(void) const;
 	float Volume(void) const;
 	float Volume4D(void) const;
 } Vect4;

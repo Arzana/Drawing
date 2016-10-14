@@ -111,20 +111,29 @@ Matrix4 Matrix4::CreateView(const Vector3 * pos, const Vector3 * tar, const Vect
 		xDot, yDot, zDot, 1);
 }
 
-Matrix4 Matrix4::CreatePerspective(float fov, float aspr, float near, float far)
+Matrix4 Matrix4::CreatePerspective(float l, float r, float b, float t, float n, float f)
 {
-	float tangent = tanf(fov * 0.5f * DEG2RAD);
-	float height = near * tangent;
-	float width = height * aspr;
-
-	float l = -width;
-	float b = -height;
+	float m11 = 2 * n / (r - l);
+	float m13 = (r + l) / (r - l);
+	float m22 = 2 * n / (t - b);
+	float m23 = (t + b) / (t - b);
+	float m33 = -(f + n) / (f - n);
+	float m34 = -(2 * f * n) / (f - n);
 
 	return Matrix4(
-		2 * near / (width - l), 0, (width + l) / (width - l), 0,
-		0, 2 * near / (height - b), (height + b) / (height - b), 0,
-		0, 0, -(far + near) / (far - near), -2 * far * near / (far - near),
+		m11, 0, m13, 0,
+		0, m22, m23, 0,
+		0, 0, m33, m34,
 		0, 0, -1, 0);
+}
+
+Matrix4 Matrix4::CreateFrustrum(float fovY, float aspr, float front, float back)
+{
+	float tangent = tanf(deg2rad(fovY / 2));
+	float height = front * tangent;
+	float width = height * aspr;
+
+	return CreatePerspective(-width, width, -height, height, front, back);
 }
 
 Matrix4 Matrix4::CreateRotation(const Vector3 * axis, float rads)
