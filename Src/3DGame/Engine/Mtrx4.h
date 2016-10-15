@@ -35,8 +35,8 @@ typedef struct Matrix4
 	static bool Equals(const Matrix4 *m1, const Matrix4 *m2);
 	static Matrix4 CreateYawPitchRoll(float yaw, float pitch, float roll);
 	static Matrix4 CreateView(const Vector3 *pos, const Vector3 *tar, const Vector3 *up);
-	static Matrix4 CreatePerspective(float l, float r, float b, float t, float n, float f);
 	static Matrix4 CreateFrustrum(float fovY, float aspr, float front, float back);
+	static Matrix4 CreateOrthographic(float width, float height, float front, float back);
 	static Matrix4 CreateRotation(const Vector3 *axis, float rads);
 	static Matrix4 CreateRotationX(float rads);
 	static Matrix4 CreateRotationY(float rads);

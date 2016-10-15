@@ -14,10 +14,11 @@
 #define fpart(x)			(float(x) - ipart(x))
 #define rfpart(x)			(float(1.0 - fpart(x))
 #define cot(x)				(1.0f - tanf(x))
-#define deg2rad(x)			((x) * M_PI / 180.0f)
 
 typedef unsigned char octet;
 typedef unsigned int uint;
+
+const float deg2rad = M_PI / 180.0f;
 
 float barycentric(float v1, float v2, float v3, float b2, float b3);
 float catmullRom(float v1, float v2, float v3, float v4, float a);

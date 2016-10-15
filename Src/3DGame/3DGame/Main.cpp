@@ -6,7 +6,10 @@ int main(int argc, char *argv[])
 {
 	window = new GameWindow("Test", WIDTH, HEIGHT);
 	window->Draw = Render;
+
 	GF_SetWindow(window);
+	GF_SetFrustrum(FOV_Y, aspr, DEPTH_NEAR, DEPTH_FAR);
+
 	window->Run();
 
 	delete window;
@@ -53,6 +56,8 @@ void Render(void)
 
 		GF_EndRender();
 	}
+
+	window->Draw = NULL;
 }
 
 Vect3 ToScreen(const Vect3 *ndc)

@@ -1,7 +1,10 @@
 #pragma once
 
+#include "Mtrx4.h"
 #include "Shapes.h"
 #include "Window.h"
+
+//#define _SHOW_FUNCTIONS_USED
 
 #define GF_POINTS			0
 #define GF_LINES			1
@@ -15,13 +18,23 @@ void GF_SetWindow(GameWindow *window);
 void GF_StartRender(const int primitiveType);
 void GF_EndRender(void);
 void GF_SetBufferLength(const size_t length);
+void GF_SetWorldMatrix(const Matrix4 *m);
+void GF_SetViewMatrix(const Matrix4 *m);
+void GF_SetFrustrum(const float fovY, const float aspr, const float front, const float back);
+void GF_SetOrthographic(const float width, const float height, const float front, const float back);
+void GF_SetViewport(const Rectangle *rect);
 void GF_AddPoint(const Vector3 v, const Color c);
 void GF_AddPoint(const float x, const float y, const float z, const Color c);
 
 #ifdef _USE_GF_INTERNAL
 void Raise(const char *msg);
-void GF_Line(const int x0, const int y0, const Color c0, const int x1, const int y1, const Color c1);
-void GF_Trgl(const Vertex v0, const Vertex v1, const Vertex v2);
+void GF_Line(const int x0, const int y0, const int z0, const Color c0, const int x1, const int y1, const int z1, const Color c1);
+void GF_Line(const Vertex *v0, const Vertex *v1);
+void GF_HLine(const float x0, const float y0, const float z0, const Color c0, const float x1, const float y1, const float z1, const Color c1);
+void GF_HLine(const Vertex *v0, const Vertex *v1);
+void GF_BFTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);
+void GF_TFTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);
+void GF_FullTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);
 void GF_Points(void);
 void GF_Lines(void);
 void GF_LineStrip(void);
@@ -29,4 +42,10 @@ void GF_LineLoop(void);
 void GF_Triangles(void);
 void GF_TriangleStrip(void);
 void GF_TriangleFan(void);
+Vect3 GF_ToNDC(const Vector4 *v);
+void GF_ToScreen(Vect3 *v);
+#endif
+
+#ifdef _SHOW_FUNCTIONS_USED
+void PrintFunction(const char *name);
 #endif

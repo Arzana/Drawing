@@ -1,4 +1,5 @@
 #include "Mtrx4.h"
+#include "Mtrx4.h"
 #include "Utils.h"
 #include "MathEx.h"
 
@@ -111,8 +112,14 @@ Matrix4 Matrix4::CreateView(const Vector3 * pos, const Vector3 * tar, const Vect
 		xDot, yDot, zDot, 1);
 }
 
-Matrix4 Matrix4::CreatePerspective(float l, float r, float b, float t, float n, float f)
+Matrix4 Matrix4::CreateFrustrum(float fovY, float aspr, float n, float f)
 {
+	float tangent = tanf(fovY / 2 * deg2rad);
+	float t = n * tangent;
+	float r = t * aspr;
+	float b = -t;
+	float l = -r;
+
 	float m11 = 2 * n / (r - l);
 	float m13 = (r + l) / (r - l);
 	float m22 = 2 * n / (t - b);
@@ -127,13 +134,25 @@ Matrix4 Matrix4::CreatePerspective(float l, float r, float b, float t, float n, 
 		0, 0, -1, 0);
 }
 
-Matrix4 Matrix4::CreateFrustrum(float fovY, float aspr, float front, float back)
+Matrix4 Matrix4::CreateOrthographic(float width, float height, float n, float f)
 {
-	float tangent = tanf(deg2rad(fovY / 2));
-	float height = front * tangent;
-	float width = height * aspr;
+	float t = height / 2;
+	float r = width / 2;
+	float b = -t;
+	float l = -r;
 
-	return CreatePerspective(-width, width, -height, height, front, back);
+	float m11 = 2 * n / (r - l);
+	float m14 = -(r + l) / (r - l);
+	float m22 = 2 / (t - b);
+	float m24 = -(t + b) / (t - b);
+	float m33 = -2 / (f - n);
+	float m34 = -(f + n) / (f - n);
+
+	return Matrix4(
+		m11, 0, 0, m14,
+		0, m22, 0, m24,
+		0, 0, m33, m34,
+		0 ,0, 0, 1);
 }
 
 Matrix4 Matrix4::CreateRotation(const Vector3 * axis, float rads)

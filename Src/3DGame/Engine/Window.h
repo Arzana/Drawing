@@ -22,9 +22,13 @@ public:
 	void Plot_S(const Vect2 *v, const Color c);
 	void Plot_S(const uint x, const uint y, const Color c);
 	void TryPlot(const Vect3 *v, const Color c);
+	void TryPlot(const float x, const float y, const float z, const Color c);
 	void TryPlot_S(const Vect3 *v, const Color c);
+	void TryPlot_S(const float x, const float y, const float z, const Color c);
 	void Run(void);
 	void Terminate();
+	uint GetWidth(void) const;
+	uint GetHeight(void) const;
 
 private:
 	typedef struct SDL_Window SDL_Window;
@@ -37,8 +41,8 @@ private:
 	uint width, height;
 
 	void InitWindow(void);
-	void InitZBuffer(void);
 	void TerminateWindow(void);
 	bool PointVisible(const uint x, const uint y) const;
 	void Tick(void);
+	void ResetZBuffer(void);
 };
