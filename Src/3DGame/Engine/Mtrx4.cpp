@@ -109,7 +109,7 @@ Matrix4 Matrix4::CreateView(const Vector3 * pos, const Vector3 * tar, const Vect
 		xAxis->X, yAxis->X, zAxis->X, 0,
 		xAxis->Y, yAxis->Y, zAxis->Y, 0,
 		xAxis->Z, yAxis->Z, zAxis->Z, 0,
-		xDot, yDot, zDot, 1);
+		-xDot, -yDot, -zDot, 1);
 }
 
 Matrix4 Matrix4::CreateFrustrum(float fovY, float aspr, float n, float f)

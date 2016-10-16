@@ -9,6 +9,7 @@ typedef struct Vertex
 	Color c;
 
 	Vertex(Vect3 v, Color c);
+	Vertex(float x, float y, float z, Color c);
 } Vrtx;
 
 struct Line 

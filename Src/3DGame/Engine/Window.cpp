@@ -60,8 +60,13 @@ void GameWindow::Plot_S(const uint x, const uint y, const Color c)
 
 void GameWindow::TryPlot(const Vect3 * v, const Color c)
 {
-	uint i = v->Y * width + v->X;
-	if (v->Z < zBuffer[i]) Plot(v->X, v->Y, c);
+	uint i = ipart(v->Y) * width + ipart(v->X);
+	if (v->Z < zBuffer[i])
+	{
+		Color *pix = (Color*)surface->pixels;
+		zBuffer[i] = v->Z;
+		pix[i] = c;
+	}
 }
 
 void GameWindow::TryPlot(const float x, const float y, const float z, const Color c)
@@ -71,7 +76,7 @@ void GameWindow::TryPlot(const float x, const float y, const float z, const Colo
 
 void GameWindow::TryPlot_S(const Vect3 * v, const Color c)
 {
-	if (PointVisible(v->X, v->Y)) TryPlot(v, c);
+	if (PointVisible(ipart(v->X), ipart(v->Y))) TryPlot(v, c);
 }
 
 void GameWindow::TryPlot_S(const float x, const float y, const float z, const Color c)
@@ -87,9 +92,14 @@ void GameWindow::Run(void)
 	while (*isRunning)
 	{
 		Tick();
-		if (Draw) Draw();
+
+		if (Draw)
+		{
+			Draw();
+			ResetZBuffer();
+		}
+
 		SDL_UpdateWindowSurface(window);
-		ResetZBuffer();
 	}
 }
 
@@ -142,6 +152,9 @@ void GameWindow::Tick()
 		{
 		case SDL_QUIT:
 			*isRunning = 0;
+			break;
+		case SDL_KEYDOWN:
+			if (KeyDown) KeyDown(ev.key.keysym.scancode);
 			break;
 		}
 	}

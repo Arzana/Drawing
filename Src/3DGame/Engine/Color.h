@@ -4,11 +4,14 @@
 #include "Vect3.h"
 #include "Vect4.h"
 
-#define CLR_BLACK	((Color)0)
-#define CLR_RED		((Color)0xFFFF0000)
-#define CLR_GREEN	((Color)0xFF00FF00)
-#define CLR_BLUE	((Color)0xFF0000FF)
-#define CLR_WHITE	((Color)0xFFFFFFFF)
+#define CLR_BLACK		((Color)0xFF000000)
+#define CLR_RED			((Color)0xFFFF0000)
+#define CLR_GREEN		((Color)0xFF00FF00)
+#define CLR_BLUE		((Color)0xFF0000FF)
+#define CLR_WHITE		((Color)0xFFFFFFFF)
+#define CLR_CYAN		((Color)0xFF00FFFF)
+#define CLR_MAGENTA		((Color)0xFFFF00FF)
+#define CLR_YELLOW		((Color)0xFFFFFF00)
 
 typedef struct Color
 {

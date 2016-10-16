@@ -12,6 +12,7 @@ class GameWindow
 {
 public:
 	void (*Draw)(void);
+	void(*KeyDown)(int);
 
 	GameWindow(const char *title, const uint width, const uint height);
 	~GameWindow();

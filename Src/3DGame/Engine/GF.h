@@ -4,7 +4,7 @@
 #include "Shapes.h"
 #include "Window.h"
 
-//#define _SHOW_FUNCTIONS_USED
+//#define _SHOW_GF_FUNCTIONS_USED
 
 #define GF_POINTS			0
 #define GF_LINES			1
@@ -25,12 +25,13 @@ void GF_SetOrthographic(const float width, const float height, const float front
 void GF_SetViewport(const Rectangle *rect);
 void GF_AddPoint(const Vector3 v, const Color c);
 void GF_AddPoint(const float x, const float y, const float z, const Color c);
+void GF_AddPoint(const Vertex vtx);
 
 #ifdef _USE_GF_INTERNAL
 void Raise(const char *msg);
 void GF_Line(const int x0, const int y0, const int z0, const Color c0, const int x1, const int y1, const int z1, const Color c1);
 void GF_Line(const Vertex *v0, const Vertex *v1);
-void GF_HLine(const float x0, const float y0, const float z0, const Color c0, const float x1, const float y1, const float z1, const Color c1);
+void GF_HLine(const float x0, const float z0, const Color c0, const float x1, const float z1, const Color c1, const float y);
 void GF_HLine(const Vertex *v0, const Vertex *v1);
 void GF_BFTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);
 void GF_TFTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);
@@ -46,6 +47,6 @@ Vect3 GF_ToNDC(const Vector4 *v);
 void GF_ToScreen(Vect3 *v);
 #endif
 
-#ifdef _SHOW_FUNCTIONS_USED
+#ifdef _SHOW_GF_FUNCTIONS_USED
 void PrintFunction(const char *name);
 #endif

@@ -8,6 +8,10 @@ Vertex::Vertex(Vect3 v, Color c)
 	this->c = c;
 }
 
+Vertex::Vertex(float x, float y, float z, Color c)
+	:Vertex(Vect3(x, y, z), c)
+{}
+
 Line::Line(Vertex v0, Vertex v1)
 	:v0(v0), v1(v1)
 { }
@@ -61,7 +65,7 @@ bool LineClip(Line * l, const Rect vp)
 		if (occ & TOP)
 		{
 			x = l->v0.v.X + (l->v1.v.X - l->v0.v.X) * (vp.h - l->v0.v.Y) / (l->v1.v.Y - l->v0.v.Y);
-			y = vp.h;
+			y = vp.h - 1;
 		}
 		else if (occ & BOTTOM)
 		{
@@ -71,7 +75,7 @@ bool LineClip(Line * l, const Rect vp)
 		else if (occ & RIGHT)
 		{
 			y = l->v0.v.Y + (l->v1.v.Y - l->v0.v.Y) * (vp.w - l->v0.v.X) / (l->v1.v.X - l->v0.v.X);
-			x = vp.w;
+			x = vp.w - 1;
 		}
 		else if (occ & LEFT)
 		{
@@ -80,7 +84,7 @@ bool LineClip(Line * l, const Rect vp)
 		}
 
 		if (occ & VERTICAL) z = lerp(l->v0.v.Z, l->v1.v.Z, invLerp(l->v0.v.Y, l->v1.v.Y, y));
-		else if (occ & HORIZONTAL) z = lerp(l->v0.v.Z, l->v1.v.Z, invLerp(l->v0.v.X, l->v1.v.X, x));
+		if (occ & HORIZONTAL) z = lerp(l->v0.v.Z, l->v1.v.Z, invLerp(l->v0.v.X, l->v1.v.X, x));
 
 		if (occ == oc0)
 		{
@@ -110,19 +114,7 @@ void Swap(Vertex *v0, Vertex *v1)
 
 void SortVerticesByY(Vertex * v0, Vertex * v1, Vertex * v2)
 {
-	if (v1->v.Y < v0->v.Y)
-	{
-		if (v1->v.Y <= v2->v.Y)
-		{
-			Swap(v0, v1);
-			if (v2->v.Y < v1->v.Y) Swap(v1, v2);
-		}
-		else Swap(v0, v2);
-	}
-	else if (v2->v.Y < v0->v.Y)
-	{
-		Swap(v0, v2);
-		if (v1->v.Y < v2->v.Y) Swap(v1, v2);
-	}
-	else if (v2->v.Y < v1->v.Y) Swap(v1, v2);
+	if (v0->v.Y > v1->v.Y) Swap(v0, v1);
+	if (v0->v.Y > v2->v.Y) Swap(v0, v2);
+	if (v1->v.Y > v2->v.Y) Swap(v1, v2);
 }
