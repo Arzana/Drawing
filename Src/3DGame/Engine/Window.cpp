@@ -16,6 +16,7 @@ GameWindow::GameWindow(const char * title, const uint width, const uint height)
 
 	InitWindow();
 	ResetZBuffer();
+	SDL_ShowCursor(SDL_DISABLE);
 }
 
 GameWindow::~GameWindow()
@@ -145,6 +146,7 @@ bool GameWindow::PointVisible(const uint x, const uint y) const
 void GameWindow::Tick()
 {
 	SDL_Event ev;
+	bool fixMove = false;
 
 	while (SDL_PollEvent(&ev))
 	{
@@ -155,6 +157,19 @@ void GameWindow::Tick()
 			break;
 		case SDL_KEYDOWN:
 			if (KeyDown) KeyDown(ev.key.keysym.scancode);
+			break;
+		case SDL_MOUSEMOTION:
+			if (ev.motion.x + ev.motion.xrel <= 0 ||
+				ev.motion.x + ev.motion.xrel >= width ||
+				ev.motion.y + ev.motion.yrel <= 0 ||
+				ev.motion.y + ev.motion.yrel >= height)
+			{
+				SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
+				SDL_WarpMouseInWindow(window, width >> 1, height >> 1);
+				SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
+				fixMove = true;
+			}
+			else if (MouseMove && !fixMove) MouseMove(ev.motion.x, ev.motion.y, ev.motion.xrel, ev.motion.yrel);
 			break;
 		}
 	}

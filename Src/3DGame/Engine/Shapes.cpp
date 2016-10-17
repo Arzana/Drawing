@@ -3,34 +3,24 @@
 #include "Shapes.h"
 
 Vertex::Vertex(Vect3 v, Color c)
-{
-	this->v = v;
-	this->c = c;
-}
+	: v(v), c(c)
+{ }
 
 Vertex::Vertex(float x, float y, float z, Color c)
-	:Vertex(Vect3(x, y, z), c)
-{}
+	: v(Vect3(x, y, z)), c(c)
+{ }
 
 Line::Line(Vertex v0, Vertex v1)
-	:v0(v0), v1(v1)
+	: v0(v0), v1(v1)
 { }
 
 Rectangle::Rectangle(void)
-{
-	x = 0;
-	y = 0;
-	w = 0;
-	h = 0;
-}
+	: x(0), y(0), w(0), h(0)
+{ }
 
 Rectangle::Rectangle(int x, int y, int w, int h)
-{
-	this->x = x;
-	this->y = y;
-	this->w = w;
-	this->h = h;
-}
+	: x(x), y(y), w(w), h(h)
+{ }
 
 OutCode ComputeOutCode(const Vect3 v, const Rect vp)
 {
@@ -105,9 +95,10 @@ bool LineClip(Line * l, const Rect vp)
 	return result;
 }
 
-void Swap(Vertex *v0, Vertex *v1)
+template <typename T>
+void Swap(T *v0, T *v1)
 {
-	Vertex temp = *v0;
+	T temp = *v0;
 	*v0 = *v1;
 	*v1 = temp;
 }

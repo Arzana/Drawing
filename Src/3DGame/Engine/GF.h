@@ -18,7 +18,7 @@ void GF_SetWindow(GameWindow *window);
 void GF_StartRender(const int primitiveType);
 void GF_EndRender(void);
 void GF_SetBufferLength(const size_t length);
-void GF_SetWorldMatrix(const Matrix4 *m);
+void GF_SetModelMatrix(const Matrix4 *m);
 void GF_SetViewMatrix(const Matrix4 *m);
 void GF_SetFrustrum(const float fovY, const float aspr, const float front, const float back);
 void GF_SetOrthographic(const float width, const float height, const float front, const float back);

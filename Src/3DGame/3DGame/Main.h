@@ -1,8 +1,9 @@
 #pragma once
 
 #include <GF.h>
-#include <Mtrx4.h>
 #include <cstdio>
+#include "Camera.h"
+#include "Cube.h"
 
 #define _USE_FULL_HD
 
@@ -20,5 +21,6 @@
 
 const float aspr = WIDTH / HEIGHT;
 
+void MouseMove(int, int, int, int);
 void KeyPress(int);
 void Render(void);

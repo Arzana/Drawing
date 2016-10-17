@@ -13,6 +13,7 @@ class GameWindow
 public:
 	void (*Draw)(void);
 	void(*KeyDown)(int);
+	void(*MouseMove)(int, int, int, int);
 
 	GameWindow(const char *title, const uint width, const uint height);
 	~GameWindow();

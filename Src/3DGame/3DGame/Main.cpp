@@ -1,14 +1,16 @@
 #include "Main.h"
 
 GameWindow *window;
-float rot = 0;
-Vect3 camPos = Vect3(0, 0, 2);
+Camera *cam;
 
 int main(int argc, char *argv[])
 {
 	window = new GameWindow("Test", WIDTH, HEIGHT);
 	window->Draw = Render;
 	window->KeyDown = KeyPress;
+	window->MouseMove = MouseMove;
+
+	cam = new Camera();
 
 	GF_SetWindow(window);
 	GF_SetFrustrum(FOV_Y, aspr, DEPTH_NEAR, DEPTH_FAR);
@@ -16,9 +18,17 @@ int main(int argc, char *argv[])
 	window->Run();
 
 	delete window;
+	delete cam;
+
 	printf("Press any key to continue...");
 	getchar();
 	return EXIT_SUCCESS;
+}
+
+void MouseMove(int x, int y, int dX, int dY)
+{
+	cam->AppendYawDegr(dX * 0.1);
+	cam->AppendPitchDegr(dY * 0.1);
 }
 
 void KeyPress(int scanCode)
@@ -28,42 +38,27 @@ void KeyPress(int scanCode)
 	case 41: // ESC
 		window->Terminate();
 		break;
+	case 26: // W
+		cam->Move(VECT3_FORWARD);
+		break;
+	case 22: // S
+		cam->Move(VECT3_BACK);
+		break;
+	case 4: // A
+		cam->Move(VECT3_LEFT);
+		break;
+	case 7: // D
+		cam->Move(VECT3_RIGHT);
+		break;
 	}
 }
 
 void Render(void)
 {
+	cam->Update();
+
 	window->Clear(CLR_BLACK);
+	GF_SetViewMatrix(cam->GetView());
 
-	rot += rot < 360 ? 0.5 : -rot;
-	Mtrx4 rotation = Mtrx4::CreateYawPitchRoll(rot * deg2rad, rot * deg2rad, rot * deg2rad);
-	GF_SetViewMatrix(&Mtrx4::CreateView(&camPos, &(camPos + rotation.Forwards()), &rotation.Up()));
-
-	GF_StartRender(GF_LINE_LOOP);
-	GF_SetBufferLength(4);
-	GF_AddPoint(-0.5, -0.5, -2, CLR_BLACK);
-	GF_AddPoint(0.5, -0.5, -2, CLR_RED);
-	GF_AddPoint(0.5, 0.5, -2, CLR_GREEN);
-	GF_AddPoint(-0.5, 0.5, -2, CLR_BLUE);
-	GF_EndRender();
-
-	GF_StartRender(GF_LINE_LOOP);
-	GF_SetBufferLength(4);
-	GF_AddPoint(-0.5, -0.5, -3, CLR_WHITE);
-	GF_AddPoint(0.5, -0.5, -3, CLR_CYAN);
-	GF_AddPoint(0.5, 0.5, -3, CLR_MAGENTA);
-	GF_AddPoint(-0.5, 0.5, -3, CLR_YELLOW);
-	GF_EndRender();
-
-	GF_StartRender(GF_LINES);
-	GF_SetBufferLength(8);
-	GF_AddPoint(-0.5, -0.5, -2, CLR_BLACK);
-	GF_AddPoint(-0.5, -0.5, -3, CLR_WHITE);
-	GF_AddPoint(0.5, -0.5, -2, CLR_RED);
-	GF_AddPoint(0.5, -0.5, -3, CLR_CYAN);
-	GF_AddPoint(0.5, 0.5, -2, CLR_GREEN);
-	GF_AddPoint(0.5, 0.5, -3, CLR_MAGENTA);
-	GF_AddPoint(-0.5, 0.5, -2, CLR_BLUE);
-	GF_AddPoint(-0.5, 0.5, -3, CLR_YELLOW);
-	GF_EndRender();
+	RenderCube();
 }

@@ -3,6 +3,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#define M_TAU				6.28318530717958647692
+
 #define abs(x)				((x) < 0 ? (x) * -1 : (x))
 #define max(x, y)			((x) < (y) ? (y) : (x))
 #define min(x, y)			((x) < (y) ? (x) : (y))

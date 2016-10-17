@@ -14,15 +14,14 @@ Rect port;
 int primType = GF_POINTS;
 int projType = GF_FRUSTRUM;
 int startCalled = 0;
-int clipLine = 0;
 
-size_t bufferLength;
-size_t bufferIndex;
+size_t bufferLength = 0;
+size_t bufferIndex = 0;
 Vect3 *vbuffer = NULL;
 Color *cbuffer = NULL;
 Vect4 *hbuffer = NULL;
 
-Mtrx4 world = MTRX4_IDENTITY;
+Mtrx4 model = MTRX4_IDENTITY;
 Mtrx4 view = MTRX4_IDENTITY;
 Mtrx4 pers = MTRX4_IDENTITY;
 float near = 0;
@@ -69,10 +68,7 @@ void GF_EndRender(void)
 		return;
 	}
 
-	startCalled = 0;
-	bufferIndex = 0;
-
-	hbuffer = Mtrx4::Transform(&(pers * view * world), vbuffer, bufferLength);
+	hbuffer = Mtrx4::Transform(&(pers * view * model), vbuffer, bufferLength);
 
 	switch (primType)
 	{
@@ -102,7 +98,10 @@ void GF_EndRender(void)
 		break;
 	}
 
+	startCalled = 0;
+	bufferIndex = 0;
 	bufferLength = 0;
+	model = MTRX4_IDENTITY;
 	free(vbuffer);
 	free(cbuffer);
 	free(hbuffer);
@@ -125,19 +124,19 @@ void GF_SetBufferLength(size_t length)
 	cbuffer = malloc_s(Color, length);
 }
 
-void GF_SetWorldMatrix(const Matrix4 * m)
+void GF_SetModelMatrix(const Matrix4 * m)
 {
 #ifdef _SHOW_GF_FUNCTIONS_USED
 	PrintFunction("GF_SetWorldMatrix(Matrix4*)");
 #endif
 
-	world = *m;
+	model = *m;
 }
 
 void GF_SetViewMatrix(const Matrix4 * m)
 {
 #ifdef _SHOW_GF_FUNCTIONS_USED
-	PrintFunction("GF_SetViewMatrix(Matrix4*)");
+	PrintFunction("GF_SetModelMatrix(Matrix4*)");
 #endif
 
 	view = *m;
@@ -268,7 +267,7 @@ void GF_LineStrip(void)
 			if (LineClip(&l, port)) GF_Line(&l.v0, &l.v1);
 		}
 		else GF_Line(&Vertex(p0, cbuffer[i]), &Vertex(p1, cbuffer[i + 1]));
-}
+	}
 }
 
 void GF_LineLoop(void)
@@ -290,7 +289,7 @@ void GF_LineLoop(void)
 			if (LineClip(&l, port)) GF_Line(&l.v0, &l.v1);
 		}
 		else GF_Line(&Vertex(p0, cbuffer[i]), &Vertex(p1, cbuffer[i + 1]));
-}
+	}
 
 	Vect4 ph0 = hbuffer[bufferLength - 1], ph1 = hbuffer[0];
 	Vect3 p0 = GF_ToNDC(&ph0), p1 = GF_ToNDC(&ph1);
@@ -320,7 +319,7 @@ void GF_Triangles(void)
 		GF_ToScreen(&p0), GF_ToScreen(&p1), GF_ToScreen(&p2);
 
 		GF_FullTrgl(&Vertex(p0, cbuffer[i]), &Vertex(p1, cbuffer[i + 1]), &Vertex(p2, cbuffer[i + 2]));
-}
+	}
 }
 
 void GF_TriangleStrip(void)
@@ -338,7 +337,7 @@ void GF_TriangleStrip(void)
 		GF_ToScreen(&p0), GF_ToScreen(&p1), GF_ToScreen(&p2);
 
 		GF_FullTrgl(&Vertex(p0, cbuffer[i - 2]), &Vertex(p1, cbuffer[i - 1]), &Vertex(p2, cbuffer[i]));
-}
+	}
 }
 
 void GF_TriangleFan(void)
@@ -356,7 +355,7 @@ void GF_TriangleFan(void)
 		GF_ToScreen(&p0), GF_ToScreen(&p1), GF_ToScreen(&p2);
 
 		GF_FullTrgl(&Vertex(p0, cbuffer[0]), &Vertex(p1, cbuffer[i]), &Vertex(p2, cbuffer[i + 1]));
-}
+	}
 }
 
 Vect3 GF_ToNDC(const Vect4 * v)
@@ -375,9 +374,9 @@ void GF_ToScreen(Vect3 * v)
 	PrintFunction("GF_ToScreen(Vect3*)");
 #endif
 
-	v->X = port.w / 2 * v->X + port.w / 2;
-	v->Y = port.h / 2 * v->Y + port.h / 2;
-	v->Z = (far - near) / 2 * v->Z + (far + near) / 2;
+	v->X = port.w * 0.5 * v->X + port.w * 0.5;
+	v->Y = port.h * 0.5 * v->Y + port.h * 0.5;
+	v->Z = (far - near) * 0.5 * v->Z + (far + near) * 0.5;
 }
 
 void GF_Line(const int x0, const int y0, const int z0, const Color c0, const int x1, const int y1, const int z1, const Color c1)
@@ -446,7 +445,7 @@ void GF_HLine(const float x0, const float z0, const Color c0, const float x1, co
 	if (x0 == x1)
 	{
 		w->TryPlot(x0, y, z0, c0);
-}
+	}
 	else if (x0 < x1)
 	{
 		for (float x = x0; x <= x1; ++x)
