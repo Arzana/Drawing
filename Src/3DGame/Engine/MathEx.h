@@ -1,18 +1,19 @@
 #pragma once
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
+#define M_PI				3.14159265358979323846
 #define M_TAU				6.28318530717958647692
 
-#define abs(x)				((x) < 0 ? (x) * -1 : (x))
-#define max(x, y)			((x) < (y) ? (y) : (x))
 #define min(x, y)			((x) < (y) ? (x) : (y))
+#define max(x, y)			((x) > (y) ? (x) : (y))
+#define abs(x)				((x) < 0 ? (x) * -1 : (x))
+#define round(x)			(ipart((x) + 0.5f))
+
 #define clamp(mi, ma, v)	(min(max((mi), (v)), (ma)))
 #define square(x)			((x) * (x))
 #define cube(x)				(square(x) * (x))
 #define ipart(x)			(int(x))
-#define round(x)			(ipart((x) + .5f))
 #define fpart(x)			(float(x) - ipart(x))
 #define rfpart(x)			(float(1.0 - fpart(x))
 #define cot(x)				(1.0f - tanf(x))
