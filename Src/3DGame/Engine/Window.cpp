@@ -45,7 +45,7 @@ GameWindow::GameWindow(const char * title, const uint width, const uint height)
 GameWindow::~GameWindow()
 {
 	TerminateWindow();
-	if (zBuffer) free(zBuffer);
+	if (zBuffer) free_s(zBuffer);
 	if (isRunning) delete isRunning;
 	if (IsFixedTimeStep) delete IsFixedTimeStep;
 	if (Lag) delete Lag;
@@ -88,12 +88,15 @@ void GameWindow::Plot_S(const uint x, const uint y, const Color c)
 void GameWindow::TryPlot(const Vect3 * v, const Color c)
 {
 	uint i = ipart(v->Y) * width + ipart(v->X);
-	if (v->Z < zBuffer[i])
+
+	if (zBuffer)
 	{
-		Color *pix = PIXELS;
+		if (v->Z > zBuffer[i]) return;
 		zBuffer[i] = v->Z;
-		pix[i] = c;
 	}
+
+	Color *pix = PIXELS;
+	pix[i] = c;
 }
 
 void GameWindow::TryPlot(const float x, const float y, const float z, const Color c)
@@ -110,6 +113,13 @@ void GameWindow::TryPlot_S(const float x, const float y, const float z, const Co
 {
 	TryPlot_S(&Vect3(x, y, z), c);
 }
+
+void GameWindow::SetZBuffering(const bool value)
+{
+	if (value && !zBuffer) zBuffer = malloc_s(float, width * height);
+	else if (!value && zBuffer) free_s(zBuffer);
+}
+
 
 void GameWindow::Run(void)
 {
@@ -241,8 +251,8 @@ void GameWindow::DoDraw(void)
 	if (frameBuffer->size() > buffLen) frameBuffer->pop();
 
 	if (Draw) Draw();
+	if (zBuffer) ResetZBuffer();
 
-	ResetZBuffer();
 	SDL_UpdateWindowSurface(window);
 }
 

@@ -90,26 +90,9 @@ bool Matrix4::Equals(const Matrix4 * m1, const Matrix4 * m2)
 
 Matrix4 Matrix4::CreateYawPitchRoll(float yaw, float pitch, float roll)
 {
-	Matrix4 result = CreateRotationX(pitch);
-	result *= CreateRotation(&result.Up(), yaw);
-	return result * CreateRotation(&result.Forwards(), roll);
-}
-
-Matrix4 Matrix4::CreateView(const Vector3 * pos, const Vector3 * tar, const Vector3 * up)
-{
-	Vector3 *zAxis = &Vector3::Normalize(&Vector3::Subtract(tar, pos));
-	Vector3 *xAxis = &Vector3::Normalize(&Vector3::Cross(up, zAxis));
-	Vector3 *yAxis = &Vector3::Cross(zAxis, xAxis);
-
-	float xDot = Vector3::Dot(xAxis, pos);
-	float yDot = Vector3::Dot(yAxis, pos);
-	float zDot = Vector3::Dot(zAxis, pos);
-
-	return Matrix4(
-		xAxis->X, yAxis->X, zAxis->X, 0,
-		xAxis->Y, yAxis->Y, zAxis->Y, 0,
-		xAxis->Z, yAxis->Z, zAxis->Z, 0,
-		-xDot, -yDot, -zDot, 1);
+	Mtrx4 result = Mtrx4::CreateRotation(&VECT3_FORWARD, roll);
+	result *= Mtrx4::CreateRotation(&VECT3_UP, yaw);
+	return result * Mtrx4::CreateRotation(&VECT3_RIGHT, pitch);
 }
 
 Matrix4 Matrix4::CreateFrustrum(float fovY, float aspr, float n, float f)
@@ -141,7 +124,7 @@ Matrix4 Matrix4::CreateOrthographic(float width, float height, float n, float f)
 	float b = -t;
 	float l = -r;
 
-	float m11 = 2 * n / (r - l);
+	float m11 = 2 / (r - l);
 	float m14 = -(r + l) / (r - l);
 	float m22 = 2 / (t - b);
 	float m24 = -(t + b) / (t - b);
@@ -157,23 +140,24 @@ Matrix4 Matrix4::CreateOrthographic(float width, float height, float n, float f)
 
 Matrix4 Matrix4::CreateRotation(const Vector3 * axis, float rads)
 {
-	float l = axis->Length();
-	float x2 = square(axis->X);
-	float y2 = square(axis->Y);
-	float z2 = square(axis->Z);
-	float L = sqrtf(l);
 	float c = cosf(rads);
 	float s = sinf(rads);
+	float xx = square(axis->X);
+	float xy = axis->X * axis->Y;
+	float xz = axis->X * axis->Z;
+	float yy = sqrt(axis->Y);
+	float yz = axis->Y * axis->Z;
+	float zz = square(axis->Z);
 
-	float m11 = (x2 + (y2 + z2) * c) / l;
-	float m12 = (axis->X * axis->Y * (1 - c) - axis->Z * L * s) / l;
-	float m13 = (axis->X * axis->Z * (1 - c) + axis->Y * L * s) / l;
-	float m21 = (axis->X * axis->Y * (1 - c) + axis->Z * L * s) / l;
-	float m22 = (y2 + (x2 + z2) * c) / l;
-	float m23 = (axis->Y * axis->Z * (1 - c) - axis->X * L * s) / l;
-	float m31 = (axis->X * axis->Z * (1 - c) - axis->Y * L * s) / l;
-	float m32 = (axis->Y * axis->Z * (1 - c) + axis->X * L * s) / l;
-	float m33 = (z2 + (x2 + y2) * c) / l;
+	float m11 = xx * (1 - c) + c;
+	float m12 = xy * (1 - c) - axis->Z * s;
+	float m13 = xz * (1 - c) + axis->Y * s;
+	float m21 = xy * (1 - c) + axis->Z * s;
+	float m22 = yy * (1 - c) + c;
+	float m23 = yz * (1 - c) - axis->X * s;
+	float m31 = xz * (1 - c) - axis->Y * s;
+	float m32 = yz * (1 - c) + axis->X * s;
+	float m33 = zz * (1 - c) + c;
 
 	return Matrix4(
 		m11, m12, m13, 0,
@@ -278,7 +262,7 @@ Vector4* Matrix4::Transform(const Matrix4 * m, const Vector3 * v, int length)
 
 	for (size_t i = 0; i < length; i++)
 	{
-		result[i] = *m * v[i];
+		result[i] = Transform(m, v + i);
 	}
 
 	return result;

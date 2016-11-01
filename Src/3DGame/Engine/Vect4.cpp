@@ -2,28 +2,16 @@
 #include "MathEx.h"
 
 Vector4::Vector4(void)
-{
-	X = 0;
-	Y = 0;
-	Z = 0;
-	W = 0;
-}
+	: X(0), Y(0), Z(0), W(0)
+{ }
 
 Vector4::Vector4(float v)
-{
-	X = v;
-	Y = v;
-	Z = v;
-	W = v;
-}
+	: X(v), Y(v), Z(v), W(v)
+{ }
 
 Vector4::Vector4(float x, float y, float z, float w)
-{
-	X = x;
-	Y = y;
-	Z = z;
-	W = w;
-}
+	: X(x), Y(y), Z(z), W(w)
+{ }
 
 Vector4 Vector4::operator-(void) const
 {
@@ -186,7 +174,10 @@ void Vector4::Clamp(const Vector4 * mi, const Vector4 * ma)
 
 bool Vector4::Clip(void) const
 {
-	return X < -W || Y < -W || Z < -W || X > W || Y > W || Z > W;
+	float pW = abs(W);
+	float nW = -pW;
+
+	return X < nW || Y < nW || Z < nW || X > pW || Y > pW || Z > pW;
 }
 
 float Vector4::Distance(const Vector4 * v1, const Vector4 * v2)

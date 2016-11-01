@@ -14,6 +14,10 @@ Line::Line(Vertex v0, Vertex v1)
 	: v0(v0), v1(v1)
 { }
 
+Line::Line(const Vertex * v0, const Vertex * v1)
+	: v0(*v0), v1(*v1)
+{ }
+
 Rectangle::Rectangle(void)
 	: x(0), y(0), w(0), h(0)
 { }

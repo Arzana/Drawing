@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdio>
+#include <Utils.h>
 #include <GF.h>
 #include "Camera.h"
 #include "Cube.h"

@@ -2,22 +2,16 @@
 #include "MathEx.h"
 
 Vector2::Vector2(void)
-{
-	X = 0;
-	Y = 0;
-}
+	: X(0), Y(0)
+{ }
 
 Vector2::Vector2(float v)
-{
-	X = v;
-	Y = v;
-}
+	: X(v), Y(v)
+{ }
 
 Vector2::Vector2(float x, float y)
-{
-	X = x;
-	Y = y;
-}
+	: X(x), Y(y)
+{ }
 
 Vector2 Vector2::operator-(void) const
 {

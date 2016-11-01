@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 	window->KeyDown = KeyPress;
 	window->MouseMove = MouseMove;
 
-	cam = new Camera();
+	cam = new Camera(Vect3(0, 0, (2 / sin(FOV_Y / 2 * deg2rad))));
 
 	GF_SetWindow(window);
 	GF_SetFrustrum(FOV_Y, aspr, DEPTH_NEAR, DEPTH_FAR);
@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
 
 void MouseMove(int x, int y, int dX, int dY)
 {
-	cam->AppendYawDegr(dX * 0.1);
-	cam->AppendPitchDegr(dY * 0.1);
+	//cam->AppendYawDegr(dX * 0.1);
+	//cam->AppendPitchDegr(dY * 0.1);
 }
 
 void KeyPress(int scanCode)
@@ -60,5 +60,6 @@ void Render(void)
 	window->Clear(CLR_BLACK);
 	GF_SetViewMatrix(cam->GetView());
 
-	RenderCube();
+	RenderCube(CUBE_LINES);
+	printf("FPS: %f\n", window->GetFps());
 }

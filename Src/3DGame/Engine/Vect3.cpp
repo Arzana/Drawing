@@ -2,25 +2,16 @@
 #include "MathEx.h"
 
 Vector3::Vector3(void)
-{
-	X = 0;
-	Y = 0;
-	Z = 0;
-}
+	: X(0), Y(0), Z(0)
+{ }
 
 Vector3::Vector3(float v)
-{
-	X = v;
-	Y = v;
-	Z = v;
-}
+	: X(v), Y(v), Z(v)
+{ }
 
 Vector3::Vector3(float x, float y, float z)
-{
-	X = x;
-	Y = y;
-	Z = z;
-}
+	: X(x), Y(y), Z(z)
+{ }
 
 Vector3 Vector3::operator-(void) const
 {

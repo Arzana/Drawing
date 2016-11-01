@@ -17,6 +17,7 @@ struct Line
 	Vertex v0, v1;
 
 	Line(Vertex v0, Vertex v1);
+	Line(const Vertex *v0, const Vertex *v1);
 };
 
 typedef struct Triangle

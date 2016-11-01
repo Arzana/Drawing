@@ -196,14 +196,8 @@ void Camera::Move(Vect3 direction)
 
 void Camera::Update(void)
 {
-	Mtrx4 rot = Mtrx4::CreateYawPitchRoll(rotation->X, rotation->Y, rotation->Z);
-	Mtrx4 trans = Mtrx4::CreateTranslation(position);
-
-	Vect4 targH = (rot * VECT3_FORWARD);
-	Vect3 targ = Vect3(targH.X, targH.Y, targH.Z);
-
-	Vect3 lookAt = *position + targ;
-	*view = Mtrx4::CreateView(position, &lookAt, &VECT3_UP) * trans;
+	*view = Mtrx4::CreateYawPitchRoll(-rotation->X, -rotation->Y, -rotation->Z);
+	*view *= Mtrx4::CreateTranslation(&Vect3::Negate(position));
 }
 
 const Mtrx4 * Camera::GetView(void) const

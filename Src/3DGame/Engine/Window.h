@@ -37,6 +37,7 @@ public:
 	void TryPlot(const float x, const float y, const float z, const Color c);
 	void TryPlot_S(const Vect3 *v, const Color c);
 	void TryPlot_S(const float x, const float y, const float z, const Color c);
+	void SetZBuffering(const bool value);
 	void Run(void);
 	void Terminate();
 	uint GetWidth(void) const;

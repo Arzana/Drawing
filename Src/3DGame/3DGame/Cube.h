@@ -1,35 +1,20 @@
 #pragma once
 #include <Shapes.h>
 
-const size_t cubeModelVertices = 8;
-const size_t cubeModelIndices = 12;
+#define CUBE_POINTS		0
+#define CUBE_LINES		1
+#define CUBE_TRIANGLES	2
 
-const Vertex cubeModel[cubeModelVertices] =
+const Vertex cubeModel[8] =
 {
-	Vertex(1, 1, 1, CLR_BLACK),
-	Vertex(1, 1, -1, CLR_RED),
-	Vertex(1, -1, -1, CLR_GREEN),
-	Vertex(-1, -1, -1, CLR_BLUE),
-	Vertex(-1, -1, 1, CLR_CYAN),
-	Vertex(-1, 1, 1, CLR_MAGENTA),
-	Vertex(-1, 1, -1, CLR_YELLOW),
-	Vertex(1, -1, 1, CLR_WHITE)
+	Vertex(1, 1, 1, CLR_BLACK),		//0
+	Vertex(1, 1, -1, CLR_RED),		//1
+	Vertex(1, -1, -1, CLR_GREEN),	//2
+	Vertex(-1, -1, -1, CLR_BLUE),	//3
+	Vertex(-1, -1, 1, CLR_CYAN),	//4
+	Vertex(-1, 1, 1, CLR_MAGENTA),	//5
+	Vertex(-1, 1, -1, CLR_YELLOW),	//6
+	Vertex(1, -1, 1, CLR_WHITE)		//7
 };
 
-const int indices[cubeModelIndices][2] = 
-{
-	{5, 4},
-	{5, 0},
-	{4, 7},
-	{7, 0},
-	{6, 5},
-	{1, 0},
-	{3, 4},
-	{2, 7},
-	{6, 3},
-	{6, 1},
-	{3, 2},
-	{2, 1}
-};
-
-void RenderCube(void);
+void RenderCube(const int type);

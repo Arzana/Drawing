@@ -1,8 +1,11 @@
 #define _USE_GF_INTERNAL
 #define _USE_LINE_CLIP
 
-#define GF_FRUSTRUM		0
-#define GF_ORTHO		1
+#define vrtxat(x)			(&Vertex(GF_ToScreen(hbuffer + x), cbuffer[x]))
+#define single_line_start	int clp = hbuffer[i].Clip() + hbuffer[j].Clip(); if (clp) {
+#define single_line_end		Line *l = &Line(vrtxat(i), vrtxat(j)); if (LineClip(l, port)) { GF_Line(l); } } else { GF_Line(vrtxat(i), vrtxat(j)); }
+#define single_line_for		single_line_start if (!flags.Clip || clp > 1) { continue; } single_line_end
+#define single_line_nonfor	single_line_start if (!flags.Clip || clp > 1) { return; } single_line_end
 
 #include "Utils.h"
 #include "GF.h"
@@ -10,10 +13,8 @@
 #include <cfloat>
 
 GameWindow *w = NULL;
+Flags flags = Flags();
 Rect port;
-int primType = GF_POINTS;
-int projType = GF_FRUSTRUM;
-int startCalled = 0;
 
 size_t bufferLength = 0;
 size_t bufferIndex = 0;
@@ -43,15 +44,15 @@ void GF_StartRender(const int primitiveType)
 	PrintFunction("GF_StartRender(int)");
 #endif
 
-	if (!w || startCalled)
+	if (!w || flags.Strt)
 	{
 		if (!w) Raise("GF_SetWindow must be called before calling GF_StartRender!");
-		if (startCalled) Raise("GF_EndRender must be called before calling GF_StartRender again!");
+		if (flags.Strt) Raise("GF_EndRender must be called before calling GF_StartRender again!");
 		return;
 	}
 
-	primType = primitiveType;
-	startCalled = 1;
+	flags.Prim = primitiveType;
+	flags.Strt = 1;
 }
 
 void GF_EndRender(void)
@@ -60,17 +61,19 @@ void GF_EndRender(void)
 	PrintFunction("GF_EndRender(void)");
 #endif
 
-	if (!startCalled || bufferIndex < bufferLength || !w)
+	if (!flags.Strt || bufferIndex < bufferLength || !w)
 	{
-		if (!startCalled) Raise("GF_StartRender must be called before calling GF_EndRender!");
+		if (!flags.Strt) Raise("GF_StartRender must be called before calling GF_EndRender!");
 		if (bufferIndex < bufferLength) Raise("Not all points in the buffer have been set!");
 		if (!w) Raise("GF_SetWindow must be called before calling GF_EndRender!");
 		return;
 	}
 
-	hbuffer = Mtrx4::Transform(&(pers * view * model), vbuffer, bufferLength);
+	Mtrx4 modelView = model * view;
+	Mtrx4 full = pers * modelView;
+	hbuffer = Mtrx4::Transform(&full, vbuffer, bufferLength);
 
-	switch (primType)
+	switch (flags.Prim)
 	{
 	case GF_POINTS:
 		GF_Points();
@@ -98,7 +101,7 @@ void GF_EndRender(void)
 		break;
 	}
 
-	startCalled = 0;
+	flags.Strt = 0;
 	bufferIndex = 0;
 	bufferLength = 0;
 	model = MTRX4_IDENTITY;
@@ -149,7 +152,7 @@ void GF_SetFrustrum(const float fovY, const float aspr, const float front, const
 #endif
 
 	pers = Mtrx4::CreateFrustrum(fovY, aspr, front, back);
-	projType = GF_FRUSTRUM;
+	flags.Proj = 1;
 	far = back;
 	near = front;
 }
@@ -161,7 +164,7 @@ void GF_SetOrthographic(const float width, const float height, const float front
 #endif
 
 	pers = Mtrx4::CreateOrthographic(width, height, front, back);
-	projType = GF_ORTHO;
+	flags.Proj = 0;
 	far = back;
 	near = front;
 }
@@ -175,15 +178,26 @@ void GF_SetViewport(const Rectangle * rect)
 	port = *rect;
 }
 
+void GF_SetFlag_Clip(const bool value)
+{
+	flags.Clip = value;
+}
+
+void GF_SetFlag_ZBuff(const bool value)
+{
+	flags.ZBuff = value;
+	w->SetZBuffering(value);
+}
+
 void GF_AddPoint(const Vector3 v, const Color c)
 {
 #ifdef _SHOW_GF_FUNCTIONS_USED
 	PrintFunction("GF_AddPoint(Vector3, Color)");
 #endif
 
-	if (!startCalled || bufferIndex >= bufferLength)
+	if (!flags.Strt || bufferIndex >= bufferLength)
 	{
-		if (!startCalled) Raise("GF_StartRender must be called before calling GF_AddPoint!");
+		if (!flags.Strt) Raise("GF_StartRender must be called before calling GF_AddPoint!");
 		if (bufferLength < 1) Raise("GF_SetBufferLength must be called before calling GF_AddPoint!");
 		if (bufferIndex >= bufferLength) Raise("Cannot add any more points to the buffer!");
 		return;
@@ -232,19 +246,9 @@ void GF_Lines(void)
 	PrintFunction("GF_Lines(void)");
 #endif
 
-	for (size_t i = 0; i < bufferLength; i += 2)
+	for (size_t i = 0, j = 1; i < bufferLength; i += 2, j += 2)
 	{
-		Vect4 ph0 = hbuffer[i], ph1 = hbuffer[i + 1];
-		Vect3 p0 = GF_ToNDC(&ph0), p1 = GF_ToNDC(&ph1);
-		GF_ToScreen(&p0), GF_ToScreen(&p1);
-
-		if (ph0.Clip() || ph1.Clip())
-		{
-			if (ph0.W < 0 || ph1.W < 0) continue;
-			Line l = Line(Vertex(p0, cbuffer[i]), Vertex(p1, cbuffer[i + 1]));
-			if (LineClip(&l, port)) GF_Line(&l.v0, &l.v1);
-		}
-		else GF_Line(&Vertex(p0, cbuffer[i]), &Vertex(p1, cbuffer[i + 1]));
+		single_line_for
 	}
 }
 
@@ -254,19 +258,9 @@ void GF_LineStrip(void)
 	PrintFunction("GF_LineStrip(void)");
 #endif
 
-	for (size_t i = 0; i < bufferLength - 1; i++)
+	for (size_t i = 0, j = 1; i < bufferLength - 1; i++, j++)
 	{
-		Vect4 ph0 = hbuffer[i], ph1 = hbuffer[i + 1];
-		Vect3 p0 = GF_ToNDC(&ph0), p1 = GF_ToNDC(&ph1);
-		GF_ToScreen(&p0), GF_ToScreen(&p1);
-
-		if (ph0.Clip() || ph1.Clip())
-		{
-			if (ph0.W < 0 || ph1.W < 0) continue;
-			Line l = Line(Vertex(p0, cbuffer[i]), Vertex(p1, cbuffer[i + 1]));
-			if (LineClip(&l, port)) GF_Line(&l.v0, &l.v1);
-		}
-		else GF_Line(&Vertex(p0, cbuffer[i]), &Vertex(p1, cbuffer[i + 1]));
+		single_line_for
 	}
 }
 
@@ -276,32 +270,14 @@ void GF_LineLoop(void)
 	PrintFunction("GF_LineLoop(void)");
 #endif
 
-	for (size_t i = 0; i < bufferLength - 1; i++)
+	size_t i = 0, j = 1;
+	for (; i < bufferLength - 1; i++, j++)
 	{
-		Vect4 ph0 = hbuffer[i], ph1 = hbuffer[i + 1];
-		Vect3 p0 = GF_ToNDC(&ph0), p1 = GF_ToNDC(&ph1);
-		GF_ToScreen(&p0), GF_ToScreen(&p1);
-
-		if (ph0.Clip() || ph1.Clip())
-		{
-			if (ph0.W < 0 || ph1.W < 0) continue;
-			Line l = Line(Vertex(p0, cbuffer[i]), Vertex(p1, cbuffer[i + 1]));
-			if (LineClip(&l, port)) GF_Line(&l.v0, &l.v1);
-		}
-		else GF_Line(&Vertex(p0, cbuffer[i]), &Vertex(p1, cbuffer[i + 1]));
+		single_line_for
 	}
 
-	Vect4 ph0 = hbuffer[bufferLength - 1], ph1 = hbuffer[0];
-	Vect3 p0 = GF_ToNDC(&ph0), p1 = GF_ToNDC(&ph1);
-	GF_ToScreen(&p0), GF_ToScreen(&p1);
-
-	if (ph0.Clip() || ph1.Clip())
-	{
-		if (ph0.W < 0 || ph1.W < 0) return;
-		Line l = Line(Vertex(p0, cbuffer[bufferLength - 1]), Vertex(p1, cbuffer[0]));
-		if (LineClip(&l, port)) GF_Line(&l.v0, &l.v1);
-	}
-	else GF_Line(&Vertex(p0, cbuffer[bufferLength - 1]), &Vertex(p1, cbuffer[0]));
+	i = bufferLength - 1, j = 0;
+	single_line_nonfor
 }
 
 void GF_Triangles(void)
@@ -364,8 +340,7 @@ Vect3 GF_ToNDC(const Vect4 * v)
 	PrintFunction("GF_ToNDC(Vect4*)");
 #endif
 
-	if (projType == GF_FRUSTRUM) return v->ToNDC();
-	else if (projType == GF_ORTHO) return Vect3(v->X, v->Y, v->Z);
+	return flags.Proj ? v->ToNDC() : Vect3(v->X, v->Y, v->Z);
 }
 
 void GF_ToScreen(Vect3 * v)
@@ -377,6 +352,13 @@ void GF_ToScreen(Vect3 * v)
 	v->X = port.w * 0.5 * v->X + port.w * 0.5;
 	v->Y = port.h * 0.5 * v->Y + port.h * 0.5;
 	v->Z = (far - near) * 0.5 * v->Z + (far + near) * 0.5;
+}
+
+Vect3 GF_ToScreen(Vect4 * v)
+{
+	Vect3 r = GF_ToNDC(v);
+	GF_ToScreen(&r);
+	return r;
 }
 
 void GF_Line(const int x0, const int y0, const int z0, const Color c0, const int x1, const int y1, const int z1, const Color c1)
@@ -430,10 +412,18 @@ void GF_Line(const Vertex * v0, const Vertex * v1)
 {
 #ifdef _SHOW_GF_FUNCTIONS_USED
 	PrintFunction("GF_Line(Vertex*, Vertex*)");
-
 #endif
 
 	GF_Line(v0->v.X, v0->v.Y, v0->v.Z, v0->c, v1->v.X, v1->v.Y, v1->v.Z, v1->c);
+}
+
+void GF_Line(const Line * line)
+{
+#ifdef _SHOW_GF_FUNCTIONS_USED
+	PrintFunction("GF_Line(Line*)");
+#endif
+
+	GF_Line(line->v0.v.X, line->v0.v.Y, line->v0.v.Z, line->v0.c, line->v1.v.X, line->v1.v.Y, line->v1.v.Z, line->v1.c);
 }
 
 void GF_HLine(const float x0, const float z0, const Color c0, const float x1, const float z1, const Color c1, const float y)
