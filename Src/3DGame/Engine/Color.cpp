@@ -1,14 +1,12 @@
 #include "Color.h"
 
 Color::Color(void)
-{
-	packed = 0;
-}
+	: packed(0)
+{ }
 
 Color::Color(const uint packed)
-{
-	this->packed = packed;
-}
+	: packed(packed)
+{ }
 
 Color::Color(const int r, const int g, const int b)
 {
@@ -40,20 +38,20 @@ Color::Color(const int r, const int g, const int b, const int a)
 }
 
 Color::Color(const float r, const float g, const float b)
-	:Color(ipart(r), ipart(g), ipart(b))
-{}
+	: Color(ipart(r), ipart(g), ipart(b))
+{ }
 
 Color::Color(const float r, const float g, const float b, const float a)
-	:Color(ipart(r), ipart(g), ipart(b), ipart(a))
-{}
+	: Color(ipart(r), ipart(g), ipart(b), ipart(a))
+{ }
 
 Color::Color(const Vect3 * v)
-	:Color(v->X, v->Y, v->Z)
-{}
+	: Color(v->X, v->Y, v->Z)
+{ }
 
 Color::Color(const Vect4 * v)
-	:Color(v->X, v->Y, v->Z, v->W)
-{}
+	: Color(v->X, v->Y, v->Z, v->W)
+{ }
 
 Color Color::operator*(float r) const
 {

@@ -4,8 +4,6 @@
 #include "Shapes.h"
 #include "Window.h"
 
-//#define _SHOW_GF_FUNCTIONS_USED
-
 #define GF_POINTS			0
 #define GF_LINES			1
 #define GF_LINE_STRIP		2
@@ -60,8 +58,4 @@ void GF_TriangleFan(void);
 Vect3 GF_ToNDC(const Vector4 *v);
 void GF_ToScreen(Vect3 *v);
 Vect3 GF_ToScreen(Vect4 *v);
-#endif
-
-#ifdef _SHOW_GF_FUNCTIONS_USED
-void PrintFunction(const char *name);
 #endif
