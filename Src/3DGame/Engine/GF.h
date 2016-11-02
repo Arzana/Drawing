@@ -30,9 +30,6 @@ void GF_AddPoint(const float x, const float y, const float z, const Color c);
 void GF_AddPoint(const Vertex vtx);
 
 #ifdef _USE_GF_INTERNAL
-/*
-FLAGS: |CLP|PRIM|PROJ|STRT|ZBUFF|0|0|0|
-*/
 typedef struct flags
 {
 	bool Clip : 1;

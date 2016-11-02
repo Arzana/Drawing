@@ -2,7 +2,7 @@
 
 #include <ctime>
 #include <queue>
-#include "Vect2.h"
+#include "Shapes.h"
 #include "Color.h"
 
 #ifndef EXIT_FAILURE
@@ -18,7 +18,7 @@ class GameWindow
 {
 public:
 	void(*Update)(void);
-	void (*Draw)(void);
+	void(*Draw)(void);
 	void(*KeyDown)(int);
 	void(*MouseMove)(int, int, int, int);
 
@@ -28,16 +28,15 @@ public:
 	GameWindow(const char *title, const uint width, const uint height);
 	~GameWindow();
 
-	void Clear(const Color c);
-	void Plot(const Vect2 *v, const Color c);
-	void Plot(const uint x, const uint y, const Color c);
-	void Plot_S(const Vect2 *v, const Color c);
-	void Plot_S(const uint x, const uint y, const Color c);
+	void Plot(const Vertex *vtx);
+	void Plot(const Vect3 *v, const Color c);
+	void Plot(const uint x, const uint y, const uint z, const Color c);
+
+	void TryPlot(const Vertex *vtx);
 	void TryPlot(const Vect3 *v, const Color c);
-	void TryPlot(const float x, const float y, const float z, const Color c);
-	void TryPlot_S(const Vect3 *v, const Color c);
-	void TryPlot_S(const float x, const float y, const float z, const Color c);
-	void SetZBuffering(const bool value);
+	void TryPlot(const uint x, const uint y, const uint z, const Color c);
+
+	void Clear(const Color c);
 	void Run(void);
 	void Terminate();
 	uint GetWidth(void) const;
@@ -73,7 +72,8 @@ private:
 
 	void InitWindow(void);
 	void TerminateWindow(void);
-	bool PointVisible(const uint x, const uint y) const;
+	template <typename T>
+	inline bool PointVisible(T x, T y) const;
 	void Tick(void);
 	void DoUpdate(void);
 	void DoDraw(void);

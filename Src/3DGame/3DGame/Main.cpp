@@ -61,5 +61,6 @@ void Render(void)
 	GF_SetViewMatrix(cam->GetView());
 
 	RenderCube(CUBE_LINES);
+
 	printf("FPS: %f\n", window->GetFps());
 }

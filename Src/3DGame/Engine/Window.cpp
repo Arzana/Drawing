@@ -9,7 +9,7 @@
 #include <unistd.h>
 #endif
 
-#define PIXELS			((Color*)surface->pixels)
+#define pix			((Color*)surface->pixels)
 
 GameWindow::GameWindow(const char * title, const uint width, const uint height)
 {
@@ -37,7 +37,6 @@ GameWindow::GameWindow(const char * title, const uint width, const uint height)
 	MouseMove = NULL;
 
 	InitWindow();
-	SDL_ShowCursor(SDL_DISABLE);
 	zBuffer = malloc_s(float, width * height);
 	ResetZBuffer();
 }
@@ -52,74 +51,55 @@ GameWindow::~GameWindow()
 	if (frameBuffer) delete frameBuffer;
 }
 
-void GameWindow::Clear(const Color c)
+void GameWindow::Plot(const Vertex * vtx)
 {
-	Color *pix = PIXELS;
-	for (size_t y = 0; y < height; y++)
-	{
-		for (size_t x = 0; x < width; x++)
-		{
-			pix[y * width + x] = c;
-		}
-	}
+	pix[ipart(vtx->v.Y) * width + ipart(vtx->v.X)] = vtx->c;
 }
 
-void GameWindow::Plot(const Vect2 * v, const Color c)
+void GameWindow::Plot(const Vect3 * v, const Color c)
 {
-	Plot(ipart(v->X), ipart(v->Y), c);
+	pix[ipart(v->Y) * width + ipart(v->X)] = c;
 }
 
-void GameWindow::Plot(const uint x, const uint y, const Color c)
+void GameWindow::Plot(const uint x, const uint y, const uint z, const Color c)
 {
-	Color *pix = PIXELS;
 	pix[y * width + x] = c;
 }
 
-void GameWindow::Plot_S(const Vect2 * v, const Color c)
+void GameWindow::TryPlot(const Vertex * vtx)
 {
-	if (PointVisible(ipart(v->X), ipart(v->Y))) Plot(v, c);
-}
+	uint i = ipart(vtx->v.Y) * width + ipart(vtx->v.X);
+	if (vtx->v.Z > zBuffer[i]) return;
 
-void GameWindow::Plot_S(const uint x, const uint y, const Color c)
-{
-	if (PointVisible(x, y)) Plot(x, y, c);
+	zBuffer[i] = vtx->v.Z;
+	pix[i] = vtx->c;
 }
 
 void GameWindow::TryPlot(const Vect3 * v, const Color c)
 {
 	uint i = ipart(v->Y) * width + ipart(v->X);
+	if (v->Z > zBuffer[i]) return;
 
-	if (zBuffer)
-	{
-		if (v->Z > zBuffer[i]) return;
-		zBuffer[i] = v->Z;
-	}
-
-	Color *pix = PIXELS;
+	zBuffer[i] = v->Z;
 	pix[i] = c;
 }
 
-void GameWindow::TryPlot(const float x, const float y, const float z, const Color c)
+void GameWindow::TryPlot(const uint x, const uint y, const uint z, const Color c)
 {
-	TryPlot(&Vect3(x, y, z), c);
+	uint i = y * width + x;
+	if (z > zBuffer[i]) return;
+
+	zBuffer[i] = z;
+	pix[i] = c;
 }
 
-void GameWindow::TryPlot_S(const Vect3 * v, const Color c)
+void GameWindow::Clear(const Color c)
 {
-	if (PointVisible(ipart(v->X), ipart(v->Y))) TryPlot(v, c);
+	for (size_t i = 0; i < height * width; i++)
+	{
+		pix[i] = c;
+	}
 }
-
-void GameWindow::TryPlot_S(const float x, const float y, const float z, const Color c)
-{
-	TryPlot_S(&Vect3(x, y, z), c);
-}
-
-void GameWindow::SetZBuffering(const bool value)
-{
-	if (value && !zBuffer) zBuffer = malloc_s(float, width * height);
-	else if (!value && zBuffer) free_s(zBuffer);
-}
-
 
 void GameWindow::Run(void)
 {
@@ -164,10 +144,11 @@ float GameWindow::GetFps(void) const
 
 void GameWindow::InitWindow(void)
 {
-	if (SDL_Init(SDL_INIT_VIDEO) != NULL) exit(EXIT_FAILURE);
+	if (SDL_Init(SDL_INIT_VIDEO)) exit(EXIT_FAILURE);
 
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
 	surface = SDL_GetWindowSurface(window);
+	SDL_ShowCursor(SDL_DISABLE);
 }
 
 void GameWindow::TerminateWindow(void)
@@ -181,7 +162,8 @@ void GameWindow::TerminateWindow(void)
 	}
 }
 
-bool GameWindow::PointVisible(const uint x, const uint y) const
+template <typename T>
+inline bool GameWindow::PointVisible(T x, T y) const
 {
 	return x > 0 && x < width && y > 0 && y < height;
 }
