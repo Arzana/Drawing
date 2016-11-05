@@ -50,6 +50,12 @@ void KeyPress(int scanCode)
 	case 7: // D
 		cam->Move(VECT3_RIGHT);
 		break;
+	case 8: // E
+		cam->Move(VECT3_UP);
+		break;
+	case 20: // Q
+		cam->Move(VECT3_DOWN);
+		break;
 	}
 }
 
@@ -60,7 +66,7 @@ void Render(void)
 	window->Clear(CLR_BLACK);
 	GF_SetViewMatrix(cam->GetView());
 
-	RenderCube(CUBE_LINES);
+	RenderCube(CUBE_TRIANGLES);
 
 	printf("FPS: %f\n", window->GetFps());
 }

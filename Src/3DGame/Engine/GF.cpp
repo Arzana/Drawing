@@ -6,7 +6,7 @@
 #define single_line_end		Line *l = &Line(vrtxat(i), vrtxat(j)); if (LineClip(l, port)) { GF_Line(l); } } else { GF_Line(vrtxat(i), vrtxat(j)); }
 #define single_line(kW)		single_line_start if (!flags.Clip || clp > 1) { kW; } single_line_end
 #define ZVC_ARGS			(const Vertex*)
-#define ZXY_ARGS			(const uint, const uint, const uint, const Color)
+#define ZXY_ARGS			(const float, const float, const float, const Color)
 #define ZVC_PLT				(void(GameWindow::*)ZVC_ARGS)
 #define ZXY_PLT				(void(GameWindow::*)ZXY_ARGS)
 #define get_zvc_plt			void(GameWindow::*plt)ZVC_ARGS = flags.ZBuff ? ZVC_PLT &GameWindow::TryPlot : ZVC_PLT &GameWindow::Plot;
@@ -17,11 +17,11 @@
 #include "GF.h"
 #include <cstdio>
 #include <cfloat>
-#include <thread>
 
 GameWindow *w = NULL;
 Flags flags = Flags();
 ViewPort port = ViewPort(0, 0, 0, 0, 0, FLT_MAX);
+Vect4 cPort;
 
 size_t bufferLength = 0;
 size_t bufferIndex = 0;
@@ -130,21 +130,21 @@ void GF_SetFrustrum(const float fovY, const float aspr, const float front, const
 {
 	pers = Mtrx4::CreateFrustrum(fovY, aspr, front, back);
 	flags.Proj = 1;
-	port.far = back;
-	port.near = front;
+	GF_SetDepth(front, back);
 }
 
 void GF_SetOrthographic(const float width, const float height, const float front, const float back)
 {
 	pers = Mtrx4::CreateOrthographic(width, height, front, back);
 	flags.Proj = 0;
-	port.far = back;
-	port.near = front;
+	GF_SetDepth(front, back);
 }
 
 void GF_SetViewport(const Rectangle * rect)
 {
 	port.screen = *rect;
+	cPort.X = rect->w * 0.5;
+	cPort.Y = rect->h * 0.5;
 }
 
 void GF_SetFlag_Clip(const bool value)
@@ -186,11 +186,11 @@ void GF_Points(void)
 {
 	get_zvc_plt
 
-	for (size_t i = 0; i < bufferLength; i++)
-	{
-		if (hbuffer[i].Clip()) continue;
-		plot(vrtxat(i));
-	}
+		for (size_t i = 0; i < bufferLength; i++)
+		{
+			if (hbuffer[i].Clip()) continue;
+			plot(vrtxat(i));
+		}
 }
 
 void GF_Lines(void)
@@ -255,9 +255,9 @@ Vect3 GF_ToNDC(const Vect4 * v)
 
 void GF_ToScreen(Vect3 * v)
 {
-	v->X = port.screen.w * 0.5 * v->X + port.screen.w * 0.5;
-	v->Y = port.screen.h * 0.5 * v->Y + port.screen.h * 0.5;
-	v->Z = (port.far - port.near) * 0.5 * v->Z + (port.far + port.near) * 0.5;
+	v->X = cPort.X * v->X + cPort.X;
+	v->Y = cPort.Y * v->Y + cPort.Y;
+	v->Z = cPort.Z * v->Z + cPort.W;
 }
 
 Vect3 GF_ToScreen(Vect4 * v)
@@ -292,23 +292,23 @@ void GF_Line(const int x0, const int y0, const int z0, const Color c0, const int
 	uint y = y0;
 
 	get_zxy_plt
-	for (size_t i = 0; i < lng; i++)
-	{
-		float a = invLerp(0, lng, i);
-		plot(x, y, lerp(z0, z1, a), Color::Lerp(c0, c1, a));
-		num += shrt;
-		if (num >= lng)
+		for (size_t i = 0; i < lng; i++)
 		{
-			num -= lng;
-			x += dx0;
-			y += dy0;
+			float a = invLerp(0, lng, i);
+			plot(x, y, lerp(z0, z1, a), Color::Lerp(c0, c1, a));
+			num += shrt;
+			if (num >= lng)
+			{
+				num -= lng;
+				x += dx0;
+				y += dy0;
+			}
+			else
+			{
+				x += dx1;
+				y += dy1;
+			}
 		}
-		else
-		{
-			x += dx1;
-			y += dy1;
-		}
-	}
 }
 
 void GF_Line(const Vertex * v0, const Vertex * v1)
@@ -325,27 +325,27 @@ void GF_HLine(const float x0, const float z0, const Color c0, const float x1, co
 {
 	get_zxy_plt
 
-	if (x0 == x1)
-	{
-		if (z0 > z1) plot(x0, y, z0, c0);
-		else plot(x1, y, z1, c1);
-	}
-	else if (x0 < x1)
-	{
-		for (float x = x0; x <= x1; ++x)
+		if (x0 == x1)
 		{
-			float a = invLerp(x0, x1, x);
-			plot(x, y, lerp(z0, z1, a), Color::Lerp(c0, c1, a));
+			if (z0 > z1) plot(x0, y, z0, c0);
+			else plot(x1, y, z1, c1);
 		}
-	}
-	else
-	{
-		for (float x = x1; x <= x0; ++x)
+		else if (x0 < x1)
 		{
-			float a = invLerp(x1, x0, x);
-			plot(x, y, lerp(z1, z0, a), Color::Lerp(c1, c0, a));
+			for (float x = x0; x <= x1; ++x)
+			{
+				float a = invLerp(x0, x1, x);
+				plot(x, y, lerp(z0, z1, a), Color::Lerp(c0, c1, a));
+			}
 		}
-	}
+		else
+		{
+			for (float x = x1; x <= x0; ++x)
+			{
+				float a = invLerp(x1, x0, x);
+				plot(x, y, lerp(z1, z0, a), Color::Lerp(c1, c0, a));
+			}
+		}
 }
 
 void GF_HLine(const Vertex * v0, const Vertex * v1)
@@ -421,6 +421,14 @@ void GF_FullTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 		GF_BFTrgl(&vt0, &vt3, &vt1);
 		GF_TFTrgl(&vt3, &vt1, &vt2);
 	}
+}
+
+void GF_SetDepth(const float front, const float back)
+{
+	port.far = back;
+	port.near = front;
+	cPort.Z = (back - front) * 0.5;
+	cPort.W = (back + front) * 0.5;
 }
 
 void Raise(const char *msg)

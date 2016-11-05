@@ -40,6 +40,7 @@ typedef struct flags
 	flags(void) : Clip(ENABLE), Prim(GF_POINTS), Proj(ENABLE), Strt(DISABLE), ZBuff(ENABLE) { }
 } Flags;
 
+void GF_SetDepth(const float front, const float back);
 void Raise(const char *msg);
 void GF_Line(const int x0, const int y0, const int z0, const Color c0, const int x1, const int y1, const int z1, const Color c1);
 void GF_Line(const Vertex *v0, const Vertex *v1);

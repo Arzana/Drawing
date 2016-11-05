@@ -61,9 +61,9 @@ void GameWindow::Plot(const Vect3 * v, const Color c)
 	pix[ipart(v->Y) * width + ipart(v->X)] = c;
 }
 
-void GameWindow::Plot(const uint x, const uint y, const uint z, const Color c)
+void GameWindow::Plot(const float x, const float y, const float z, const Color c)
 {
-	pix[y * width + x] = c;
+	pix[ipart(y) * width + ipart(x)] = c;
 }
 
 void GameWindow::TryPlot(const Vertex * vtx)
@@ -84,9 +84,9 @@ void GameWindow::TryPlot(const Vect3 * v, const Color c)
 	pix[i] = c;
 }
 
-void GameWindow::TryPlot(const uint x, const uint y, const uint z, const Color c)
+void GameWindow::TryPlot(const float x, const float y, const float z, const Color c)
 {
-	uint i = y * width + x;
+	uint i = ipart(y) * width + ipart(x);
 	if (z > zBuffer[i]) return;
 
 	zBuffer[i] = z;

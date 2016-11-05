@@ -30,11 +30,11 @@ public:
 
 	void Plot(const Vertex *vtx);
 	void Plot(const Vect3 *v, const Color c);
-	void Plot(const uint x, const uint y, const uint z, const Color c);
+	void Plot(const float x, const float y, const float z, const Color c);
 
 	void TryPlot(const Vertex *vtx);
 	void TryPlot(const Vect3 *v, const Color c);
-	void TryPlot(const uint x, const uint y, const uint z, const Color c);
+	void TryPlot(const float  x, const float y, const float z, const Color c);
 
 	void Clear(const Color c);
 	void Run(void);
