@@ -59,7 +59,7 @@ typedef struct ViewPort
 
 int ComputeMask(const Vect3 v, const ViewPort viewPort);
 bool LineClip(Line *l, const ViewPort viewPort);
-bool TriangleClip(Triangle *t, int *len);
+bool TriangleClip(Triangle *t, int *len, const ViewPort viewPort);
 #endif
 
 #ifdef _USE_GF_INTERNAL

@@ -4,8 +4,7 @@
 #define vrtxat(x)			(&Vertex(GF_ToScreen(hbuffer + x), cbuffer[x]))
 #define single_line_start	int clp = hbuffer[i].Clip() + hbuffer[j].Clip(); if (clp) {
 #define single_line_end		Line *l = &Line(vrtxat(i), vrtxat(j)); if (LineClip(l, port)) { GF_Line(l); } } else { GF_Line(vrtxat(i), vrtxat(j)); }
-#define single_line_for		single_line_start if (!flags.Clip || clp > 1) { continue; } single_line_end
-#define single_line_nonfor	single_line_start if (!flags.Clip || clp > 1) { return; } single_line_end
+#define single_line(kW)		single_line_start if (!flags.Clip || clp > 1) { kW; } single_line_end
 #define ZVC_ARGS			(const Vertex*)
 #define ZXY_ARGS			(const uint, const uint, const uint, const Color)
 #define ZVC_PLT				(void(GameWindow::*)ZVC_ARGS)
@@ -18,6 +17,7 @@
 #include "GF.h"
 #include <cstdio>
 #include <cfloat>
+#include <thread>
 
 GameWindow *w = NULL;
 Flags flags = Flags();
@@ -197,7 +197,7 @@ void GF_Lines(void)
 {
 	for (size_t i = 0, j = 1; i < bufferLength; i += 2, j += 2)
 	{
-		single_line_for
+		single_line(continue)
 	}
 }
 
@@ -205,7 +205,7 @@ void GF_LineStrip(void)
 {
 	for (size_t i = 0, j = 1; i < bufferLength - 1; i++, j++)
 	{
-		single_line_for
+		single_line(continue)
 	}
 }
 
@@ -214,11 +214,11 @@ void GF_LineLoop(void)
 	size_t i = 0, j = 1;
 	for (; i < bufferLength - 1; i++, j++)
 	{
-		single_line_for
+		single_line(continue)
 	}
 
 	i = bufferLength - 1, j = 0;
-	single_line_nonfor
+	single_line(return)
 }
 
 void GF_Triangles(void)

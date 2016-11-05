@@ -1,7 +1,7 @@
 #define _USE_CLIPPING
 
-#define vect(vrtx)		l->vrtx.v
-#define clr(vrtx)		l->vrtx.c
+#define vect(vrtx)		p->vrtx.v
+#define clr(vrtx)		p->vrtx.c
 #define vx(vrtx)		vect(vrtx).X
 #define vy(vrtx)		vect(vrtx).Y
 #define vz(vrtx)		vect(vrtx).Z
@@ -62,7 +62,7 @@ int ComputeMask(const Vect3 v, const ViewPort vp)
 	return code;
 }
 
-bool LineClip(Line * l, const ViewPort vp)
+bool LineClip(Line * p, const ViewPort vp)
 {
 	int m0 = ComputeMask(vect(v0), vp);
 	int m1 = ComputeMask(vect(v1), vp);
@@ -117,7 +117,7 @@ bool LineClip(Line * l, const ViewPort vp)
 	return true;
 }
 
-bool TriangleClip(Triangle * t, int * len)
+bool TriangleClip(Triangle * p, int * len, const ViewPort vp)
 {
 	return false;
 }
