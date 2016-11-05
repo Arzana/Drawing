@@ -11,6 +11,7 @@
 #define GF_TRIANGLES		4
 #define GF_TRIANGLE_STRIP	5
 #define GF_TRIANGLE_FAN		6
+#define GF_POLYGON			7
 
 void GF_SetWindow(GameWindow *window);
 void GF_StartRender(const int primitiveType);

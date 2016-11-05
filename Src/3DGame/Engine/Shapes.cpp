@@ -1,4 +1,10 @@
-#define _USE_LINE_CLIP
+#define _USE_CLIPPING
+
+#define vect(vrtx)		l->vrtx.v
+#define clr(vrtx)		l->vrtx.c
+#define vx(vrtx)		vect(vrtx).X
+#define vy(vrtx)		vect(vrtx).Y
+#define vz(vrtx)		vect(vrtx).Z
 
 #include "Shapes.h"
 
@@ -18,6 +24,14 @@ Line::Line(const Vertex * v0, const Vertex * v1)
 	: v0(*v0), v1(*v1)
 { }
 
+Triangle::Triangle(Vertex v0, Vertex v1, Vertex v2)
+	: v0(v0), v1(v1), v2(v2)
+{ }
+
+Triangle::Triangle(const Vertex * v0, const Vertex * v1, const Vertex * v2)
+	: v0(*v0), v1(*v1), v2(*v2)
+{ }
+
 Rectangle::Rectangle(void)
 	: x(0), y(0), w(0), h(0)
 { }
@@ -26,77 +40,86 @@ Rectangle::Rectangle(int x, int y, int w, int h)
 	: x(x), y(y), w(w), h(h)
 { }
 
-OutCode ComputeOutCode(const Vect3 v, const Rect vp)
-{
-	OutCode code = INSIDE;
+ViewPort::ViewPort(Rectangle screen, float far, float near)
+	: screen(screen), far(far), near(near)
+{ }
 
-	if (v.X < vp.x) code |= LEFT;
-	else if (v.X > vp.w) code |= RIGHT;
-	if (v.Y < vp.y) code |= BOTTOM;
-	if (v.Y > vp.h) code |= TOP;
+ViewPort::ViewPort(int x, int y, int w, int h, float f, float n)
+	: screen(x, y, w, h), far(f), near(n)
+{ }
+
+int ComputeMask(const Vect3 v, const ViewPort vp)
+{
+	int code = INSIDE;
+
+	if (v.X < vp.screen.x) code |= LEFT;
+	else if (v.X > vp.screen.w) code |= RIGHT;
+	if (v.Y < vp.screen.y) code |= BOTTOM;
+	else if (v.Y > vp.screen.h) code |= TOP;
+	if (v.Z < vp.near) code |= NEAR;
+	else if (v.Z > vp.far) code |= FAR;
 
 	return code;
 }
 
-bool LineClip(Line * l, const Rect vp)
+bool LineClip(Line * l, const ViewPort vp)
 {
-	OutCode oc0 = ComputeOutCode(l->v0.v, vp);
-	OutCode oc1 = ComputeOutCode(l->v1.v, vp);
-	bool result = false;
+	int m0 = ComputeMask(vect(v0), vp);
+	int m1 = ComputeMask(vect(v1), vp);
 
-	while (true)
+	while (m0 | m1)
 	{
-		if (!(oc0 | oc1))
-		{
-			result = true;
-			break;
-		}
-		else if (oc0 & oc1) break;
+		if (m0 & m1) return false;
 
-		float x, y, z;
-		OutCode occ = oc0 ? oc0 : oc1;
+		float x, y, z, a;
+		int mc = m0 ? m0 : m1;
 
-		if (occ & TOP)
+		if (mc & TOP) y = vp.screen.h;
+		else if (mc & BOTTOM) y = vp.screen.y;
+		else if (mc & RIGHT) x = vp.screen.w;
+		else if (mc & LEFT) x = vp.screen.x;
+		else if (mc & NEAR) z = vp.near;
+		else if (mc & FAR) z = vp.far;
+
+		if (mc & VERTICAL)
 		{
-			x = l->v0.v.X + (l->v1.v.X - l->v0.v.X) * (vp.h - l->v0.v.Y) / (l->v1.v.Y - l->v0.v.Y);
-			y = vp.h - 1;
+			a = invLerp(vy(v0), vy(v1), y);
+			z = lerp(vz(v0), vz(v1), a);
+			x = lerp(vx(v0), vx(v1), a);
 		}
-		else if (occ & BOTTOM)
+		else if (mc & HORIZONTAL)
 		{
-			x = l->v0.v.X + (l->v1.v.X - l->v0.v.X) * (vp.y - l->v0.v.Y) / (l->v1.v.Y - l->v0.v.Y);
-			y = vp.y;
+			a = invLerp(vx(v0), vx(v1), x);
+			z = lerp(vz(v0), vz(v1), a);
+			y = lerp(vy(v0), vy(v1), a);
 		}
-		else if (occ & RIGHT)
+		else if (mc & DEPTH)
 		{
-			y = l->v0.v.Y + (l->v1.v.Y - l->v0.v.Y) * (vp.w - l->v0.v.X) / (l->v1.v.X - l->v0.v.X);
-			x = vp.w - 1;
-		}
-		else if (occ & LEFT)
-		{
-			y = l->v0.v.Y + (l->v1.v.Y - l->v0.v.Y) * (vp.x - l->v0.v.X) / (l->v1.v.X - l->v0.v.X);
-			x = vp.x;
+			a = invLerp(vz(v0), vz(v1), z);
+			x = lerp(vx(v0), vx(v1), a);
+			y = lerp(vy(v0), vy(v1), a);
 		}
 
-		if (occ & VERTICAL) z = lerp(l->v0.v.Z, l->v1.v.Z, invLerp(l->v0.v.Y, l->v1.v.Y, y));
-		if (occ & HORIZONTAL) z = lerp(l->v0.v.Z, l->v1.v.Z, invLerp(l->v0.v.X, l->v1.v.X, x));
-
-		if (occ == oc0)
+		if (mc == m0)
 		{
-			l->v0.v.X = x;
-			l->v0.v.Y = y;
-			l->v0.v.Z = z;
-			oc0 = ComputeOutCode(l->v0.v, vp);
+			vect(v0) = Vect3(x, y, z);
+			clr(v0) = Color::Lerp(clr(v0), clr(v1), a);
+			m0 = ComputeMask(vect(v0), vp);
 		}
 		else
 		{
-			l->v1.v.X = x;
-			l->v1.v.Y = y;
-			l->v1.v.Z = z;
-			oc1 = ComputeOutCode(l->v1.v, vp);
+			vect(v1) = Vect3(x, y, z);
+			clr(v1) = Color::Lerp(clr(v0), clr(v1), a);
+			m1 = ComputeMask(vect(v1), vp);
 		}
 	}
 
-	return result;
+	return true;
+}
+
+bool TriangleClip(Triangle * t, int * len)
+{
+	return false;
 }
 
 template <typename T>

@@ -1,5 +1,5 @@
 #define _USE_GF_INTERNAL
-#define _USE_LINE_CLIP
+#define _USE_CLIPPING
 
 #define vrtxat(x)			(&Vertex(GF_ToScreen(hbuffer + x), cbuffer[x]))
 #define single_line_start	int clp = hbuffer[i].Clip() + hbuffer[j].Clip(); if (clp) {
@@ -21,7 +21,7 @@
 
 GameWindow *w = NULL;
 Flags flags = Flags();
-Rect port;
+ViewPort port = ViewPort(0, 0, 0, 0, 0, FLT_MAX);
 
 size_t bufferLength = 0;
 size_t bufferIndex = 0;
@@ -32,8 +32,6 @@ Vect4 *hbuffer = NULL;
 Mtrx4 model = MTRX4_IDENTITY;
 Mtrx4 view = MTRX4_IDENTITY;
 Mtrx4 pers = MTRX4_IDENTITY;
-float near = 0;
-float far = FLT_MAX;
 
 void GF_SetWindow(GameWindow * window)
 {
@@ -132,21 +130,21 @@ void GF_SetFrustrum(const float fovY, const float aspr, const float front, const
 {
 	pers = Mtrx4::CreateFrustrum(fovY, aspr, front, back);
 	flags.Proj = 1;
-	far = back;
-	near = front;
+	port.far = back;
+	port.near = front;
 }
 
 void GF_SetOrthographic(const float width, const float height, const float front, const float back)
 {
 	pers = Mtrx4::CreateOrthographic(width, height, front, back);
 	flags.Proj = 0;
-	far = back;
-	near = front;
+	port.far = back;
+	port.near = front;
 }
 
 void GF_SetViewport(const Rectangle * rect)
 {
-	port = *rect;
+	port.screen = *rect;
 }
 
 void GF_SetFlag_Clip(const bool value)
@@ -257,9 +255,9 @@ Vect3 GF_ToNDC(const Vect4 * v)
 
 void GF_ToScreen(Vect3 * v)
 {
-	v->X = port.w * 0.5 * v->X + port.w * 0.5;
-	v->Y = port.h * 0.5 * v->Y + port.h * 0.5;
-	v->Z = (far - near) * 0.5 * v->Z + (far + near) * 0.5;
+	v->X = port.screen.w * 0.5 * v->X + port.screen.w * 0.5;
+	v->Y = port.screen.h * 0.5 * v->Y + port.screen.h * 0.5;
+	v->Z = (port.far - port.near) * 0.5 * v->Z + (port.far + port.near) * 0.5;
 }
 
 Vect3 GF_ToScreen(Vect4 * v)
@@ -427,7 +425,6 @@ void GF_FullTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 
 void Raise(const char *msg)
 {
-	printf(msg);
-	printf("\n");
+	printf("%s\n", msg);
 	w->Terminate();
 }

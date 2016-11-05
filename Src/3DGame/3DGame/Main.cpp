@@ -60,7 +60,7 @@ void Render(void)
 	window->Clear(CLR_BLACK);
 	GF_SetViewMatrix(cam->GetView());
 
-	RenderCube(CUBE_TRIANGLES);
+	RenderCube(CUBE_LINES);
 
 	printf("FPS: %f\n", window->GetFps());
 }

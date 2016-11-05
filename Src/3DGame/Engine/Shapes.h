@@ -12,17 +12,20 @@ typedef struct Vertex
 	Vertex(float x, float y, float z, Color c);
 } Vrtx;
 
-struct Line 
+typedef struct Line 
 {
 	Vertex v0, v1;
 
 	Line(Vertex v0, Vertex v1);
 	Line(const Vertex *v0, const Vertex *v1);
-};
+} Line;
 
 typedef struct Triangle
 {
 	Vertex v0, v1, v2;
+
+	Triangle(Vertex v0, Vertex v1, Vertex v2);
+	Triangle(const Vertex *v0, const Vertex *v1, const Vertex *v2);
 } Trgl;
 
 typedef struct Rectangle
@@ -33,9 +36,16 @@ typedef struct Rectangle
 	Rectangle(int x, int y, int w, int h);
 } Rect;
 
-#ifdef _USE_LINE_CLIP
-typedef int OutCode;
+typedef struct ViewPort
+{
+	Rectangle screen;
+	float far, near;
 
+	ViewPort(Rectangle screen, float far, float near);
+	ViewPort(int x, int y, int w, int h, float f, float n);
+} ViewPort;
+
+#ifdef _USE_CLIPPING
 #define INSIDE		0
 #define LEFT		1
 #define RIGHT		2
@@ -43,9 +53,13 @@ typedef int OutCode;
 #define BOTTOM		4
 #define TOP			8
 #define VERTICAL	12
+#define NEAR		16
+#define FAR			32
+#define DEPTH		48
 
-OutCode ComputeOutCode(const Vect3 v, const Rect viewPort);
-bool LineClip(Line *l, const Rect viewPort);
+int ComputeMask(const Vect3 v, const ViewPort viewPort);
+bool LineClip(Line *l, const ViewPort viewPort);
+bool TriangleClip(Triangle *t, int *len);
 #endif
 
 #ifdef _USE_GF_INTERNAL

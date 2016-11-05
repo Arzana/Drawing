@@ -28,5 +28,5 @@ const float deg2rad = float(M_PI / 180.0f);
 
 float barycentric(float v1, float v2, float v3, float b2, float b3);
 float catmullRom(float v1, float v2, float v3, float v4, float a);
-float lerp(float min, float max, float a);
-float invLerp(float min, float max, float v);
+inline float lerp(float min, float max, float a) { return min + (max - min) * a; }
+inline float invLerp(float min, float max, float v) { return (v - min) / (max - min); }
