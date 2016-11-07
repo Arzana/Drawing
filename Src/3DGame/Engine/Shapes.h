@@ -10,6 +10,9 @@ typedef struct Vertex
 
 	Vertex(Vect3 v, Color c);
 	Vertex(float x, float y, float z, Color c);
+
+	inline bool operator ==(const Vertex &r) const { return v == r.v && c == r.c; }
+	inline bool operator !=(const Vertex &r) const { return v != r.v || c != r.c; }
 } Vrtx;
 
 typedef struct Line 
@@ -26,6 +29,8 @@ typedef struct Triangle
 
 	Triangle(Vertex v0, Vertex v1, Vertex v2);
 	Triangle(const Vertex *v0, const Vertex *v1, const Vertex *v2);
+	Line GetLine(int l) const;
+	bool IsInside(const Vect3 v);
 } Trgl;
 
 typedef struct Rectangle
@@ -56,10 +61,14 @@ typedef struct ViewPort
 #define NEAR		16
 #define FAR			32
 #define DEPTH		48
+#define OUTSIDE		63
+
+#include <vector>
 
 int ComputeMask(const Vect3 v, const ViewPort viewPort);
 bool LineClip(Line *l, const ViewPort viewPort);
-bool TriangleClip(Triangle *t, int *len, const ViewPort viewPort);
+size_t GetNextPoint(std::vector<Vertex> *l, int *direction);
+Vertex* TriangleClip(Triangle *t, int *len, const ViewPort viewPort);
 #endif
 
 #ifdef _USE_GF_INTERNAL

@@ -1,11 +1,15 @@
 #define _USE_CLIPPING
+#define _VECT_CONV
 
 #define vect(vrtx)		p->vrtx.v
 #define clr(vrtx)		p->vrtx.c
 #define vx(vrtx)		vect(vrtx).X
 #define vy(vrtx)		vect(vrtx).Y
 #define vz(vrtx)		vect(vrtx).Z
+#define SORT_ARGS		(const Vertex *v0, const Vertex *v1)
 
+#include <vector>
+#include "Utils.h"
 #include "Shapes.h"
 
 Vertex::Vertex(Vect3 v, Color c)
@@ -31,6 +35,27 @@ Triangle::Triangle(Vertex v0, Vertex v1, Vertex v2)
 Triangle::Triangle(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 	: v0(*v0), v1(*v1), v2(*v2)
 { }
+
+Line Triangle::GetLine(int l) const
+{
+	l = clamp(0, 2, l);
+	if (l == 0) return Line(v0, v1);
+	if (l == 1) return Line(v1, v2);
+	return Line(v2, v0);
+}
+
+bool Triangle::IsInside(const Vect3 v)
+{
+	Vect2 *vs1 = &V3ToV2(&(v1.v - v0.v));
+	Vect2 *vs2 = &V3ToV2(&(v2.v - v0.v));
+	Vect2 *q = &V3ToV2(&(v - v0.v));
+
+	float r = Vect2::PrepDot(vs1, vs2);
+	float s = Vect2::PrepDot(q, vs2) / r;
+	float t = Vect2::PrepDot(vs1, q) / r;
+
+	return s >= 0 && t >= 0 && s + t <= 1;
+}
 
 Rectangle::Rectangle(void)
 	: x(0), y(0), w(0), h(0)
@@ -117,9 +142,126 @@ bool LineClip(Line * p, const ViewPort vp)
 	return true;
 }
 
-bool TriangleClip(Triangle * p, int * len, const ViewPort vp)
+size_t GetNextPoint(std::vector<Vertex> * l, int *dir)
 {
-	return false;
+	if (l->size() <= 1) return 0;
+	size_t r = 0;
+
+	if (*dir == 0)
+	{
+		Sort<Vertex>(l, []SORT_ARGS { return v0->v.Y < v1->v.Y; });
+		Vertex p = l->at(0);
+		bool rightMost = true;
+
+		for (size_t i = 1; i < l->size(); i++)
+		{
+			Vertex c = l->at(i);
+			if (c.v.Y > p.v.Y) break;
+
+			rightMost = false;
+			if (c.v.X < p.v.X)
+			{
+				p = c;
+				r = i;
+			}
+		}
+
+		if (rightMost) ++(*dir);
+	}
+	else if (*dir == 1)
+	{
+		Sort<Vertex>(l, []SORT_ARGS { return v0->v.X > v1->v.X; });
+		Vertex p = l->at(0);
+		bool downMost = true;
+
+		for (size_t i = 1; i < l->size(); i++)
+		{
+			Vertex c = l->at(i);
+			if (c.v.X < p.v.X) break;
+
+			downMost = false;
+			if (c.v.Y < p.v.Y)
+			{
+				p = c;
+				r = i;
+			}
+		}
+
+		if (downMost) ++(*dir);
+	}
+	else if (*dir == 2)
+	{
+		Sort<Vertex>(l, []SORT_ARGS { return v0->v.Y > v1->v.Y; });
+		Vertex p = l->at(0);
+		bool leftMost = true;
+
+		for (size_t i = 1; i < l->size(); i++)
+		{
+			Vertex c = l->at(i);
+			if (c.v.Y < p.v.Y) break;
+
+			leftMost = false;
+			if (c.v.X > p.v.X)
+			{
+				p = c;
+				r = i;
+			}
+		}
+
+		if (leftMost) ++(*dir);
+	}
+	else if (*dir == 3)
+	{
+		Sort<Vertex>(l, []SORT_ARGS { return v0->v.X < v1->v.X; });
+		Vertex p = l->at(0);
+
+		for (size_t i = 1; i < l->size(); i++)
+		{
+			Vertex c = l->at(i);
+			if (c.v.Y > p.v.Y)
+			{
+				p = c;
+				r = i;
+			}
+		}
+	}
+
+	return r;
+}
+
+Vertex* TriangleClip(Triangle * p, int * len, const ViewPort vp)
+{
+	std::vector<Vertex> temp;
+
+	Vect3 c;
+	if (p->IsInside(c = Vect3(vp.screen.x, vp.screen.y, vp.near))) temp.push_back(Vertex(c, CLR_BLACK));
+	if (p->IsInside(c = Vect3(vp.screen.x, vp.screen.h, vp.near))) temp.push_back(Vertex(c, CLR_BLACK));
+	if (p->IsInside(c = Vect3(vp.screen.w, vp.screen.h, vp.near))) temp.push_back(Vertex(c, CLR_BLACK));
+	if (p->IsInside(c = Vect3(vp.screen.w, vp.screen.y, vp.near))) temp.push_back(Vertex(c, CLR_BLACK));
+
+	for (size_t i = 0; i < 3; i++)
+	{
+		Line *l = &p->GetLine(i);
+		if (LineClip(l, vp))
+		{
+			if (!Contains(temp, &l->v0)) temp.push_back(l->v0);
+			if (!Contains(temp, &l->v1)) temp.push_back(l->v1);
+		}
+	}
+
+	if (!(*len = temp.size())) return NULL;
+
+	Vertex *poly = malloc_s(Vertex, temp.size());
+	int dir = 0;
+	size_t i = 0, j = GetNextPoint(&temp, &dir);
+	while (temp.size() > 0)
+	{
+		poly[i++] = temp.at(j);
+		temp.erase(temp.begin() + j);
+		j = GetNextPoint(&temp, &dir);
+	}
+
+	return poly;
 }
 
 template <typename T>

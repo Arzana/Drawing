@@ -1,0 +1,20 @@
+Create temp list
+Loop through viewport corners
+	if corner inside (barycentric)
+		add to temp
+Loop through triangle lines
+	if line visible
+		if temp does not contain v0
+			add v0 to temp
+		if temp does not contain v1
+			add v1 to temp
+if temp length == 0
+	return false
+Create result pointer
+Create index specififier (value = upper left most point)
+while temp length > 0
+	add point at index to result
+	remove point from temp
+	find next point in temp
+	set index to found value
+return true

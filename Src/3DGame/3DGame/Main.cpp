@@ -33,28 +33,29 @@ void MouseMove(int x, int y, int dX, int dY)
 
 void KeyPress(int scanCode)
 {
+	const float scalar = 0.5f;
 	switch (scanCode)
 	{
 	case 41: // ESC
 		window->Terminate();
 		break;
 	case 26: // W
-		cam->Move(VECT3_FORWARD);
+		cam->Move(VECT3_FORWARD * scalar);
 		break;
 	case 22: // S
-		cam->Move(VECT3_BACK);
+		cam->Move(VECT3_BACK * scalar);
 		break;
 	case 4: // A
-		cam->Move(VECT3_LEFT);
+		cam->Move(VECT3_LEFT * scalar);
 		break;
 	case 7: // D
-		cam->Move(VECT3_RIGHT);
+		cam->Move(VECT3_RIGHT * scalar);
 		break;
 	case 8: // E
-		cam->Move(VECT3_UP);
+		cam->Move(VECT3_UP * scalar);
 		break;
 	case 20: // Q
-		cam->Move(VECT3_DOWN);
+		cam->Move(VECT3_DOWN * scalar);
 		break;
 	}
 }
@@ -66,7 +67,13 @@ void Render(void)
 	window->Clear(CLR_BLACK);
 	GF_SetViewMatrix(cam->GetView());
 
-	RenderCube(CUBE_TRIANGLES);
+	//RenderCube(CUBE_TRIANGLES);
+	GF_StartRender(GF_TRIANGLES);
+	GF_SetBufferLength(3);
+	GF_AddPoint(0, -0.5, 1, CLR_RED);
+	GF_AddPoint(-0.5, 0.5, 1, CLR_BLUE);
+	GF_AddPoint(0.5, 0.5, 1, CLR_GREEN);
+	GF_EndRender();
 
 	printf("FPS: %f\n", window->GetFps());
 }

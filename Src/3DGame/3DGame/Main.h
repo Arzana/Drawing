@@ -1,5 +1,7 @@
 #pragma once
 
+#define _USE_CLIPPING
+
 #include <cstdio>
 #include <Utils.h>
 #include <GF.h>

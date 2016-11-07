@@ -267,7 +267,7 @@ Vector2 Vector2::Normalize(const Vector2 * v)
 
 float Vector2::PrepDot(const Vector2 * v1, const Vector2 * v2)
 {
-	return (v1->X * v2->Y) - (v1->Y * v2->X);
+	return v1->X * v2->Y - v1->Y * v2->X;
 }
 
 Vector2 Vector2::Reflect(const Vector2 * v, const Vector2 * n)

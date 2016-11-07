@@ -105,9 +105,10 @@ void GF_EndRender(void)
 
 void GF_SetBufferLength(size_t length)
 {
-	if (length < 1)
+	if (length < 1 || bufferLength != 0)
 	{
-		Raise("Length must be greater than zero!");
+		if (length < 1) Raise("Length must be greater than zero!");
+		if (bufferLength != 0) Raise("GF_EndRender must be called before respecifying the buffer length!");
 		return;
 	}
 
@@ -225,8 +226,24 @@ void GF_Triangles(void)
 {
 	for (size_t i = 0, j = 1, k = 2; i < bufferLength; i += 3, j += 3, k += 3)
 	{
-		if ((hbuffer + i)->Clip() || (hbuffer + j)->Clip() || (hbuffer + k)->Clip()) continue;
-		GF_FullTrgl(vrtxat(i), vrtxat(j), vrtxat(k));
+		if ((hbuffer + i)->Clip() || (hbuffer + j)->Clip() || (hbuffer + k)->Clip())
+		{
+			Trgl *t = &Trgl(vrtxat(i), vrtxat(j), vrtxat(k));
+			int polyVLen = 0;
+			Vertex *poly;
+
+			if (poly = TriangleClip(t, &polyVLen, port))
+			{
+				size_t i = 0, j = 1;
+				for (; i < polyVLen - 1; i++, j++)
+				{
+					GF_Line(poly + i, poly + j);
+				}
+				GF_Line(poly + (polyVLen - 1), poly);
+				free_s(poly);
+			}
+		}
+		else GF_FullTrgl(vrtxat(i), vrtxat(j), vrtxat(k));
 	}
 }
 
