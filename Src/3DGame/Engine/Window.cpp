@@ -148,7 +148,10 @@ void GameWindow::InitWindow(void)
 
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
 	surface = SDL_GetWindowSurface(window);
+
+#ifdef _MOUSE_LOCK
 	SDL_ShowCursor(SDL_DISABLE);
+#endif
 }
 
 void GameWindow::TerminateWindow(void)
@@ -253,6 +256,7 @@ void GameWindow::HandleEvents(void)
 		case SDL_KEYDOWN:
 			if (KeyDown) KeyDown(ev.key.keysym.scancode);
 			break;
+#ifdef _MOUSE_LOCK
 		case SDL_MOUSEMOTION:
 			if (ev.motion.x + ev.motion.xrel <= 0 ||
 				ev.motion.x + ev.motion.xrel >= width ||
@@ -266,6 +270,7 @@ void GameWindow::HandleEvents(void)
 			}
 			else if (MouseMove && !fixMove) MouseMove(ev.motion.x, ev.motion.y, ev.motion.xrel, ev.motion.yrel);
 			break;
+#endif
 		}
 	}
 }

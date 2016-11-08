@@ -7,6 +7,7 @@
 #define vy(vrtx)		vect(vrtx).Y
 #define vz(vrtx)		vect(vrtx).Z
 #define SORT_ARGS		(const Vertex *v0, const Vertex *v1)
+#define SPEC_VEC(mask)	(bool(mask & HORIZONTAL) + bool(mask & VERTICAL) + bool(mask & DEPTH) > 1)
 
 #include <vector>
 #include "Utils.h"
@@ -142,102 +143,16 @@ bool LineClip(Line * p, const ViewPort vp)
 	return true;
 }
 
-size_t GetNextPoint(std::vector<Vertex> * l, int *dir)
-{
-	if (l->size() <= 1) return 0;
-	size_t r = 0;
-
-	if (*dir == 0)
-	{
-		Sort<Vertex>(l, []SORT_ARGS { return v0->v.Y < v1->v.Y; });
-		Vertex p = l->at(0);
-		bool rightMost = true;
-
-		for (size_t i = 1; i < l->size(); i++)
-		{
-			Vertex c = l->at(i);
-			if (c.v.Y > p.v.Y) break;
-
-			rightMost = false;
-			if (c.v.X < p.v.X)
-			{
-				p = c;
-				r = i;
-			}
-		}
-
-		if (rightMost) ++(*dir);
-	}
-	else if (*dir == 1)
-	{
-		Sort<Vertex>(l, []SORT_ARGS { return v0->v.X > v1->v.X; });
-		Vertex p = l->at(0);
-		bool downMost = true;
-
-		for (size_t i = 1; i < l->size(); i++)
-		{
-			Vertex c = l->at(i);
-			if (c.v.X < p.v.X) break;
-
-			downMost = false;
-			if (c.v.Y < p.v.Y)
-			{
-				p = c;
-				r = i;
-			}
-		}
-
-		if (downMost) ++(*dir);
-	}
-	else if (*dir == 2)
-	{
-		Sort<Vertex>(l, []SORT_ARGS { return v0->v.Y > v1->v.Y; });
-		Vertex p = l->at(0);
-		bool leftMost = true;
-
-		for (size_t i = 1; i < l->size(); i++)
-		{
-			Vertex c = l->at(i);
-			if (c.v.Y < p.v.Y) break;
-
-			leftMost = false;
-			if (c.v.X > p.v.X)
-			{
-				p = c;
-				r = i;
-			}
-		}
-
-		if (leftMost) ++(*dir);
-	}
-	else if (*dir == 3)
-	{
-		Sort<Vertex>(l, []SORT_ARGS { return v0->v.X < v1->v.X; });
-		Vertex p = l->at(0);
-
-		for (size_t i = 1; i < l->size(); i++)
-		{
-			Vertex c = l->at(i);
-			if (c.v.Y > p.v.Y)
-			{
-				p = c;
-				r = i;
-			}
-		}
-	}
-
-	return r;
-}
-
 Vertex* TriangleClip(Triangle * p, int * len, const ViewPort vp)
 {
 	std::vector<Vertex> temp;
+	SortVerticesBySpecial(&p->v0, &p->v1, &p->v2, vp);
 
 	Vect3 c;
 	if (p->IsInside(c = Vect3(vp.screen.x, vp.screen.y, vp.near))) temp.push_back(Vertex(c, CLR_BLACK));
+	if (p->IsInside(c = Vect3(vp.screen.w, vp.screen.y, vp.near))) temp.push_back(Vertex(c, CLR_BLACK));
 	if (p->IsInside(c = Vect3(vp.screen.x, vp.screen.h, vp.near))) temp.push_back(Vertex(c, CLR_BLACK));
 	if (p->IsInside(c = Vect3(vp.screen.w, vp.screen.h, vp.near))) temp.push_back(Vertex(c, CLR_BLACK));
-	if (p->IsInside(c = Vect3(vp.screen.w, vp.screen.y, vp.near))) temp.push_back(Vertex(c, CLR_BLACK));
 
 	for (size_t i = 0; i < 3; i++)
 	{
@@ -249,18 +164,13 @@ Vertex* TriangleClip(Triangle * p, int * len, const ViewPort vp)
 		}
 	}
 
-	if (!(*len = temp.size())) return NULL;
+	if ((*len = temp.size()) == 0) return NULL;
 
-	Vertex *poly = malloc_s(Vertex, temp.size());
-	int dir = 0;
-	size_t i = 0, j = GetNextPoint(&temp, &dir);
-	while (temp.size() > 0)
+	Vertex *poly = malloc_s(Vertex, *len);
+	for (size_t i = 0; i < *len; i++)
 	{
-		poly[i++] = temp.at(j);
-		temp.erase(temp.begin() + j);
-		j = GetNextPoint(&temp, &dir);
+		poly[i] = temp.at(i);
 	}
-
 	return poly;
 }
 
@@ -277,4 +187,53 @@ void SortVerticesByY(Vertex * v0, Vertex * v1, Vertex * v2)
 	if (v0->v.Y > v1->v.Y) Swap(v0, v1);
 	if (v0->v.Y > v2->v.Y) Swap(v0, v2);
 	if (v1->v.Y > v2->v.Y) Swap(v1, v2);
+}
+
+void SortVerticesBySpecial(Vertex * v0, Vertex * v1, Vertex * v2, const ViewPort vp)
+{
+	std::vector<Vertex> mult;
+	std::vector<Vertex> norm;
+
+	int mask = ComputeMask(v0->v, vp);
+	if (SPEC_VEC(mask)) mult.push_back(*v0);
+	else norm.push_back(*v0);
+
+	mask = ComputeMask(v1->v, vp);
+	if (SPEC_VEC(mask))
+	{
+		if (mult.size() > 0)
+		{
+			Vertex v3 = mult.at(0);
+			if (v3.v.Y <= v1->v.Y)
+			{
+				if (v3.v.Y == v1->v.Y && v3.v.X > v1->v.X) mult.insert(mult.begin(), *v1);
+				else mult.push_back(*v1);
+			}
+			else mult.push_back(*v1);
+		}
+		else mult.push_back(*v1);
+	}
+	else norm.push_back(*v1);
+
+	mask = ComputeMask(v2->v, vp);
+	if (SPEC_VEC(mask))
+	{
+		if (mult.size() > 0)
+		{
+			Vertex v3 = mult.at(0);
+			if (v3.v.Y <= v2->v.Y)
+			{
+				if (v3.v.Y == v2->v.Y && v3.v.X > v2->v.X) mult.insert(mult.begin(), *v2);
+				else mult.push_back(*v2);
+			}
+			else mult.push_back(*v2);
+		}
+		else mult.push_back(*v2);
+	}
+	else norm.push_back(*v2);
+
+	mult.insert(mult.end(), norm.begin(), norm.end());
+	*v0 = mult.at(0);
+	*v1 = mult.at(1);
+	*v2 = mult.at(2);
 }

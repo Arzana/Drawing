@@ -27,11 +27,14 @@ inline Vect2 V3ToV2(const Vect3 *v) { return Vect2(v->X, v->Y); }
 #endif
 
 #ifdef _VECTOR_
-#include <functional>
-
 template <typename T>
-bool Contains(std::vector<T> vec, T *element);
+bool Contains(std::vector<T> vec, T *element)
+{
+	for (size_t i = 0; i < vec.size(); i++)
+	{
+		if (vec.at(i) == *element) return true;
+	}
 
-template <typename T>
-void Sort(std::vector<T> *vec, std::function<bool(const T*, const T*)> pred);
+	return false;
+}
 #endif

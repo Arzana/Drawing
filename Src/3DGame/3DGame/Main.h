@@ -8,7 +8,7 @@
 #include "Camera.h"
 #include "Cube.h"
 
-#define _USE_FULL_HD
+//#define _USE_FULL_HD
 
 #ifdef _USE_FULL_HD
 #define HEIGHT		1080.0f

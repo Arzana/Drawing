@@ -5,6 +5,8 @@
 #include "Shapes.h"
 #include "Color.h"
 
+//#define _MOUSE_LOCK
+
 #ifndef EXIT_FAILURE
 #define EXIT_SUCCESS	0
 #define EXIT_FAILURE	1

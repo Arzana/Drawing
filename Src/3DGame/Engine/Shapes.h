@@ -67,8 +67,8 @@ typedef struct ViewPort
 
 int ComputeMask(const Vect3 v, const ViewPort viewPort);
 bool LineClip(Line *l, const ViewPort viewPort);
-size_t GetNextPoint(std::vector<Vertex> *l, int *direction);
 Vertex* TriangleClip(Triangle *t, int *len, const ViewPort viewPort);
+void SortVerticesBySpecial(Vertex * v0, Vertex * v1, Vertex * v2, const ViewPort vp);
 #endif
 
 #ifdef _USE_GF_INTERNAL
