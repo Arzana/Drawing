@@ -1,5 +1,6 @@
 Create temp list
-Loop through viewport corners
+Sort Triangle vertices (Specials (UL -> UR -> DL -> DR) -> normals)
+Loop through viewport corners (UL -> UR -> DL -> DR)
 	if corner inside (barycentric)
 		add to temp
 Loop through triangle lines
@@ -9,12 +10,5 @@ Loop through triangle lines
 		if temp does not contain v1
 			add v1 to temp
 if temp length == 0
-	return false
-Create result pointer
-Create index specififier (value = upper left most point)
-while temp length > 0
-	add point at index to result
-	remove point from temp
-	find next point in temp
-	set index to found value
-return true
+	return null
+return result pointer
