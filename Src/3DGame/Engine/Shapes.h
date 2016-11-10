@@ -8,6 +8,7 @@ typedef struct Vertex
 	Vect3 v;
 	Color c;
 
+	Vertex(void);
 	Vertex(Vect3 v, Color c);
 	Vertex(float x, float y, float z, Color c);
 
@@ -30,7 +31,7 @@ typedef struct Triangle
 	Triangle(Vertex v0, Vertex v1, Vertex v2);
 	Triangle(const Vertex *v0, const Vertex *v1, const Vertex *v2);
 	Line GetLine(int l) const;
-	bool IsInside(const Vect3 v);
+	bool IsInside(const Vect3 v, Color *c);
 } Trgl;
 
 typedef struct Rectangle
@@ -40,6 +41,14 @@ typedef struct Rectangle
 	Rectangle(void);
 	Rectangle(int x, int y, int w, int h);
 } Rect;
+
+typedef struct Polygon
+{
+	Vertex *v;
+	int polyVLen;
+
+	Polygon(void);
+} Poly;
 
 typedef struct ViewPort
 {

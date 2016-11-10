@@ -2,9 +2,6 @@
 #define _USE_CLIPPING
 
 #define vrtxat(x)			(&Vertex(GF_ToScreen(hbuffer + x), cbuffer[x]))
-#define single_line_start	int clp = hbuffer[i].Clip() + hbuffer[j].Clip(); if (clp) {
-#define single_line_end		Line *l = &Line(vrtxat(i), vrtxat(j)); if (LineClip(l, port)) { GF_Line(l); } } else { GF_Line(vrtxat(i), vrtxat(j)); }
-#define single_line(kW)		single_line_start if (!flags.Clip || clp > 1) { kW; } single_line_end
 #define ZVC_ARGS			(const Vertex*)
 #define ZXY_ARGS			(const float, const float, const float, const Color)
 #define ZVC_PLT				(void(GameWindow::*)ZVC_ARGS)
@@ -198,7 +195,7 @@ void GF_Lines(void)
 {
 	for (size_t i = 0, j = 1; i < bufferLength; i += 2, j += 2)
 	{
-		single_line(continue)
+		single_line(i, j);
 	}
 }
 
@@ -206,44 +203,25 @@ void GF_LineStrip(void)
 {
 	for (size_t i = 0, j = 1; i < bufferLength - 1; i++, j++)
 	{
-		single_line(continue)
+		single_line(i, j);
 	}
 }
 
 void GF_LineLoop(void)
 {
-	size_t i = 0, j = 1;
-	for (; i < bufferLength - 1; i++, j++)
+	for (size_t i = 0, j = 1; i < bufferLength - 1; i++, j++)
 	{
-		single_line(continue)
+		single_line(i, j);
 	}
 
-	i = bufferLength - 1, j = 0;
-	single_line(return)
+	single_line(bufferLength - 1, 0);
 }
 
 void GF_Triangles(void)
 {
 	for (size_t i = 0, j = 1, k = 2; i < bufferLength; i += 3, j += 3, k += 3)
 	{
-		if ((hbuffer + i)->Clip() || (hbuffer + j)->Clip() || (hbuffer + k)->Clip())
-		{
-			Trgl *t = &Trgl(vrtxat(i), vrtxat(j), vrtxat(k));
-			int polyVLen = 0;
-			Vertex *poly;
-
-			if (poly = TriangleClip(t, &polyVLen, port))
-			{
-				size_t i = 0, j = 1;
-				for (; i < polyVLen - 1; i++, j++)
-				{
-					GF_Line(poly + i, poly + j);
-				}
-				GF_Line(poly + (polyVLen - 1), poly);
-				free_s(poly);
-			}
-		}
-		else GF_FullTrgl(vrtxat(i), vrtxat(j), vrtxat(k));
+		single_triangle(i, j, k);
 	}
 }
 
@@ -251,8 +229,7 @@ void GF_TriangleStrip(void)
 {
 	for (size_t i = 2, j = 1, k = 0; i < bufferLength; i++, j++, k++)
 	{
-		if ((hbuffer + i)->Clip() || (hbuffer + j)->Clip() || (hbuffer + k)->Clip()) continue;
-		GF_FullTrgl(vrtxat(i), vrtxat(j), vrtxat(k));
+		single_triangle(i, j, k);
 	}
 }
 
@@ -260,8 +237,7 @@ void GF_TriangleFan(void)
 {
 	for (size_t i = 1, j = 2; i < bufferLength - 1; i++, j++)
 	{
-		if ((hbuffer)->Clip() || (hbuffer + i)->Clip() || (hbuffer + j)->Clip()) continue;
-		GF_FullTrgl(vrtxat(0), vrtxat(i), vrtxat(j));
+		single_triangle(0, i, j);
 	}
 }
 
@@ -282,6 +258,40 @@ Vect3 GF_ToScreen(Vect4 * v)
 	Vect3 r = GF_ToNDC(v);
 	GF_ToScreen(&r);
 	return r;
+}
+
+void single_line(const int i, const int j)
+{
+	int clp = (hbuffer + i)->Clip() + (hbuffer + j)->Clip(); 
+	if (clp) 
+	{
+		if (!flags.Clip || clp > 1) return;
+		Line *l = &Line(vrtxat(i), vrtxat(j)); 
+		if (LineClip(l, port)) GF_Line(l); 
+	} 
+	else GF_Line(vrtxat(i), vrtxat(j));
+}
+
+void single_triangle(const int i, const int j, const int k)
+{
+	int clp = hbuffer[i].Clip() + (hbuffer + j)->Clip() + (hbuffer + k)->Clip();
+	if (clp)
+	{
+		if (!flags.Clip || clp > 2) return;
+		Trgl *t = &Trgl(vrtxat(i), vrtxat(j), vrtxat(k));
+		Poly p;
+
+		if (p.v = TriangleClip(t, &p.polyVLen, port))
+		{
+			for (size_t l = 1, m = 2; l < p.polyVLen - 1; l++, m++)
+			{
+				GF_FullTrgl(p.v, p.v + l, p.v + m);
+			}
+
+			free(p.v);
+		}
+	}
+	else GF_FullTrgl(vrtxat(i), vrtxat(j), vrtxat(k));
 }
 
 void GF_Line(const int x0, const int y0, const int z0, const Color c0, const int x1, const int y1, const int z1, const Color c1)

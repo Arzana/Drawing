@@ -44,6 +44,7 @@ public:
 	uint GetWidth(void) const;
 	uint GetHeight(void) const;
 	float GetFps(void) const;
+	float GetAvarageFPS(void) const;
 
 private:
 	typedef struct SDL_Window SDL_Window;

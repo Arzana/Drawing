@@ -66,6 +66,13 @@ void Render(void)
 
 	window->Clear(CLR_BLACK);
 	GF_SetViewMatrix(cam->GetView());
-	RenderCube(CUBE_TRIANGLES);
-	printf("FPS: %f\n", window->GetFps());
+
+	GF_StartRender(GF_TRIANGLES);
+	GF_SetBufferLength(3);
+	GF_AddPoint(0, -0.5, 1, CLR_RED);
+	GF_AddPoint(-0.5, 0.5, 1, CLR_GREEN);
+	GF_AddPoint(0.5, 0.5, 1, CLR_BLUE);
+	GF_EndRender();
+
+	printf("%7.3f|%7.3f\n", window->GetAvarageFPS(), window->GetFps());
 }

@@ -130,6 +130,11 @@ uint GameWindow::GetHeight(void) const
 
 float GameWindow::GetFps(void) const
 {
+	return frameBuffer->back();
+}
+
+float GameWindow::GetAvarageFPS(void) const
+{
 	float sum = 0;
 	const std::deque<float> imp = frameBuffer->_Get_container();
 

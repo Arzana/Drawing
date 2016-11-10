@@ -53,6 +53,11 @@ Color::Color(const Vect4 * v)
 	: Color(v->X, v->Y, v->Z, v->W)
 { }
 
+Color Color::operator+(const Color & r) const
+{
+	return Add(this, &r);
+}
+
 Color Color::operator*(float r) const
 {
 	return Multiply(this, r);
@@ -66,6 +71,11 @@ bool Color::operator==(const Color & r) const
 bool Color::operator!=(const Color & r) const
 {
 	return !Equals(this, &r);
+}
+
+Color Color::Add(const Color * c1, const Color * c2)
+{
+	return Color(c1->GetR() + c2->GetR(), c1->GetG() + c2->GetG(), c1->GetB() + c2->GetB());
 }
 
 bool Color::Equals(const Color * c1, const Color * c2)

@@ -13,6 +13,10 @@
 #include "Utils.h"
 #include "Shapes.h"
 
+Vertex::Vertex(void)
+	: v(), c()
+{ }
+
 Vertex::Vertex(Vect3 v, Color c)
 	: v(v), c(c)
 { }
@@ -45,17 +49,24 @@ Line Triangle::GetLine(int l) const
 	return Line(v2, v0);
 }
 
-bool Triangle::IsInside(const Vect3 v)
+bool Triangle::IsInside(const Vect3 v, Color * c)
 {
 	Vect2 *vs1 = &V3ToV2(&(v1.v - v0.v));
 	Vect2 *vs2 = &V3ToV2(&(v2.v - v0.v));
-	Vect2 *q = &V3ToV2(&(v - v0.v));
+	Vect2 *vs3 = &V3ToV2(&(v - v0.v));
 
 	float r = Vect2::PrepDot(vs1, vs2);
-	float s = Vect2::PrepDot(q, vs2) / r;
-	float t = Vect2::PrepDot(vs1, q) / r;
+	float s = Vect2::PrepDot(vs3, vs2) / r;
+	float t = Vect2::PrepDot(vs1, vs3) / r;
 
-	return s >= 0 && t >= 0 && s + t <= 1;
+	if (s >= 0 && t >= 0 && s + t <= 1)
+	{
+		float u = 1.0f - s - t;
+		*c = v0.c * s + v1.c * t + v2.c * u;
+		return true;
+	}
+
+	return false;
 }
 
 Rectangle::Rectangle(void)
@@ -64,6 +75,10 @@ Rectangle::Rectangle(void)
 
 Rectangle::Rectangle(int x, int y, int w, int h)
 	: x(x), y(y), w(w), h(h)
+{ }
+
+Polygon::Polygon(void)
+	: v(NULL), polyVLen(0)
 { }
 
 ViewPort::ViewPort(Rectangle screen, float far, float near)
@@ -148,11 +163,11 @@ Vertex* TriangleClip(Triangle * p, int * len, const ViewPort vp)
 	std::vector<Vertex> temp;
 	SortVerticesBySpecial(&p->v0, &p->v1, &p->v2, vp);
 
-	Vect3 c;
-	if (p->IsInside(c = Vect3(vp.screen.x, vp.screen.y, vp.near))) temp.push_back(Vertex(c, CLR_BLACK));
-	if (p->IsInside(c = Vect3(vp.screen.w, vp.screen.y, vp.near))) temp.push_back(Vertex(c, CLR_BLACK));
-	if (p->IsInside(c = Vect3(vp.screen.x, vp.screen.h, vp.near))) temp.push_back(Vertex(c, CLR_BLACK));
-	if (p->IsInside(c = Vect3(vp.screen.w, vp.screen.h, vp.near))) temp.push_back(Vertex(c, CLR_BLACK));
+	Vertex v;
+	if (p->IsInside(v.v = Vect3(vp.screen.x, vp.screen.y, vp.near), &v.c)) temp.push_back(v);
+	if (p->IsInside(v.v = Vect3(vp.screen.w, vp.screen.y, vp.near), &v.c)) temp.push_back(v);
+	if (p->IsInside(v.v = Vect3(vp.screen.x, vp.screen.h, vp.near), &v.c)) temp.push_back(v);
+	if (p->IsInside(v.v = Vect3(vp.screen.w, vp.screen.h, vp.near), &v.c)) temp.push_back(v);
 
 	for (size_t i = 0; i < 3; i++)
 	{

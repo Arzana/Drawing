@@ -11,7 +11,6 @@
 #define GF_TRIANGLES		4
 #define GF_TRIANGLE_STRIP	5
 #define GF_TRIANGLE_FAN		6
-#define GF_POLYGON			7
 
 void GF_SetWindow(GameWindow *window);
 void GF_StartRender(const int primitiveType);
@@ -60,4 +59,6 @@ void GF_TriangleFan(void);
 Vect3 GF_ToNDC(const Vector4 *v);
 void GF_ToScreen(Vect3 *v);
 Vect3 GF_ToScreen(Vect4 *v);
+void single_line(const int i, const int j);
+void single_triangle(const int i, const int j, const int k);
 #endif

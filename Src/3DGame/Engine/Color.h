@@ -30,10 +30,12 @@ typedef struct Color
 	Color(const Vect3 *v);
 	Color(const Vect4 *v);
 
+	Color operator +(const Color &r) const;
 	Color operator *(float r) const;
 	bool operator ==(const Color &r) const;
 	bool operator !=(const Color &r) const;
 
+	static Color Add(const Color *c1, const Color *c2);
 	static bool Equals(const Color *c1, const Color *c2);
 	inline octet GetA(void) const;
 	inline octet GetR(void) const;
