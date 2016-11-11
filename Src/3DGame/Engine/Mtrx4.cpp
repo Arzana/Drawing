@@ -146,16 +146,17 @@ Matrix4 Matrix4::CreateRotation(const Vector3 * axis, float rads)
 	float yy = sqrt(axis->Y);
 	float yz = axis->Y * axis->Z;
 	float zz = square(axis->Z);
+	float omc = 1 - c;
 
-	float m11 = xx * (1 - c) + c;
-	float m12 = xy * (1 - c) - axis->Z * s;
-	float m13 = xz * (1 - c) + axis->Y * s;
-	float m21 = xy * (1 - c) + axis->Z * s;
-	float m22 = yy * (1 - c) + c;
-	float m23 = yz * (1 - c) - axis->X * s;
-	float m31 = xz * (1 - c) - axis->Y * s;
-	float m32 = yz * (1 - c) + axis->X * s;
-	float m33 = zz * (1 - c) + c;
+	float m11 = xx * omc + c;
+	float m12 = xy * omc - axis->Z * s;
+	float m13 = xz * omc + axis->Y * s;
+	float m21 = xy * omc + axis->Z * s;
+	float m22 = yy * omc + c;
+	float m23 = yz * omc - axis->X * s;
+	float m31 = xz * omc - axis->Y * s;
+	float m32 = yz * omc + axis->X * s;
+	float m33 = zz * omc + c;
 
 	return Matrix4(
 		m11, m12, m13, 0,
@@ -217,25 +218,25 @@ Matrix4 Matrix4::CreateTranslation(const Vector3 * pos)
 
 Matrix4 Matrix4::Multiply(const Matrix4 * m1, const Matrix4 * m2)
 {
-	float m11 = (m1->M11 * m2->M11) + (m1->M12 * m2->M21) + (m1->M13 * m2->M31) + (m1->M14 * m2->M41);
-	float m12 = (m1->M11 * m2->M12) + (m1->M12 * m2->M22) + (m1->M13 * m2->M32) + (m1->M14 * m2->M42);
-	float m13 = (m1->M11 * m2->M13) + (m1->M12 * m2->M23) + (m1->M13 * m2->M33) + (m1->M14 * m2->M43);
-	float m14 = (m1->M11 * m2->M14) + (m1->M12 * m2->M24) + (m1->M13 * m2->M34) + (m1->M14 * m2->M44);
+	float m11 = m1->M11 * m2->M11 + m1->M12 * m2->M21 + m1->M13 * m2->M31 + m1->M14 * m2->M41;
+	float m12 = m1->M11 * m2->M12 + m1->M12 * m2->M22 + m1->M13 * m2->M32 + m1->M14 * m2->M42;
+	float m13 = m1->M11 * m2->M13 + m1->M12 * m2->M23 + m1->M13 * m2->M33 + m1->M14 * m2->M43;
+	float m14 = m1->M11 * m2->M14 + m1->M12 * m2->M24 + m1->M13 * m2->M34 + m1->M14 * m2->M44;
 
-	float m21 = (m1->M21 * m2->M11) + (m1->M22 * m2->M21) + (m1->M23 * m2->M31) + (m1->M24 * m2->M41);
-	float m22 = (m1->M21 * m2->M12) + (m1->M22 * m2->M22) + (m1->M23 * m2->M32) + (m1->M24 * m2->M42);
-	float m23 = (m1->M21 * m2->M13) + (m1->M22 * m2->M23) + (m1->M23 * m2->M33) + (m1->M24 * m2->M43);
-	float m24 = (m1->M21 * m2->M14) + (m1->M22 * m2->M24) + (m1->M23 * m2->M34) + (m1->M24 * m2->M44);
+	float m21 = m1->M21 * m2->M11 + m1->M22 * m2->M21 + m1->M23 * m2->M31 + m1->M24 * m2->M41;
+	float m22 = m1->M21 * m2->M12 + m1->M22 * m2->M22 + m1->M23 * m2->M32 + m1->M24 * m2->M42;
+	float m23 = m1->M21 * m2->M13 + m1->M22 * m2->M23 + m1->M23 * m2->M33 + m1->M24 * m2->M43;
+	float m24 = m1->M21 * m2->M14 + m1->M22 * m2->M24 + m1->M23 * m2->M34 + m1->M24 * m2->M44;
 
-	float m31 = (m1->M31 * m2->M11) + (m1->M32 * m2->M21) + (m1->M33 * m2->M31) + (m1->M34 * m2->M41);
-	float m32 = (m1->M31 * m2->M12) + (m1->M32 * m2->M22) + (m1->M33 * m2->M32) + (m1->M34 * m2->M42);
-	float m33 = (m1->M31 * m2->M13) + (m1->M32 * m2->M23) + (m1->M33 * m2->M33) + (m1->M34 * m2->M43);
-	float m34 = (m1->M31 * m2->M14) + (m1->M32 * m2->M24) + (m1->M33 * m2->M34) + (m1->M34 * m2->M44);
+	float m31 = m1->M31 * m2->M11 + m1->M32 * m2->M21 + m1->M33 * m2->M31 + m1->M34 * m2->M41;
+	float m32 = m1->M31 * m2->M12 + m1->M32 * m2->M22 + m1->M33 * m2->M32 + m1->M34 * m2->M42;
+	float m33 = m1->M31 * m2->M13 + m1->M32 * m2->M23 + m1->M33 * m2->M33 + m1->M34 * m2->M43;
+	float m34 = m1->M31 * m2->M14 + m1->M32 * m2->M24 + m1->M33 * m2->M34 + m1->M34 * m2->M44;
 
-	float m41 = (m1->M41 * m2->M11) + (m1->M42 * m2->M21) + (m1->M43 * m2->M31) + (m1->M44 * m2->M41);
-	float m42 = (m1->M41 * m2->M12) + (m1->M42 * m2->M22) + (m1->M43 * m2->M32) + (m1->M44 * m2->M42);
-	float m43 = (m1->M41 * m2->M13) + (m1->M42 * m2->M23) + (m1->M43 * m2->M33) + (m1->M44 * m2->M43);
-	float m44 = (m1->M41 * m2->M14) + (m1->M42 * m2->M24) + (m1->M43 * m2->M34) + (m1->M44 * m2->M44);
+	float m41 = m1->M41 * m2->M11 + m1->M42 * m2->M21 + m1->M43 * m2->M31 + m1->M44 * m2->M41;
+	float m42 = m1->M41 * m2->M12 + m1->M42 * m2->M22 + m1->M43 * m2->M32 + m1->M44 * m2->M42;
+	float m43 = m1->M41 * m2->M13 + m1->M42 * m2->M23 + m1->M43 * m2->M33 + m1->M44 * m2->M43;
+	float m44 = m1->M41 * m2->M14 + m1->M42 * m2->M24 + m1->M43 * m2->M34 + m1->M44 * m2->M44;
 
 	return Matrix4(
 		m11, m12, m13, m14,
@@ -246,10 +247,10 @@ Matrix4 Matrix4::Multiply(const Matrix4 * m1, const Matrix4 * m2)
 
 Vector4 Matrix4::Transform(const Matrix4 * m, const Vector3 * v)
 {
-	float x = (v->X * m->M11) + (v->Y * m->M12) + (v->Z * m->M13) + m->M14;
-	float y = (v->X * m->M21) + (v->Y * m->M22) + (v->Z * m->M23) + m->M24;
-	float z = (v->X * m->M31) + (v->Y * m->M32) + (v->Z * m->M33) + m->M34;
-	float w = (v->X * m->M41) + (v->Y * m->M42) + (v->Z * m->M43) + m->M44;
+	float x = v->X * m->M11 + v->Y * m->M12 + v->Z * m->M13 + m->M14;
+	float y = v->X * m->M21 + v->Y * m->M22 + v->Z * m->M23 + m->M24;
+	float z = v->X * m->M31 + v->Y * m->M32 + v->Z * m->M33 + m->M34;
+	float w = v->X * m->M41 + v->Y * m->M42 + v->Z * m->M43 + m->M44;
 
 	return Vector4(x, y, z, w);
 }

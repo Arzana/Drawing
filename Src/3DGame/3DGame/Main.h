@@ -7,6 +7,7 @@
 #include <GF.h>
 #include "Camera.h"
 #include "Cube.h"
+#include "Triangle.h"
 
 //#define _USE_FULL_HD
 

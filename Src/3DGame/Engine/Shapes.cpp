@@ -21,6 +21,10 @@ Vertex::Vertex(Vect3 v, Color c)
 	: v(v), c(c)
 { }
 
+Vertex::Vertex(float x, float y, float z)
+	: v(Vect3(x, y, z)), c(CLR_WHITE)
+{ }
+
 Vertex::Vertex(float x, float y, float z, Color c)
 	: v(Vect3(x, y, z)), c(c)
 { }
@@ -49,11 +53,11 @@ Line Triangle::GetLine(int l) const
 	return Line(v2, v0);
 }
 
-bool Triangle::IsInside(const Vect3 v, Color * c)
+bool Triangle::IsInside(Vertex *v)
 {
 	Vect2 *vs1 = &V3ToV2(&(v1.v - v0.v));
 	Vect2 *vs2 = &V3ToV2(&(v2.v - v0.v));
-	Vect2 *vs3 = &V3ToV2(&(v - v0.v));
+	Vect2 *vs3 = &V3ToV2(&(v->v - v0.v));
 
 	float r = Vect2::PrepDot(vs1, vs2);
 	float s = Vect2::PrepDot(vs3, vs2) / r;
@@ -62,7 +66,9 @@ bool Triangle::IsInside(const Vect3 v, Color * c)
 	if (s >= 0 && t >= 0 && s + t <= 1)
 	{
 		float u = 1.0f - s - t;
-		*c = v0.c * s + v1.c * t + v2.c * u;
+		v->v.Z = v0.v.Z * s + v1.v.Z * t + v2.v.Z * u;
+		v->c = v0.c * s + v1.c * t + v2.c * u;
+
 		return true;
 	}
 
@@ -164,10 +170,10 @@ Vertex* TriangleClip(Triangle * p, int * len, const ViewPort vp)
 	SortVerticesBySpecial(&p->v0, &p->v1, &p->v2, vp);
 
 	Vertex v;
-	if (p->IsInside(v.v = Vect3(vp.screen.x, vp.screen.y, vp.near), &v.c)) temp.push_back(v);
-	if (p->IsInside(v.v = Vect3(vp.screen.w, vp.screen.y, vp.near), &v.c)) temp.push_back(v);
-	if (p->IsInside(v.v = Vect3(vp.screen.x, vp.screen.h, vp.near), &v.c)) temp.push_back(v);
-	if (p->IsInside(v.v = Vect3(vp.screen.w, vp.screen.h, vp.near), &v.c)) temp.push_back(v);
+	if (p->IsInside(&(v = Vertex(vp.screen.x, vp.screen.y, vp.near)))) temp.push_back(v);
+	if (p->IsInside(&(v = Vertex(vp.screen.w, vp.screen.y, vp.near)))) temp.push_back(v);
+	if (p->IsInside(&(v = Vertex(vp.screen.x, vp.screen.h, vp.near)))) temp.push_back(v);
+	if (p->IsInside(&(v = Vertex(vp.screen.w, vp.screen.h, vp.near)))) temp.push_back(v);
 
 	for (size_t i = 0; i < 3; i++)
 	{

@@ -6,8 +6,8 @@
 #define ZXY_ARGS			(const float, const float, const float, const Color)
 #define ZVC_PLT				(void(GameWindow::*)ZVC_ARGS)
 #define ZXY_PLT				(void(GameWindow::*)ZXY_ARGS)
-#define get_zvc_plt			void(GameWindow::*plt)ZVC_ARGS = flags.ZBuff ? ZVC_PLT &GameWindow::TryPlot : ZVC_PLT &GameWindow::Plot;
-#define get_zxy_plt			void(GameWindow::*plt)ZXY_ARGS = flags.ZBuff ? ZXY_PLT &GameWindow::TryPlot : ZXY_PLT &GameWindow::Plot;
+#define get_zvc_plt			void(GameWindow::*plt)ZVC_ARGS = flags.ZBuff ? ZVC_PLT &GameWindow::TryPlot : ZVC_PLT &GameWindow::Plot
+#define get_zxy_plt			void(GameWindow::*plt)ZXY_ARGS = flags.ZBuff ? ZXY_PLT &GameWindow::TryPlot : ZXY_PLT &GameWindow::Plot
 #define plot				(w->*plt)
 
 #include "Utils.h"
@@ -166,8 +166,7 @@ void GF_AddPoint(const Vector3 v, const Color c)
 	}
 
 	vbuffer[bufferIndex] = v;
-	cbuffer[bufferIndex] = c;
-	++bufferIndex;
+	cbuffer[bufferIndex++] = c;
 }
 
 void GF_AddPoint(const float x, const float y, float z, const Color c)
@@ -182,13 +181,13 @@ void GF_AddPoint(const Vertex vtx)
 
 void GF_Points(void)
 {
-	get_zvc_plt
+	get_zvc_plt;
 
-		for (size_t i = 0; i < bufferLength; i++)
-		{
-			if (hbuffer[i].Clip()) continue;
-			plot(vrtxat(i));
-		}
+	for (size_t i = 0; i < bufferLength; i++)
+	{
+		if (hbuffer[i].Clip()) continue;
+		plot(vrtxat(i));
+	}
 }
 
 void GF_Lines(void)
@@ -253,22 +252,15 @@ void GF_ToScreen(Vect3 * v)
 	v->Z = cPort.Z * v->Z + cPort.W;
 }
 
-Vect3 GF_ToScreen(Vect4 * v)
-{
-	Vect3 r = GF_ToNDC(v);
-	GF_ToScreen(&r);
-	return r;
-}
-
 void single_line(const int i, const int j)
 {
-	int clp = (hbuffer + i)->Clip() + (hbuffer + j)->Clip(); 
-	if (clp) 
+	int clp = (hbuffer + i)->Clip() + (hbuffer + j)->Clip();
+	if (clp)
 	{
 		if (!flags.Clip || clp > 1) return;
-		Line *l = &Line(vrtxat(i), vrtxat(j)); 
-		if (LineClip(l, port)) GF_Line(l); 
-	} 
+		Line *l = &Line(vrtxat(i), vrtxat(j));
+		if (LineClip(l, port)) GF_Line(l);
+	}
 	else GF_Line(vrtxat(i), vrtxat(j));
 }
 
@@ -277,7 +269,7 @@ void single_triangle(const int i, const int j, const int k)
 	int clp = hbuffer[i].Clip() + (hbuffer + j)->Clip() + (hbuffer + k)->Clip();
 	if (clp)
 	{
-		if (!flags.Clip || clp > 2) return;
+		if (!flags.Clip) return;
 		Trgl *t = &Trgl(vrtxat(i), vrtxat(j), vrtxat(k));
 		Poly p;
 
@@ -318,24 +310,24 @@ void GF_Line(const int x0, const int y0, const int z0, const Color c0, const int
 	uint x = x0;
 	uint y = y0;
 
-	get_zxy_plt
-		for (size_t i = 0; i < lng; i++)
+	get_zxy_plt;
+	for (size_t i = 0; i < lng; i++)
+	{
+		float a = invLerp(0, lng, i);
+		plot(x, y, lerp(z0, z1, a), Color::Lerp(c0, c1, a));
+		num += shrt;
+		if (num >= lng)
 		{
-			float a = invLerp(0, lng, i);
-			plot(x, y, lerp(z0, z1, a), Color::Lerp(c0, c1, a));
-			num += shrt;
-			if (num >= lng)
-			{
-				num -= lng;
-				x += dx0;
-				y += dy0;
-			}
-			else
-			{
-				x += dx1;
-				y += dy1;
-			}
+			num -= lng;
+			x += dx0;
+			y += dy0;
 		}
+		else
+		{
+			x += dx1;
+			y += dy1;
+		}
+	}
 }
 
 void GF_Line(const Vertex * v0, const Vertex * v1)
@@ -350,29 +342,29 @@ void GF_Line(const Line * line)
 
 void GF_HLine(const float x0, const float z0, const Color c0, const float x1, const float z1, const Color c1, const float y)
 {
-	get_zxy_plt
+	get_zxy_plt;
 
-		if (x0 == x1)
+	if (x0 == x1)
+	{
+		if (z0 > z1) plot(x0, y, z0, c0);
+		else plot(x1, y, z1, c1);
+	}
+	else if (x0 < x1)
+	{
+		for (float x = x0; x <= x1; ++x)
 		{
-			if (z0 > z1) plot(x0, y, z0, c0);
-			else plot(x1, y, z1, c1);
+			float a = invLerp(x0, x1, x);
+			plot(x, y, lerp(z0, z1, a), Color::Lerp(c0, c1, a));
 		}
-		else if (x0 < x1)
+	}
+	else
+	{
+		for (float x = x1; x <= x0; ++x)
 		{
-			for (float x = x0; x <= x1; ++x)
-			{
-				float a = invLerp(x0, x1, x);
-				plot(x, y, lerp(z0, z1, a), Color::Lerp(c0, c1, a));
-			}
+			float a = invLerp(x1, x0, x);
+			plot(x, y, lerp(z1, z0, a), Color::Lerp(c1, c0, a));
 		}
-		else
-		{
-			for (float x = x1; x <= x0; ++x)
-			{
-				float a = invLerp(x1, x0, x);
-				plot(x, y, lerp(z1, z0, a), Color::Lerp(c1, c0, a));
-			}
-		}
+	}
 }
 
 void GF_HLine(const Vertex * v0, const Vertex * v1)

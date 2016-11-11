@@ -14,8 +14,6 @@
 
 #define FPS_LOCK	60.0f
 
-const clock_t mili2clocks = CLOCKS_PER_SEC / 1000;
-
 class GameWindow
 {
 public:
@@ -49,6 +47,8 @@ public:
 private:
 	typedef struct SDL_Window SDL_Window;
 	typedef struct SDL_Surface SDL_Surface;
+
+	const clock_t mili2clocks = CLOCKS_PER_SEC / 1000;
 
 	SDL_Window *window;
 	SDL_Surface *surface;

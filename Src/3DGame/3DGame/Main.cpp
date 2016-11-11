@@ -27,8 +27,9 @@ int main(int argc, char *argv[])
 
 void MouseMove(int x, int y, int dX, int dY)
 {
-	//cam->AppendYawDegr(dX * 0.1);
-	//cam->AppendPitchDegr(dY * 0.1);
+	const float scalar = 0.1f;
+	cam->AppendYawDegr(dX * scalar);
+	cam->AppendPitchDegr(dY * scalar);
 }
 
 void KeyPress(int scanCode)
@@ -67,12 +68,7 @@ void Render(void)
 	window->Clear(CLR_BLACK);
 	GF_SetViewMatrix(cam->GetView());
 
-	GF_StartRender(GF_TRIANGLES);
-	GF_SetBufferLength(3);
-	GF_AddPoint(0, -0.5, 1, CLR_RED);
-	GF_AddPoint(-0.5, 0.5, 1, CLR_GREEN);
-	GF_AddPoint(0.5, 0.5, 1, CLR_BLUE);
-	GF_EndRender();
+	RenderTriangle(2);
 
 	printf("%7.3f|%7.3f\n", window->GetAvarageFPS(), window->GetFps());
 }

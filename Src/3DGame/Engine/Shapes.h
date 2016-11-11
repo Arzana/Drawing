@@ -10,6 +10,7 @@ typedef struct Vertex
 
 	Vertex(void);
 	Vertex(Vect3 v, Color c);
+	Vertex(float x, float y, float z);
 	Vertex(float x, float y, float z, Color c);
 
 	inline bool operator ==(const Vertex &r) const { return v == r.v && c == r.c; }
@@ -31,7 +32,7 @@ typedef struct Triangle
 	Triangle(Vertex v0, Vertex v1, Vertex v2);
 	Triangle(const Vertex *v0, const Vertex *v1, const Vertex *v2);
 	Line GetLine(int l) const;
-	bool IsInside(const Vect3 v, Color *c);
+	bool IsInside(Vertex *v);
 } Trgl;
 
 typedef struct Rectangle
