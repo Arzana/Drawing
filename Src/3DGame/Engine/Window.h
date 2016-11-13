@@ -21,6 +21,7 @@ public:
 	void(*Draw)(void);
 	void(*KeyDown)(int);
 	void(*MouseMove)(int, int, int, int);
+	void(*OnTerminate)(void);
 
 	bool *IsFixedTimeStep;
 	bool *Lag;

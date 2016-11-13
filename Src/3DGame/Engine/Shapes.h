@@ -61,17 +61,17 @@ typedef struct ViewPort
 } ViewPort;
 
 #ifdef _USE_CLIPPING
-#define INSIDE		0
-#define LEFT		1
-#define RIGHT		2
-#define HORIZONTAL	3
-#define BOTTOM		4
-#define TOP			8
-#define VERTICAL	12
-#define NEAR		16
-#define FAR			32
-#define DEPTH		48
-#define OUTSIDE		63
+#define INSIDE		0b000000
+#define LEFT		0b000001
+#define RIGHT		0b000010
+#define HORIZONTAL	0b000011
+#define BOTTOM		0b000100
+#define TOP			0b001000
+#define VERTICAL	0b001100
+#define NEAR		0b010000
+#define FAR			0b100000
+#define DEPTH		0b110000
+#define OUTSIDE		0b111111
 
 #include <vector>
 

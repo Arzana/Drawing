@@ -35,6 +35,7 @@ GameWindow::GameWindow(const char * title, const uint width, const uint height)
 	Draw = NULL;
 	KeyDown = NULL;
 	MouseMove = NULL;
+	OnTerminate = NULL;
 
 	InitWindow();
 	zBuffer = malloc_s(float, width * height);
@@ -111,6 +112,8 @@ void GameWindow::Run(void)
 	{
 		Tick();
 	}
+
+	if (OnTerminate) OnTerminate();
 }
 
 void GameWindow::Terminate()

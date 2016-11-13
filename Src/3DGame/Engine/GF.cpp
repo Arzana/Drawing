@@ -1,6 +1,8 @@
 #define _USE_GF_INTERNAL
 #define _USE_CLIPPING
 
+#define NUM_THREADS			100
+
 #define vrtxat(x)			(&Vertex(GF_ToScreen(hbuffer + x), cbuffer[x]))
 #define ZVC_ARGS			(const Vertex*)
 #define ZXY_ARGS			(const float, const float, const float, const Color)
@@ -9,14 +11,38 @@
 #define get_zvc_plt			void(GameWindow::*plt)ZVC_ARGS = flags.ZBuff ? ZVC_PLT &GameWindow::TryPlot : ZVC_PLT &GameWindow::Plot
 #define get_zxy_plt			void(GameWindow::*plt)ZXY_ARGS = flags.ZBuff ? ZXY_PLT &GameWindow::TryPlot : ZXY_PLT &GameWindow::Plot
 #define plot				(w->*plt)
+#define get_pop(v)			v.back(); v.pop_back()
 
 #include "Utils.h"
 #include "GF.h"
 #include <cstdio>
 #include <cfloat>
+#include <vector>
+#include <thread>
+#include <mutex>
+
+using namespace std;
+
+struct hline 
+{
+	float x0, z0;
+	Color c0;
+	float x1, z1;
+	Color c1;
+	float y;
+
+	hline(float x0, float z0, Color c0, float x1, float z1, Color c1, float y)
+		: x0(x0), z0(z0), c0(c0), x1(x1), z1(z1), c1(c1), y(y)
+	{ }
+};
+
+thread ths[NUM_THREADS];
+mutex mtx;
+vector<hline> buff;
+bool running;
 
 GameWindow *w = NULL;
-Flags flags = Flags();
+Flags flags;
 ViewPort port = ViewPort(0, 0, 0, 0, 0, FLT_MAX);
 Vect4 cPort;
 
@@ -30,16 +56,63 @@ Mtrx4 model = MTRX4_IDENTITY;
 Mtrx4 view = MTRX4_IDENTITY;
 Mtrx4 pers = MTRX4_IDENTITY;
 
+void line_func(const size_t thrdId)
+{
+	printf("%d starting up\n", thrdId);
+
+	while (running)
+	{
+		mtx.lock();
+		if (buff.size() > 0)
+		{
+			hline line = get_pop(buff);
+			mtx.unlock();
+
+			GF_HLine(line.x0, line.z0, line.c0, line.x1, line.z1, line.c1, line.y);
+		}
+		else
+		{
+			mtx.unlock();
+			this_thread::sleep_for(chrono::milliseconds(1));
+		}
+	}
+
+	printf("%d shutting down\n", thrdId);
+}
+
+void GF_Init(void)
+{
+	flags.Init = true;
+	running = true;
+	
+	for (size_t i = 0; i < NUM_THREADS; i++)
+	{
+		ths[i] = thread(line_func, i);
+	}
+}
+
+void GF_End(void)
+{
+	running = false;
+
+	for (size_t i = 0; i < NUM_THREADS; i++)
+	{
+		ths[i].join();
+	}
+}
+
 void GF_SetWindow(GameWindow * window)
 {
 	w = window;
 	GF_SetViewport(&Rect(0, 0, w->GetWidth() - 1, w->GetHeight() - 1));
+	w->OnTerminate = [](void) { running = false; };
 }
 
 void GF_StartRender(const int primitiveType)
 {
-	if (!w || flags.Strt)
+	if (!flags.Init || !w || flags.Strt)
 	{
+		if (!flags.Init) Raise("GF_Init must be called before calling any graphics functions!");
 		if (!w) Raise("GF_SetWindow must be called before calling GF_StartRender!");
 		if (flags.Strt) Raise("GF_EndRender must be called before calling GF_StartRender again!");
 		return;
@@ -51,8 +124,9 @@ void GF_StartRender(const int primitiveType)
 
 void GF_EndRender(void)
 {
-	if (!flags.Strt || bufferIndex < bufferLength || !w)
+	if (!flags.Init || !flags.Strt || bufferIndex < bufferLength || !w)
 	{
+		if (!flags.Init) Raise("GF_Init must be called before calling any graphics functions!");
 		if (!flags.Strt) Raise("GF_StartRender must be called before calling GF_EndRender!");
 		if (bufferIndex < bufferLength) Raise("Not all points in the buffer have been set!");
 		if (!w) Raise("GF_SetWindow must be called before calling GF_EndRender!");
@@ -91,6 +165,8 @@ void GF_EndRender(void)
 		break;
 	}
 
+	while (buff.size() > 0) this_thread::sleep_for(chrono::milliseconds(1));
+
 	flags.Strt = 0;
 	bufferIndex = 0;
 	bufferLength = 0;
@@ -102,8 +178,9 @@ void GF_EndRender(void)
 
 void GF_SetBufferLength(size_t length)
 {
-	if (length < 1 || bufferLength != 0)
+	if (!flags.Init || length < 1 || bufferLength != 0)
 	{
+		if (!flags.Init) Raise("GF_Init must be called before calling any graphics functions!");
 		if (length < 1) Raise("Length must be greater than zero!");
 		if (bufferLength != 0) Raise("GF_EndRender must be called before respecifying the buffer length!");
 		return;
@@ -157,8 +234,9 @@ void GF_SetFlag_ZBuff(const bool value)
 
 void GF_AddPoint(const Vector3 v, const Color c)
 {
-	if (!flags.Strt || bufferIndex >= bufferLength)
+	if (!flags.Init || !flags.Strt || bufferIndex >= bufferLength)
 	{
+		if (!flags.Init) Raise("GF_Init must be called before calling any graphics functions!");
 		if (!flags.Strt) Raise("GF_StartRender must be called before calling GF_AddPoint!");
 		if (bufferLength < 1) Raise("GF_SetBufferLength must be called before calling GF_AddPoint!");
 		if (bufferIndex >= bufferLength) Raise("Cannot add any more points to the buffer!");
@@ -367,11 +445,6 @@ void GF_HLine(const float x0, const float z0, const Color c0, const float x1, co
 	}
 }
 
-void GF_HLine(const Vertex * v0, const Vertex * v1)
-{
-	GF_HLine(v0->v.X, v0->v.Z, v0->c, v1->v.X, v1->v.Z, v1->c, v0->v.Y);
-}
-
 void GF_BFTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 {
 	float invSlp0 = (v1->v.X - v0->v.X) / (v1->v.Y - v0->v.Y);
@@ -388,7 +461,10 @@ void GF_BFTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 		float z0 = lerp(v0->v.Z, v1->v.Z, a);
 		float z1 = lerp(v0->v.Z, v2->v.Z, a);
 
-		GF_HLine(x0, z0, c0, x1, z1, c1, y);
+		mtx.lock();
+		buff.push_back(hline(x0, z0, c0, x1, z1, c1, y));
+		mtx.unlock();
+
 		x0 += invSlp0;
 		x1 += invSlp1;
 	}
@@ -410,7 +486,10 @@ void GF_TFTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 		float z0 = lerp(v2->v.Z, v0->v.Z, a);
 		float z1 = lerp(v2->v.Z, v1->v.Z, a);
 
-		GF_HLine(x0, z0, c0, x1, z1, c1, y);
+		mtx.lock();
+		buff.push_back(hline(x0, z0, c0, x1, z1, c1, y));
+		mtx.unlock();
+
 		x0 -= invSlp0;
 		x1 -= invSlp1;
 	}

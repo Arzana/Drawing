@@ -12,6 +12,8 @@
 #define GF_TRIANGLE_STRIP	5
 #define GF_TRIANGLE_FAN		6
 
+void GF_Init(void);
+void GF_End(void);
 void GF_SetWindow(GameWindow *window);
 void GF_StartRender(const int primitiveType);
 void GF_EndRender(void);
@@ -30,13 +32,21 @@ void GF_AddPoint(const Vertex vtx);
 #ifdef _USE_GF_INTERNAL
 typedef struct flags
 {
+	bool Init : 1;
 	bool Clip : 1;
 	bool ZBuff : 1;
 	bool Proj : 1;
 	bool Strt : 1;
 	octet Prim : 3;
 
-	flags(void) : Clip(ENABLE), Prim(GF_POINTS), Proj(ENABLE), Strt(DISABLE), ZBuff(ENABLE) { }
+	flags(void) 
+		: Init(false)
+		, Clip(ENABLE)
+		, Prim(GF_POINTS)
+		, Proj(ENABLE)
+		, Strt(false)
+		, ZBuff(ENABLE) 
+	{ }
 } Flags;
 
 void GF_SetDepth(const float front, const float back);
@@ -45,7 +55,6 @@ void GF_Line(const int x0, const int y0, const int z0, const Color c0, const int
 void GF_Line(const Vertex *v0, const Vertex *v1);
 void GF_Line(const Line *line);
 void GF_HLine(const float x0, const float z0, const Color c0, const float x1, const float z1, const Color c1, const float y);
-void GF_HLine(const Vertex *v0, const Vertex *v1);
 void GF_BFTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);
 void GF_TFTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);
 void GF_FullTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);

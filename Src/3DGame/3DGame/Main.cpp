@@ -12,10 +12,12 @@ int main(int argc, char *argv[])
 
 	cam = new Camera(Vect3(0, 0, (2 / sin(FOV_Y / 2 * deg2rad))));
 
+	GF_Init();
 	GF_SetWindow(window);
 	GF_SetFrustrum(FOV_Y, aspr, DEPTH_NEAR, DEPTH_FAR);
 
 	window->Run();
+	GF_End();
 
 	delete window;
 	delete cam;
@@ -34,7 +36,7 @@ void MouseMove(int x, int y, int dX, int dY)
 
 void KeyPress(int scanCode)
 {
-	const float scalar = 0.5f;
+	const float scalar = 0.1f;
 	switch (scanCode)
 	{
 	case 41: // ESC
@@ -68,7 +70,7 @@ void Render(void)
 	window->Clear(CLR_BLACK);
 	GF_SetViewMatrix(cam->GetView());
 
-	RenderTriangle(2);
+	RenderCube(2);
 
 	printf("%7.3f|%7.3f\n", window->GetAvarageFPS(), window->GetFps());
 }

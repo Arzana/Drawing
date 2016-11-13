@@ -13,6 +13,9 @@
 #include "Utils.h"
 #include "Shapes.h"
 
+template <typename T>
+void Swap(T *v0, T *v1);
+
 Vertex::Vertex(void)
 	: v(), c()
 { }
@@ -66,8 +69,8 @@ bool Triangle::IsInside(Vertex *v)
 	if (s >= 0 && t >= 0 && s + t <= 1)
 	{
 		float u = 1.0f - s - t;
-		v->v.Z = v0.v.Z * s + v1.v.Z * t + v2.v.Z * u;
-		v->c = v0.c * s + v1.c * t + v2.c * u;
+		v->v.Z = v0.v.Z * u + v1.v.Z * s + v2.v.Z * t;
+		v->c = v0.c * u + v1.c * s + v2.c * t;
 
 		return true;
 	}
@@ -173,7 +176,11 @@ Vertex* TriangleClip(Triangle * p, int * len, const ViewPort vp)
 	if (p->IsInside(&(v = Vertex(vp.screen.x, vp.screen.y, vp.near)))) temp.push_back(v);
 	if (p->IsInside(&(v = Vertex(vp.screen.w, vp.screen.y, vp.near)))) temp.push_back(v);
 	if (p->IsInside(&(v = Vertex(vp.screen.x, vp.screen.h, vp.near)))) temp.push_back(v);
-	if (p->IsInside(&(v = Vertex(vp.screen.w, vp.screen.h, vp.near)))) temp.push_back(v);
+	if (p->IsInside(&(v = Vertex(vp.screen.w, vp.screen.h, vp.near))))
+	{
+		temp.push_back(v);
+		if (temp.size() > 3) Swap(&temp[2], &temp[3]);
+	}
 
 	for (size_t i = 0; i < 3; i++)
 	{
