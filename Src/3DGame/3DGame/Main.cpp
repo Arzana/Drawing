@@ -2,6 +2,7 @@
 
 GameWindow *window;
 Camera *cam;
+const float scalar = 0.1f;
 
 int main(int argc, char *argv[])
 {
@@ -10,7 +11,7 @@ int main(int argc, char *argv[])
 	window->KeyDown = KeyPress;
 	window->MouseMove = MouseMove;
 
-	cam = new Camera(Vect3(0, 0, (2 / sin(FOV_Y / 2 * deg2rad))));
+	cam = new Camera(Vect3(0, 0, Z_DIST(1)));
 
 	GF_Init();
 	GF_SetWindow(window);
@@ -29,14 +30,12 @@ int main(int argc, char *argv[])
 
 void MouseMove(int x, int y, int dX, int dY)
 {
-	const float scalar = 0.1f;
 	cam->AppendYawDegr(dX * scalar);
 	cam->AppendPitchDegr(dY * scalar);
 }
 
 void KeyPress(int scanCode)
 {
-	const float scalar = 0.1f;
 	switch (scanCode)
 	{
 	case 41: // ESC
@@ -70,7 +69,7 @@ void Render(void)
 	window->Clear(CLR_BLACK);
 	GF_SetViewMatrix(cam->GetView());
 
-	RenderCube(2);
+	RenderTriangle(2);
 
 	printf("%7.3f|%7.3f\n", window->GetAvarageFPS(), window->GetFps());
 }

@@ -32,20 +32,20 @@ void GF_AddPoint(const Vertex vtx);
 #ifdef _USE_GF_INTERNAL
 typedef struct flags
 {
-	bool Init : 1;
-	bool Clip : 1;
-	bool ZBuff : 1;
-	bool Proj : 1;
-	bool Strt : 1;
-	octet Prim : 3;
+	bool init : 1;
+	bool clip : 1;
+	bool zBuff : 1;
+	bool proj : 1;
+	bool strt : 1;
+	octet prim : 3;
 
 	flags(void) 
-		: Init(false)
-		, Clip(ENABLE)
-		, Prim(GF_POINTS)
-		, Proj(ENABLE)
-		, Strt(false)
-		, ZBuff(ENABLE) 
+		: init(false)
+		, clip(ENABLE)
+		, zBuff(ENABLE)
+		, prim(GF_POINTS)
+		, proj(ENABLE)
+		, strt(false)
 	{ }
 } Flags;
 
@@ -55,6 +55,9 @@ void GF_Line(const int x0, const int y0, const int z0, const Color c0, const int
 void GF_Line(const Vertex *v0, const Vertex *v1);
 void GF_Line(const Line *line);
 void GF_HLine(const float x0, const float z0, const Color c0, const float x1, const float z1, const Color c1, const float y);
+void GF_HLine(const float x0, const float z0, const float x1, const float z1, const float y, const Color c);
+void GF_VLine(const float y0, const float z0, const Color c0, const float y1, const float z1, const Color c1, const float x);
+void GF_VLine(const float y0, const float z0, const float y1, const float z1, const float x, const Color c);
 void GF_BFTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);
 void GF_TFTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);
 void GF_FullTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);

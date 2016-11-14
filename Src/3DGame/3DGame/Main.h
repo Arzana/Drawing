@@ -1,7 +1,5 @@
 #pragma once
 
-#define _USE_CLIPPING
-
 #include <cstdio>
 #include <Utils.h>
 #include <GF.h>
@@ -22,6 +20,7 @@
 #define DEPTH_FAR	100.0f
 #define DEPTH_NEAR	0.1f
 #define FOV_Y		45.0f
+#define Z_DIST(r)	((r) / sinf(FOV_Y / 2 * deg2rad))
 
 const float aspr = WIDTH / HEIGHT;
 

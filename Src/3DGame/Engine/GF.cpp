@@ -8,8 +8,8 @@
 #define ZXY_ARGS			(const float, const float, const float, const Color)
 #define ZVC_PLT				(void(GameWindow::*)ZVC_ARGS)
 #define ZXY_PLT				(void(GameWindow::*)ZXY_ARGS)
-#define get_zvc_plt			void(GameWindow::*plt)ZVC_ARGS = flags.ZBuff ? ZVC_PLT &GameWindow::TryPlot : ZVC_PLT &GameWindow::Plot
-#define get_zxy_plt			void(GameWindow::*plt)ZXY_ARGS = flags.ZBuff ? ZXY_PLT &GameWindow::TryPlot : ZXY_PLT &GameWindow::Plot
+#define get_zvc_plt			void(GameWindow::*plt)ZVC_ARGS = flags.zBuff ? ZVC_PLT &GameWindow::TryPlot : ZVC_PLT &GameWindow::Plot
+#define get_zxy_plt			void(GameWindow::*plt)ZXY_ARGS = flags.zBuff ? ZXY_PLT &GameWindow::TryPlot : ZXY_PLT &GameWindow::Plot
 #define plot				(w->*plt)
 #define get_pop(v)			v.back(); v.pop_back()
 
@@ -65,10 +65,10 @@ void line_func(const size_t thrdId)
 		mtx.lock();
 		if (buff.size() > 0)
 		{
-			hline line = get_pop(buff);
+			hline l = get_pop(buff);
 			mtx.unlock();
 
-			GF_HLine(line.x0, line.z0, line.c0, line.x1, line.z1, line.c1, line.y);
+			GF_HLine(l.x0, l.z0, l.c0, l.x1, l.z1, l.c1, l.y);
 		}
 		else
 		{
@@ -82,7 +82,7 @@ void line_func(const size_t thrdId)
 
 void GF_Init(void)
 {
-	flags.Init = true;
+	flags.init = true;
 	running = true;
 	
 	for (size_t i = 0; i < NUM_THREADS; i++)
@@ -110,24 +110,24 @@ void GF_SetWindow(GameWindow * window)
 
 void GF_StartRender(const int primitiveType)
 {
-	if (!flags.Init || !w || flags.Strt)
+	if (!flags.init || !w || flags.strt)
 	{
-		if (!flags.Init) Raise("GF_Init must be called before calling any graphics functions!");
+		if (!flags.init) Raise("GF_Init must be called before calling any graphics functions!");
 		if (!w) Raise("GF_SetWindow must be called before calling GF_StartRender!");
-		if (flags.Strt) Raise("GF_EndRender must be called before calling GF_StartRender again!");
+		if (flags.strt) Raise("GF_EndRender must be called before calling GF_StartRender again!");
 		return;
 	}
 
-	flags.Prim = primitiveType;
-	flags.Strt = 1;
+	flags.prim = primitiveType;
+	flags.strt = 1;
 }
 
 void GF_EndRender(void)
 {
-	if (!flags.Init || !flags.Strt || bufferIndex < bufferLength || !w)
+	if (!flags.init || !flags.strt || bufferIndex < bufferLength || !w)
 	{
-		if (!flags.Init) Raise("GF_Init must be called before calling any graphics functions!");
-		if (!flags.Strt) Raise("GF_StartRender must be called before calling GF_EndRender!");
+		if (!flags.init) Raise("GF_Init must be called before calling any graphics functions!");
+		if (!flags.strt) Raise("GF_StartRender must be called before calling GF_EndRender!");
 		if (bufferIndex < bufferLength) Raise("Not all points in the buffer have been set!");
 		if (!w) Raise("GF_SetWindow must be called before calling GF_EndRender!");
 		return;
@@ -137,7 +137,7 @@ void GF_EndRender(void)
 	Mtrx4 full = pers * modelView;
 	hbuffer = Mtrx4::Transform(&full, vbuffer, bufferLength);
 
-	switch (flags.Prim)
+	switch (flags.prim)
 	{
 	case GF_POINTS:
 		GF_Points();
@@ -167,7 +167,7 @@ void GF_EndRender(void)
 
 	while (buff.size() > 0) this_thread::sleep_for(chrono::milliseconds(1));
 
-	flags.Strt = 0;
+	flags.strt = 0;
 	bufferIndex = 0;
 	bufferLength = 0;
 	model = MTRX4_IDENTITY;
@@ -178,9 +178,9 @@ void GF_EndRender(void)
 
 void GF_SetBufferLength(size_t length)
 {
-	if (!flags.Init || length < 1 || bufferLength != 0)
+	if (!flags.init || length < 1 || bufferLength != 0)
 	{
-		if (!flags.Init) Raise("GF_Init must be called before calling any graphics functions!");
+		if (!flags.init) Raise("GF_Init must be called before calling any graphics functions!");
 		if (length < 1) Raise("Length must be greater than zero!");
 		if (bufferLength != 0) Raise("GF_EndRender must be called before respecifying the buffer length!");
 		return;
@@ -204,14 +204,14 @@ void GF_SetViewMatrix(const Matrix4 * m)
 void GF_SetFrustrum(const float fovY, const float aspr, const float front, const float back)
 {
 	pers = Mtrx4::CreateFrustrum(fovY, aspr, front, back);
-	flags.Proj = 1;
+	flags.proj = 1;
 	GF_SetDepth(front, back);
 }
 
 void GF_SetOrthographic(const float width, const float height, const float front, const float back)
 {
 	pers = Mtrx4::CreateOrthographic(width, height, front, back);
-	flags.Proj = 0;
+	flags.proj = 0;
 	GF_SetDepth(front, back);
 }
 
@@ -224,20 +224,20 @@ void GF_SetViewport(const Rectangle * rect)
 
 void GF_SetFlag_Clip(const bool value)
 {
-	flags.Clip = value;
+	flags.clip = value;
 }
 
 void GF_SetFlag_ZBuff(const bool value)
 {
-	flags.ZBuff = value;
+	flags.zBuff = value;
 }
 
 void GF_AddPoint(const Vector3 v, const Color c)
 {
-	if (!flags.Init || !flags.Strt || bufferIndex >= bufferLength)
+	if (!flags.init || !flags.strt || bufferIndex >= bufferLength)
 	{
-		if (!flags.Init) Raise("GF_Init must be called before calling any graphics functions!");
-		if (!flags.Strt) Raise("GF_StartRender must be called before calling GF_AddPoint!");
+		if (!flags.init) Raise("GF_Init must be called before calling any graphics functions!");
+		if (!flags.strt) Raise("GF_StartRender must be called before calling GF_AddPoint!");
 		if (bufferLength < 1) Raise("GF_SetBufferLength must be called before calling GF_AddPoint!");
 		if (bufferIndex >= bufferLength) Raise("Cannot add any more points to the buffer!");
 		return;
@@ -320,7 +320,7 @@ void GF_TriangleFan(void)
 
 Vect3 GF_ToNDC(const Vect4 * v)
 {
-	return flags.Proj ? v->ToNDC() : Vect3(v->X, v->Y, v->Z);
+	return flags.proj ? v->ToNDC() : Vect3(v->X, v->Y, v->Z);
 }
 
 void GF_ToScreen(Vect3 * v)
@@ -335,7 +335,7 @@ void single_line(const int i, const int j)
 	int clp = (hbuffer + i)->Clip() + (hbuffer + j)->Clip();
 	if (clp)
 	{
-		if (!flags.Clip || clp > 1) return;
+		if (!flags.clip || clp > 1) return;
 		Line *l = &Line(vrtxat(i), vrtxat(j));
 		if (LineClip(l, port)) GF_Line(l);
 	}
@@ -347,7 +347,7 @@ void single_triangle(const int i, const int j, const int k)
 	int clp = hbuffer[i].Clip() + (hbuffer + j)->Clip() + (hbuffer + k)->Clip();
 	if (clp)
 	{
-		if (!flags.Clip) return;
+		if (!flags.clip) return;
 		Trgl *t = &Trgl(vrtxat(i), vrtxat(j), vrtxat(k));
 		Poly p;
 
@@ -445,6 +445,93 @@ void GF_HLine(const float x0, const float z0, const Color c0, const float x1, co
 	}
 }
 
+void GF_HLine(const float x0, const float z0, const float x1, const float z1, const float y, const Color c)
+{
+	get_zxy_plt;
+
+	if (x0 == x1)
+	{
+		if (z0 > z1) plot(x0, y, z0, c);
+		else plot(x1, y, z1, c);
+	}
+	else
+	{
+		if (x0 < x1)
+		{
+			float dz = (z1 - z0) / (x1 - x0);
+			for (float x = x0, z = z0; x <= x1; ++x, z += dz)
+			{
+				plot(x, y, z, c);
+			}
+		}
+		else
+		{
+			float dz = (z0 - z1) / (x0 - x1);
+			for (float x = x1, z = z1; x <= x0; ++x, z += dz)
+			{
+				plot(x, y, z, c);
+			}
+		}
+	}
+}
+
+void GF_VLine(const float y0, const float z0, const Color c0, const float y1, const float z1, const Color c1, const float x)
+{
+	get_zxy_plt;
+
+	if (y0 == y1)
+	{
+		if (z0 > z1) plot(x, y0, z0, c0);
+		else plot(x, y1, z1, c1);
+	}
+	else if (y0 < y1)
+	{
+		for (float y = y0; x <= y1; ++y)
+		{
+			float a = invLerp(y0, y1, y);
+			plot(x, y, lerp(z0, z1, a), Color::Lerp(c0, c1, a));
+		}
+	}
+	else
+	{
+		for (float y = y1; x <= y0; ++y)
+		{
+			float a = invLerp(y1, y0, y);
+			plot(x, y, lerp(z1, z0, a), Color::Lerp(c1, c0, a));
+		}
+	}
+}
+
+void GF_VLine(const float y0, const float z0, const float y1, const float z1, const float x, const Color c)
+{
+	get_zxy_plt;
+
+	if (y0 == y1)
+	{
+		if (z0 > z1) plot(x, y0, z0, c);
+		else plot(x, y1, z1, c);
+	}
+	else
+	{
+		if (y0 < y1)
+		{
+			float dz = (z1 - z0) / (y1 - y0);
+			for (float y = y0, z = z0; y <= y1; ++y, z += dz)
+			{
+				plot(x, y, z, c);
+			}
+		}
+		else
+		{
+			float dz = (z0 - z1) / (y0 - y1);
+			for (float y = y1, z = z1; y <= y0; ++y, z += dz)
+			{
+				plot(x, y, z, c);
+			}
+		}
+	}
+}
+
 void GF_BFTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 {
 	float invSlp0 = (v1->v.X - v0->v.X) / (v1->v.Y - v0->v.Y);
@@ -453,7 +540,7 @@ void GF_BFTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 	float x0 = v0->v.X;
 	float x1 = v0->v.X;
 
-	for (float y = v0->v.Y; y <= v1->v.Y; y++)
+	for (int y = v0->v.Y; y <= v1->v.Y; y++)
 	{
 		float a = invLerp(v0->v.Y, v1->v.Y, y);
 		Color c0 = Color::Lerp(v0->c, v1->c, a);
@@ -478,7 +565,7 @@ void GF_TFTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 	float x0 = v2->v.X;
 	float x1 = v2->v.X;
 
-	for (float y = v2->v.Y; y > v0->v.Y; y--)
+	for (int y = v2->v.Y; y > v0->v.Y; y--)
 	{
 		float a = invLerp(v2->v.Y, v0->v.Y, y);
 		Color c0 = Color::Lerp(v2->c, v0->c, a);
@@ -512,9 +599,7 @@ void GF_FullTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 		float a = invLerp(vt0.v.Y, vt2.v.Y, y);
 		float z = lerp(vt0.v.Z, vt2.v.Z, a);
 
-		Vect3 v3 = Vect3(x, y, z);
-		Color c3 = Color::Lerp(vt0.c, vt2.c, a);
-		Vertex vt3 = Vertex(v3, c3);
+		Vertex vt3 = Vertex(Vect3(x, y, z), Color::Lerp(vt0.c, vt2.c, a));
 
 		GF_BFTrgl(&vt0, &vt3, &vt1);
 		GF_TFTrgl(&vt3, &vt1, &vt2);

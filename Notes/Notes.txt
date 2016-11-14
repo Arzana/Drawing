@@ -1,0 +1,5 @@
+Compute distance between object and camera
+for full view
+	a = fovY / 2
+	r = radius bounding radius
+	d = r / sin(a)
