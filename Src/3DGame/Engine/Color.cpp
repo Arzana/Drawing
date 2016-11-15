@@ -58,9 +58,19 @@ Color Color::operator+(const Color & r) const
 	return Add(this, &r);
 }
 
+Color Color::operator-(const Color & r) const
+{
+	return Subtract(this, &r);
+}
+
 Color Color::operator*(float r) const
 {
 	return Multiply(this, r);
+}
+
+Color Color::operator/(float r) const
+{
+	return Divide(this, r);
 }
 
 bool Color::operator==(const Color & r) const
@@ -76,6 +86,11 @@ bool Color::operator!=(const Color & r) const
 Color Color::Add(const Color * c1, const Color * c2)
 {
 	return Color(c1->GetR() + c2->GetR(), c1->GetG() + c2->GetG(), c1->GetB() + c2->GetB());
+}
+
+Color Color::Divide(const Color * c, float divider)
+{
+	return Color(c->GetR() / divider, c->GetG() / divider, c->GetB() / divider, c->GetA() / divider);
 }
 
 bool Color::Equals(const Color * c1, const Color * c2)
@@ -117,6 +132,11 @@ Color Color::Lerp(const Color mi, const Color ma, float a)
 Color Color::Multiply(const Color * c, float multiplier)
 {
 	return Color(c->GetR() * multiplier, c->GetG() * multiplier, c->GetB() * multiplier, c->GetA() * multiplier);
+}
+
+Color Color::Subtract(const Color * c1, const Color * c2)
+{
+	return Color(c1->GetR() - c2->GetR(), c1->GetG() - c2->GetG(), c1->GetB() - c2->GetB());
 }
 
 Vect3 Color::ToVect3(void) const

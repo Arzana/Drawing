@@ -31,11 +31,14 @@ typedef struct Color
 	Color(const Vect4 *v);
 
 	Color operator +(const Color &r) const;
+	Color operator -(const Color &r) const;
 	Color operator *(float r) const;
+	Color operator /(float r) const;
 	bool operator ==(const Color &r) const;
 	bool operator !=(const Color &r) const;
 
 	static Color Add(const Color *c1, const Color *c2);
+	static Color Divide(const Color *c, float divider);
 	static bool Equals(const Color *c1, const Color *c2);
 	inline octet GetA(void) const;
 	inline octet GetR(void) const;
@@ -43,6 +46,7 @@ typedef struct Color
 	inline octet GetB(void) const;
 	static Color Lerp(const Color min, const Color max, float a);
 	static Color Multiply(const Color *c, float multiplier);
+	static Color Subtract(const Color *c1, const Color *c2);
 	Vect3 ToVect3(void) const;
 	Vect4 ToVect4(void) const;
 } Color;

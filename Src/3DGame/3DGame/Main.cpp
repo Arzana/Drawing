@@ -69,6 +69,16 @@ void Render(void)
 	window->Clear(CLR_BLACK);
 	GF_SetViewMatrix(cam->GetView());
 
+	//GF_StartRender(GF_LINES);
+	//GF_SetBufferLength(lLen << 1);
+
+	//for (size_t i = 0; i < lLen; i++)
+	//{
+	//	GF_AddPoint(vertices[lines[i][0]]);
+	//	GF_AddPoint(vertices[lines[i][1]]);
+	//}
+
+	//GF_EndRender();
 	RenderTriangle(2);
 
 	printf("%7.3f|%7.3f\n", window->GetAvarageFPS(), window->GetFps());

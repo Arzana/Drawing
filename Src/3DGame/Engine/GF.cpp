@@ -1,7 +1,7 @@
 #define _USE_GF_INTERNAL
 #define _USE_CLIPPING
 
-#define NUM_THREADS			100
+#define N_THREADS			100
 
 #define vrtxat(x)			(&Vertex(GF_ToScreen(hbuffer + x), cbuffer[x]))
 #define ZVC_ARGS			(const Vertex*)
@@ -13,13 +13,13 @@
 #define plot				(w->*plt)
 #define get_pop(v)			v.back(); v.pop_back()
 
-#include "Utils.h"
-#include "GF.h"
 #include <cstdio>
 #include <cfloat>
 #include <vector>
 #include <thread>
 #include <mutex>
+#include "Utils.h"
+#include "GF.h"
 
 using namespace std;
 
@@ -36,9 +36,9 @@ struct hline
 	{ }
 };
 
-thread ths[NUM_THREADS];
+thread ths[N_THREADS];
 mutex mtx;
-vector<hline> buff;
+vector<hline> lBuff;
 bool running;
 
 GameWindow *w = NULL;
@@ -58,14 +58,14 @@ Mtrx4 pers = MTRX4_IDENTITY;
 
 void line_func(const size_t thrdId)
 {
-	printf("%d starting up\n", thrdId);
+	printf("starting hline(%d)\n", thrdId);
 
 	while (running)
 	{
 		mtx.lock();
-		if (buff.size() > 0)
+		if (lBuff.size() > 0)
 		{
-			hline l = get_pop(buff);
+			hline l = get_pop(lBuff);
 			mtx.unlock();
 
 			GF_HLine(l.x0, l.z0, l.c0, l.x1, l.z1, l.c1, l.y);
@@ -77,15 +77,15 @@ void line_func(const size_t thrdId)
 		}
 	}
 
-	printf("%d shutting down\n", thrdId);
+	printf("stopping hline(%d)\n", thrdId);
 }
 
 void GF_Init(void)
 {
 	flags.init = true;
 	running = true;
-	
-	for (size_t i = 0; i < NUM_THREADS; i++)
+
+	for (size_t i = 0; i < N_THREADS; i++)
 	{
 		ths[i] = thread(line_func, i);
 	}
@@ -95,7 +95,7 @@ void GF_End(void)
 {
 	running = false;
 
-	for (size_t i = 0; i < NUM_THREADS; i++)
+	for (size_t i = 0; i < N_THREADS; i++)
 	{
 		ths[i].join();
 	}
@@ -165,7 +165,7 @@ void GF_EndRender(void)
 		break;
 	}
 
-	while (buff.size() > 0) this_thread::sleep_for(chrono::milliseconds(1));
+	while (lBuff.size() > 0) this_thread::sleep_for(chrono::milliseconds(1));
 
 	flags.strt = 0;
 	bufferIndex = 0;
@@ -344,8 +344,7 @@ void single_line(const int i, const int j)
 
 void single_triangle(const int i, const int j, const int k)
 {
-	int clp = hbuffer[i].Clip() + (hbuffer + j)->Clip() + (hbuffer + k)->Clip();
-	if (clp)
+	if ((hbuffer + i)->Clip() + (hbuffer + j)->Clip() + (hbuffer + k)->Clip())
 	{
 		if (!flags.clip) return;
 		Trgl *t = &Trgl(vrtxat(i), vrtxat(j), vrtxat(k));
@@ -549,7 +548,7 @@ void GF_BFTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 		float z1 = lerp(v0->v.Z, v2->v.Z, a);
 
 		mtx.lock();
-		buff.push_back(hline(x0, z0, c0, x1, z1, c1, y));
+		lBuff.push_back(hline(x0, z0, c0, x1, z1, c1, y));
 		mtx.unlock();
 
 		x0 += invSlp0;
@@ -574,7 +573,7 @@ void GF_TFTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 		float z1 = lerp(v2->v.Z, v1->v.Z, a);
 
 		mtx.lock();
-		buff.push_back(hline(x0, z0, c0, x1, z1, c1, y));
+		lBuff.push_back(hline(x0, z0, c0, x1, z1, c1, y));
 		mtx.unlock();
 
 		x0 -= invSlp0;

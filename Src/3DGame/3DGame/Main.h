@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Cube.h"
 #include "Triangle.h"
+#include "Sectors.h"
 
 //#define _USE_FULL_HD
 
