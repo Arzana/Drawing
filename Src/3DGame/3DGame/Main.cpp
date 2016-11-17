@@ -1,4 +1,5 @@
 #include "Main.h"
+#include <WindowBase.h>
 
 GameWindow *window;
 Camera *cam;

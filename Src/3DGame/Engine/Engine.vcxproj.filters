@@ -31,6 +31,12 @@
     <Filter Include="Source Files\Graphics">
       <UniqueIdentifier>{8f3fbc6f-f397-4479-906e-d9b7523394e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Window">
+      <UniqueIdentifier>{9b6059d3-7f8d-411e-9c69-611bae6f76e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Window">
+      <UniqueIdentifier>{ea315658-c7b1-4be3-ad15-388dbb2ec383}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vect2.h">
@@ -63,6 +69,9 @@
     <ClInclude Include="Utils.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="WindowBase.h">
+      <Filter>Header Files\Window</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vect2.cpp">
@@ -74,17 +83,11 @@
     <ClCompile Include="Vect3.cpp">
       <Filter>Source Files\Core\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Window.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="Vect4.cpp">
       <Filter>Source Files\Core\Math</Filter>
     </ClCompile>
     <ClCompile Include="Color.cpp">
       <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Mtrx3.cpp">
       <Filter>Source Files\Core\Math</Filter>
@@ -97,6 +100,15 @@
     </ClCompile>
     <ClCompile Include="Shapes.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowBase.cpp">
+      <Filter>Source Files\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
