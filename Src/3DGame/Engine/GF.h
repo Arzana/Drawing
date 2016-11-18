@@ -2,7 +2,7 @@
 
 #include "Mtrx4.h"
 #include "Shapes.h"
-#include "Window.h"
+#include "GameWindow.h"
 
 #define GF_POINTS			0
 #define GF_LINES			1
@@ -22,7 +22,7 @@ void GF_SetModelMatrix(const Matrix4 *m);
 void GF_SetViewMatrix(const Matrix4 *m);
 void GF_SetFrustrum(const float fovY, const float aspr, const float front, const float back);
 void GF_SetOrthographic(const float width, const float height, const float front, const float back);
-void GF_SetViewport(const Rectangle *rect);
+void GF_SetViewport(const Rect *rect);
 void GF_SetFlag_Clip(const bool value);
 void GF_SetFlag_ZBuff(const bool value);
 void GF_AddPoint(const Vector3 v, const Color c);

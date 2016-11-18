@@ -215,7 +215,7 @@ void GF_SetOrthographic(const float width, const float height, const float front
 	GF_SetDepth(front, back);
 }
 
-void GF_SetViewport(const Rectangle * rect)
+void GF_SetViewport(const Rect * rect)
 {
 	port.screen = *rect;
 	cPort.X = rect->w * 0.5;

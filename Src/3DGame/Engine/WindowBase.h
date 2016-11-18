@@ -5,8 +5,11 @@
 #include <Windows.h>
 #include "MathEx.h"
 
+#undef far
+#undef near
+
 #ifdef _USE_WINDOW_BASE_INTERNAL
-HBITMAP hbmp;
+extern HBITMAP hbmp;
 #endif
 
 class WindowBase
@@ -15,7 +18,7 @@ public:
 	uint width, height;
 	void *pixels;
 
-	WindowBase(const char *title, const uint width, const uint height);
+	WindowBase(const char *title, const uint width, const uint height, WNDPROC wndProc);
 	~WindowBase(void);
 	const HWND GetHWND(void) const;
 private:
@@ -26,5 +29,4 @@ private:
 
 	int WndInit(const char g_szClassName[], const char title[]);
 	int BmpInit(void);
-	static LRESULT CALLBACK WndProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam);
 };

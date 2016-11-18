@@ -5,6 +5,9 @@
 #define M_PI				3.14159265358979323846
 #define M_TAU				6.28318530717958647692
 
+#undef min
+#undef max
+
 #define ipart(x)			(int(x))
 #define square(x)			((x) * (x))
 #define cube(x)				(square(x) * (x))

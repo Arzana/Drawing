@@ -1,11 +1,14 @@
 #pragma once
 
+#ifdef _USE_WINDOW_INTERNAL
+#define _USE_WINDOW_BASE_INTERNAL
+#endif
+
 #include <ctime>
 #include <queue>
+#include "WindowBase.h"
 #include "Shapes.h"
 #include "Color.h"
-
-//#define _MOUSE_LOCK
 
 #ifndef EXIT_FAILURE
 #define EXIT_SUCCESS	0
@@ -13,6 +16,11 @@
 #endif
 
 #define FPS_LOCK	60.0f
+
+#ifdef _USE_WINDOW_INTERNAL
+bool *isRunning;
+LRESULT CALLBACK WndProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam);
+#endif
 
 class GameWindow
 {
@@ -29,35 +37,28 @@ public:
 	GameWindow(const char *title, const uint width, const uint height);
 	~GameWindow();
 
-	void Plot(const Vertex *vtx);
+	void Plot(const Vertex *vrtx);
 	void Plot(const Vect3 *v, const Color c);
 	void Plot(const float x, const float y, const float z, const Color c);
 
-	void TryPlot(const Vertex *vtx);
+	void TryPlot(const Vertex *vrtx);
 	void TryPlot(const Vect3 *v, const Color c);
 	void TryPlot(const float  x, const float y, const float z, const Color c);
 
 	void Clear(const Color c);
 	void Run(void);
-	void Terminate();
+	void Terminate(void);
+	void Show(void) const;
+	void Hide(void) const;
 	uint GetWidth(void) const;
 	uint GetHeight(void) const;
 	float GetFps(void) const;
 	float GetAvarageFPS(void) const;
-
 private:
-	typedef struct SDL_Window SDL_Window;
-	typedef struct SDL_Surface SDL_Surface;
-
 	const clock_t mili2clocks = CLOCKS_PER_SEC / 1000;
 
-	SDL_Window *window;
-	SDL_Surface *surface;
+	WindowBase *window;
 	float *zBuffer;
-
-	const char *title;
-	uint width, height;
-	int *isRunning;
 
 	const clock_t MAX_ELAPSED_TIME = 500 * mili2clocks;
 	const clock_t TARGET_ELAPSED_TIME = 1.0f / FPS_LOCK * CLOCKS_PER_SEC;

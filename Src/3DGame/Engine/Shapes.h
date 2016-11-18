@@ -53,10 +53,10 @@ typedef struct Polygon
 
 typedef struct ViewPort
 {
-	Rectangle screen;
+	Rect screen;
 	float far, near;
 
-	ViewPort(Rectangle screen, float far, float near);
+	ViewPort(Rect screen, float far, float near);
 	ViewPort(int x, int y, int w, int h, float f, float n);
 } ViewPort;
 

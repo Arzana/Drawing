@@ -72,6 +72,9 @@
     <ClInclude Include="WindowBase.h">
       <Filter>Header Files\Window</Filter>
     </ClInclude>
+    <ClInclude Include="GameWindow.h">
+      <Filter>Header Files\Window</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vect2.cpp">
@@ -104,11 +107,8 @@
     <ClCompile Include="WindowBase.cpp">
       <Filter>Source Files\Window</Filter>
     </ClCompile>
-    <ClCompile Include="Window.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="GameWindow.cpp">
+      <Filter>Source Files\Window</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

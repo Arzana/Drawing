@@ -1,5 +1,4 @@
 #include "Main.h"
-#include <WindowBase.h>
 
 GameWindow *window;
 Camera *cam;
@@ -18,14 +17,12 @@ int main(int argc, char *argv[])
 	GF_SetWindow(window);
 	GF_SetFrustrum(FOV_Y, aspr, DEPTH_NEAR, DEPTH_FAR);
 
+	window->Show();
 	window->Run();
 	GF_End();
 
 	delete window;
 	delete cam;
-
-	printf("Press any key to continue...");
-	getchar();
 	return EXIT_SUCCESS;
 }
 
@@ -39,25 +36,25 @@ void KeyPress(int scanCode)
 {
 	switch (scanCode)
 	{
-	case 41: // ESC
+	case VK_ESCAPE: // ESC
 		window->Terminate();
 		break;
-	case 26: // W
+	case 0x57: // W
 		cam->Move(VECT3_FORWARD * scalar);
 		break;
-	case 22: // S
+	case 0x53: // S
 		cam->Move(VECT3_BACK * scalar);
 		break;
-	case 4: // A
+	case 0x41: // A
 		cam->Move(VECT3_LEFT * scalar);
 		break;
-	case 7: // D
+	case 0x44: // D
 		cam->Move(VECT3_RIGHT * scalar);
 		break;
-	case 8: // E
+	case 0x45: // E
 		cam->Move(VECT3_UP * scalar);
 		break;
-	case 20: // Q
+	case 0x51: // Q
 		cam->Move(VECT3_DOWN * scalar);
 		break;
 	}

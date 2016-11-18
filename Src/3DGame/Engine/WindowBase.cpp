@@ -4,11 +4,15 @@
 #include "Utils.h"
 #include "WindowBase.h"
 
-WindowBase::WindowBase(const char * title, const uint width, const uint height)
+WNDPROC WndProc;
+HBITMAP hbmp;
+
+WindowBase::WindowBase(const char * title, const uint width, const uint height, WNDPROC wndProc)
 {
 	this->title = title;
 	this->width = width;
 	this->height = height;
+	WndProc = wndProc;
 
 	if (WndInit("WindowBase", title)) exit(0);
 	if (BmpInit()) exit(0);
@@ -33,7 +37,7 @@ int WindowBase::WndInit(const char g_szClassName[], const char title[])
 	{
 		sizeof(WNDCLASSEX),
 		CS_DBLCLKS,
-		this->WndProc,
+		WndProc,
 		0, 0,
 		GetModuleHandle(0),
 		LoadIcon(NULL, IDI_APPLICATION),
@@ -87,7 +91,7 @@ int WindowBase::BmpInit(void)
 		sizeof(BITMAPINFOHEADER),
 		width, -(int)height,
 		1,
-		24,
+		32,
 		BI_RGB,
 		0,
 		10, 10,
@@ -115,42 +119,5 @@ int WindowBase::BmpInit(void)
 
 	memcpy(pixels, bits, sizeof(pixels));
 	ReleaseDC(hwnd, hdc);
-	return 0;
-}
-
-LRESULT WindowBase::WndProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-	case WM_CLOSE:
-		DeleteObject(hbmp);
-		DestroyWindow(hwnd);
-		break;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-	case WM_PAINT:
-		PAINTSTRUCT		ps;
-		HDC				hdc;
-		BITMAP			bmp;
-		HDC				hdcMem;
-		HGDIOBJ			oldBmp;
-
-		hdc = BeginPaint(hwnd, &ps);
-		hdcMem = CreateCompatibleDC(hdc);
-		oldBmp = SelectObject(hdcMem, hbmp);
-
-		GetObject(hbmp, sizeof(BITMAP), &bmp);
-		BitBlt(hdc, 0, 0, bmp.bmWidth, bmp.bmHeight, hdcMem, 0, 0, SRCCOPY);
-
-		SelectObject(hdcMem, oldBmp);
-		DeleteDC(hdcMem);
-
-		EndPaint(hwnd, &ps);
-		break;
-	default:
-		return DefWindowProc(hwnd, msg, wParam, lParam);
-	}
-
 	return 0;
 }

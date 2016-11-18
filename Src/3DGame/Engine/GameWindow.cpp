@@ -1,75 +1,61 @@
-#include "Utils.h"
-#include "Window.h"
-#include <SDL.h>
+#define _USE_WINDOW_INTERNAL
+
 #include <cfloat>
+#include "Utils.h"
+#include "GameWindow.h"
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <unistd.h>
-#endif
-
-#define pix			((Color*)surface->pixels)
+#define pix		((Color*)window->pixels)
+void(**KD)(int vk);
 
 GameWindow::GameWindow(const char * title, const uint width, const uint height)
+	: inactiveSleepTime(0), accumelatedElapsedTime(0), previousTicks(0), timer(0), totalGameTime(0), elapsedGameTime(0), updateFrameLag(0)
+	, Update(NULL), Draw(NULL), KeyDown(NULL), MouseMove(NULL), OnTerminate(NULL)
 {
-	this->title = title;
-	this->width = width;
-	this->height = height;
+	KD = &KeyDown;
 
+	if (isRunning) return;
+	else isRunning = new bool(false);
+
+	window = new WindowBase(title, width, height, WndProc);
 	IsFixedTimeStep = new bool(true);
 	Lag = new bool(false);
 
-	inactiveSleepTime = 0;
-	accumelatedElapsedTime = 0;
-	previousTicks = 0;
-	timer = 0;
-	totalGameTime = 0;
-	elapsedGameTime = 0;
-	updateFrameLag = 0;
-
 	frameBuffer = new std::queue<float>();
-
-	isRunning = NULL;
-	Update = NULL;
-	Draw = NULL;
-	KeyDown = NULL;
-	MouseMove = NULL;
-	OnTerminate = NULL;
-
-	InitWindow();
 	zBuffer = malloc_s(float, width * height);
 	ResetZBuffer();
 }
 
-GameWindow::~GameWindow()
+GameWindow::~GameWindow(void)
 {
-	TerminateWindow();
-	if (zBuffer) free_s(zBuffer);
-	if (isRunning) delete isRunning;
+	if (window) delete window;
 	if (IsFixedTimeStep) delete IsFixedTimeStep;
 	if (Lag) delete Lag;
 	if (frameBuffer) delete frameBuffer;
+	if (zBuffer) free_s(zBuffer);
+	if (isRunning) delete isRunning;
+
+	DeleteObject(hbmp);
+	DestroyWindow(window->GetHWND());
 }
 
-void GameWindow::Plot(const Vertex * vtx)
+void GameWindow::Plot(const Vertex *vrtx)
 {
-	pix[ipart(vtx->v.Y) * width + ipart(vtx->v.X)] = vtx->c;
+	pix[ipart(vrtx->v.Y) * window->width + ipart(vrtx->v.X)] = vrtx->c;
 }
 
 void GameWindow::Plot(const Vect3 * v, const Color c)
 {
-	pix[ipart(v->Y) * width + ipart(v->X)] = c;
+	pix[ipart(v->Y) * window->width + ipart(v->X)] = c;
 }
 
 void GameWindow::Plot(const float x, const float y, const float z, const Color c)
 {
-	pix[ipart(y) * width + ipart(x)] = c;
+	pix[ipart(y) * window->width + ipart(x)] = c;
 }
 
 void GameWindow::TryPlot(const Vertex * vtx)
 {
-	uint i = ipart(vtx->v.Y) * width + ipart(vtx->v.X);
+	uint i = ipart(vtx->v.Y) * window->width + ipart(vtx->v.X);
 	if (vtx->v.Z > zBuffer[i]) return;
 
 	zBuffer[i] = vtx->v.Z;
@@ -78,7 +64,7 @@ void GameWindow::TryPlot(const Vertex * vtx)
 
 void GameWindow::TryPlot(const Vect3 * v, const Color c)
 {
-	uint i = ipart(v->Y) * width + ipart(v->X);
+	uint i = ipart(v->Y) * window->width + ipart(v->X);
 	if (v->Z > zBuffer[i]) return;
 
 	zBuffer[i] = v->Z;
@@ -87,7 +73,7 @@ void GameWindow::TryPlot(const Vect3 * v, const Color c)
 
 void GameWindow::TryPlot(const float x, const float y, const float z, const Color c)
 {
-	uint i = ipart(y) * width + ipart(x);
+	uint i = ipart(y) * window->width + ipart(x);
 	if (z > zBuffer[i]) return;
 
 	zBuffer[i] = z;
@@ -96,7 +82,7 @@ void GameWindow::TryPlot(const float x, const float y, const float z, const Colo
 
 void GameWindow::Clear(const Color c)
 {
-	for (size_t i = 0; i < height * width; i++)
+	for (size_t i = 0; i < window->height * window->width; i++)
 	{
 		pix[i] = c;
 	}
@@ -104,10 +90,9 @@ void GameWindow::Clear(const Color c)
 
 void GameWindow::Run(void)
 {
-	if (!isRunning) isRunning = new int(1);
-	else *isRunning = 1;
-
+	*isRunning = true;
 	timer = clock();
+
 	while (*isRunning)
 	{
 		Tick();
@@ -116,19 +101,29 @@ void GameWindow::Run(void)
 	if (OnTerminate) OnTerminate();
 }
 
-void GameWindow::Terminate()
+void GameWindow::Terminate(void)
 {
-	*isRunning = 0;
+	if (isRunning) *isRunning = false;
+}
+
+void GameWindow::Show(void) const
+{
+	ShowWindow(window->GetHWND(), SW_SHOWDEFAULT);
+}
+
+void GameWindow::Hide(void) const
+{
+	CloseWindow(window->GetHWND());
 }
 
 uint GameWindow::GetWidth(void) const
 {
-	return width;
+	return window->width;
 }
 
 uint GameWindow::GetHeight(void) const
 {
-	return height;
+	return window->height;
 }
 
 float GameWindow::GetFps(void) const
@@ -150,36 +145,13 @@ float GameWindow::GetAvarageFPS(void) const
 	return sum / len;
 }
 
-void GameWindow::InitWindow(void)
-{
-	if (SDL_Init(SDL_INIT_VIDEO)) exit(EXIT_FAILURE);
-
-	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
-	surface = SDL_GetWindowSurface(window);
-
-#ifdef _MOUSE_LOCK
-	SDL_ShowCursor(SDL_DISABLE);
-#endif
-}
-
-void GameWindow::TerminateWindow(void)
-{
-	if (window)
-	{
-		SDL_DestroyWindow(window);
-		window = NULL;
-		surface = NULL;
-		SDL_Quit();
-	}
-}
-
-template <typename T>
+template<typename T>
 inline bool GameWindow::PointVisible(T x, T y) const
 {
-	return x > 0 && x < width && y > 0 && y < height;
+	return x > 0 && x < window->width && y > 0 && y < window->height;
 }
 
-void GameWindow::Tick()
+void GameWindow::Tick(void)
 {
 RetryTick:
 	clock_t currentTicks = clock();
@@ -239,53 +211,67 @@ void GameWindow::DoUpdate(void)
 
 void GameWindow::DoDraw(void)
 {
-	float currentFps = 1.0f / (elapsedGameTime / (float)CLOCKS_PER_SEC);
-	frameBuffer->push(currentFps);
+	float curFps = 1.0f / (elapsedGameTime / (float)CLOCKS_PER_SEC);
+	frameBuffer->push(curFps);
 	if (frameBuffer->size() > buffLen) frameBuffer->pop();
 
 	if (Draw) Draw();
 	if (zBuffer) ResetZBuffer();
 
-	SDL_UpdateWindowSurface(window);
+	RedrawWindow(window->GetHWND(), NULL, NULL, RDW_INVALIDATE);
 }
 
 void GameWindow::HandleEvents(void)
 {
-	SDL_Event ev;
-	bool fixMove = false;
-
-	while (SDL_PollEvent(&ev))
+	MSG msg;
+	while (PeekMessage(&msg, window->GetHWND(), 0, 0, PM_REMOVE))
 	{
-		switch (ev.type)
-		{
-		case SDL_QUIT:
-			*isRunning = 0;
-			break;
-		case SDL_KEYDOWN:
-			if (KeyDown) KeyDown(ev.key.keysym.scancode);
-			break;
-#ifdef _MOUSE_LOCK
-		case SDL_MOUSEMOTION:
-			if (ev.motion.x + ev.motion.xrel <= 0 ||
-				ev.motion.x + ev.motion.xrel >= width ||
-				ev.motion.y + ev.motion.yrel <= 0 ||
-				ev.motion.y + ev.motion.yrel >= height)
-			{
-				SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
-				SDL_WarpMouseInWindow(window, width >> 1, height >> 1);
-				SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
-				fixMove = true;
-			}
-			else if (MouseMove && !fixMove) MouseMove(ev.motion.x, ev.motion.y, ev.motion.xrel, ev.motion.yrel);
-			break;
-#endif
-		}
+		DispatchMessage(&msg);
 	}
+}
+
+LRESULT CALLBACK WndProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_CLOSE:
+		*isRunning = false;
+		break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+	case WM_KEYDOWN:
+		if (KD) (*KD)(wParam);
+		break;
+	case WM_PAINT:
+		PAINTSTRUCT		ps;
+		HDC				hdc;
+		BITMAP			bmp;
+		HDC				hdcMem;
+		HGDIOBJ			oldBmp;
+
+		hdc = BeginPaint(hwnd, &ps);
+		hdcMem = CreateCompatibleDC(hdc);
+		oldBmp = SelectObject(hdcMem, hbmp);
+
+		GetObject(hbmp, sizeof(BITMAP), &bmp);
+		BitBlt(hdc, 0, 0, bmp.bmWidth, bmp.bmHeight, hdcMem, 0, 0, SRCCOPY);
+
+		SelectObject(hdcMem, oldBmp);
+		DeleteDC(hdcMem);
+
+		EndPaint(hwnd, &ps);
+		break;
+	default:
+		return DefWindowProc(hwnd, msg, wParam, lParam);
+	}
+
+	return 0;
 }
 
 void GameWindow::ResetZBuffer(void)
 {
-	uint length = width * height;
+	uint length = window->width * window->height;
 	for (size_t i = 0; i < length; i++)
 	{
 		zBuffer[i] = FLT_MAX;
