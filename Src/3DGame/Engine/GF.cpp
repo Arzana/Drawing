@@ -1,8 +1,6 @@
 #define _USE_GF_INTERNAL
 #define _USE_CLIPPING
 
-#define N_THREADS			100
-
 #define vrtxat(x)			(&Vertex(GF_ToScreen(hbuffer + x), cbuffer[x]))
 #define ZVC_ARGS			(const Vertex*)
 #define ZXY_ARGS			(const float, const float, const float, const Color)
@@ -11,36 +9,14 @@
 #define get_zvc_plt			void(GameWindow::*plt)ZVC_ARGS = flags.zBuff ? ZVC_PLT &GameWindow::TryPlot : ZVC_PLT &GameWindow::Plot
 #define get_zxy_plt			void(GameWindow::*plt)ZXY_ARGS = flags.zBuff ? ZXY_PLT &GameWindow::TryPlot : ZXY_PLT &GameWindow::Plot
 #define plot				(w->*plt)
-#define get_pop(v)			v.back(); v.pop_back()
 
 #include <cstdio>
 #include <cfloat>
-#include <vector>
-#include <thread>
-#include <mutex>
 #include "Utils.h"
 #include "GF.h"
+#include "GF_Threads.h"
 
-using namespace std;
-
-struct hline 
-{
-	float x0, z0;
-	Color c0;
-	float x1, z1;
-	Color c1;
-	float y;
-
-	hline(float x0, float z0, Color c0, float x1, float z1, Color c1, float y)
-		: x0(x0), z0(z0), c0(c0), x1(x1), z1(z1), c1(c1), y(y)
-	{ }
-};
-
-thread ths[N_THREADS];
-mutex mtx;
-vector<hline> lBuff;
 bool running;
-
 GameWindow *w = NULL;
 Flags flags;
 ViewPort port = ViewPort(0, 0, 0, 0, 0, FLT_MAX);
@@ -56,49 +32,31 @@ Mtrx4 model = MTRX4_IDENTITY;
 Mtrx4 view = MTRX4_IDENTITY;
 Mtrx4 pers = MTRX4_IDENTITY;
 
-void line_func(const size_t thrdId)
-{
-	printf("starting hline(%d)\n", thrdId);
-
-	while (running)
-	{
-		mtx.lock();
-		if (lBuff.size() > 0)
-		{
-			hline l = get_pop(lBuff);
-			mtx.unlock();
-
-			GF_HLine(l.x0, l.z0, l.c0, l.x1, l.z1, l.c1, l.y);
-		}
-		else
-		{
-			mtx.unlock();
-			this_thread::sleep_for(chrono::milliseconds(1));
-		}
-	}
-
-	printf("stopping hline(%d)\n", thrdId);
-}
-
 void GF_Init(void)
 {
+	if (flags.init)
+	{
+		printf("GF_End must be called before calling GF_Init again!");
+		return;
+	}
+
 	flags.init = true;
 	running = true;
-
-	for (size_t i = 0; i < N_THREADS; i++)
-	{
-		ths[i] = thread(line_func, i);
-	}
+	thrdsRun = &running;
+	SetHLineThreads(0, N_THREADS);
 }
 
 void GF_End(void)
 {
-	running = false;
-
-	for (size_t i = 0; i < N_THREADS; i++)
+	if (!flags.init)
 	{
-		ths[i].join();
+		printf("GF_Init must be called before calling GF_End!");
+		return;
 	}
+	
+	flags.init = false;
+	running = false;
+	JoinThreads();
 }
 
 void GF_SetWindow(GameWindow * window)
@@ -165,7 +123,7 @@ void GF_EndRender(void)
 		break;
 	}
 
-	while (lBuff.size() > 0) this_thread::sleep_for(chrono::milliseconds(1));
+	WaitThreads();
 
 	flags.strt = 0;
 	bufferIndex = 0;
@@ -547,9 +505,7 @@ void GF_BFTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 		float z0 = lerp(v0->v.Z, v1->v.Z, a);
 		float z1 = lerp(v0->v.Z, v2->v.Z, a);
 
-		mtx.lock();
-		lBuff.push_back(hline(x0, z0, c0, x1, z1, c1, y));
-		mtx.unlock();
+		AddHLine(hline(x0, z0, c0, x1, z1, c1, y));
 
 		x0 += invSlp0;
 		x1 += invSlp1;
@@ -572,9 +528,7 @@ void GF_TFTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 		float z0 = lerp(v2->v.Z, v0->v.Z, a);
 		float z1 = lerp(v2->v.Z, v1->v.Z, a);
 
-		mtx.lock();
-		lBuff.push_back(hline(x0, z0, c0, x1, z1, c1, y));
-		mtx.unlock();
+		AddHLine(hline(x0, z0, c0, x1, z1, c1, y));
 
 		x0 -= invSlp0;
 		x1 -= invSlp1;

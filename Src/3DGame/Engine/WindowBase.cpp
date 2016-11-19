@@ -3,6 +3,7 @@
 #include <cstdio>
 #include "Utils.h"
 #include "WindowBase.h"
+#include "Color.h"
 
 WNDPROC WndProc;
 HBITMAP hbmp;
@@ -91,7 +92,7 @@ int WindowBase::BmpInit(void)
 		sizeof(BITMAPINFOHEADER),
 		width, -(int)height,
 		1,
-		32,
+		sizeof(Color) << 3,
 		BI_RGB,
 		0,
 		10, 10,

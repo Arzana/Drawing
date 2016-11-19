@@ -17,12 +17,14 @@ int main(int argc, char *argv[])
 	GF_SetWindow(window);
 	GF_SetFrustrum(FOV_Y, aspr, DEPTH_NEAR, DEPTH_FAR);
 
-	window->Show();
 	window->Run();
 	GF_End();
 
 	delete window;
 	delete cam;
+
+	printf("Press any key to continue...");
+	getchar();
 	return EXIT_SUCCESS;
 }
 

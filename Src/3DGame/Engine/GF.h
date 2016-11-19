@@ -12,6 +12,11 @@
 #define GF_TRIANGLE_STRIP	5
 #define GF_TRIANGLE_FAN		6
 
+#ifndef ENABLE
+#define ENABLE	1
+#define DISABLE 0
+#endif
+
 void GF_Init(void);
 void GF_End(void);
 void GF_SetWindow(GameWindow *window);

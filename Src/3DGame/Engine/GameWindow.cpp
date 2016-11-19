@@ -27,15 +27,15 @@ GameWindow::GameWindow(const char * title, const uint width, const uint height)
 
 GameWindow::~GameWindow(void)
 {
+	DeleteObject(hbmp);
+	DestroyWindow(window->GetHWND());
+
 	if (window) delete window;
 	if (IsFixedTimeStep) delete IsFixedTimeStep;
 	if (Lag) delete Lag;
 	if (frameBuffer) delete frameBuffer;
 	if (zBuffer) free_s(zBuffer);
 	if (isRunning) delete isRunning;
-
-	DeleteObject(hbmp);
-	DestroyWindow(window->GetHWND());
 }
 
 void GameWindow::Plot(const Vertex *vrtx)
@@ -90,6 +90,8 @@ void GameWindow::Clear(const Color c)
 
 void GameWindow::Run(void)
 {
+	Show();
+
 	*isRunning = true;
 	timer = clock();
 

@@ -75,6 +75,9 @@
     <ClInclude Include="GameWindow.h">
       <Filter>Header Files\Window</Filter>
     </ClInclude>
+    <ClInclude Include="GF_Threads.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vect2.cpp">
@@ -109,6 +112,9 @@
     </ClCompile>
     <ClCompile Include="GameWindow.cpp">
       <Filter>Source Files\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="GF_Threads.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
