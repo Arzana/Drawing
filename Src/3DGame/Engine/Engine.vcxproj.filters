@@ -78,6 +78,9 @@
     <ClInclude Include="GF_Threads.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Quaternion.h">
+      <Filter>Header Files\Core\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vect2.cpp">
@@ -115,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="GF_Threads.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Quaternion.cpp">
+      <Filter>Source Files\Core\Math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

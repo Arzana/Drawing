@@ -5,6 +5,7 @@ Camera::Camera(void)
 {
 	position = new Vect3();
 	rotation = new Vect3();
+	quat = new QUAT_IDENTITY;
 	view = new MTRX4_IDENTITY;
 }
 
@@ -12,6 +13,7 @@ Camera::Camera(const Vect3 pos)
 { 
 	position = new Vect3(pos);
 	rotation = new Vect3();
+	quat = new QUAT_IDENTITY;
 	view = new MTRX4_IDENTITY;
 }
 
@@ -19,6 +21,7 @@ Camera::~Camera(void)
 {
 	delete position;
 	delete rotation;
+	delete quat;
 	delete view;
 }
 
@@ -196,7 +199,8 @@ void Camera::Move(Vect3 direction)
 
 void Camera::Update(void)
 {
-	*view = Mtrx4::CreateYawPitchRoll(-rotation->X, -rotation->Y, -rotation->Z);
+	*quat = Quat::CreateYawPitchRoll(-rotation->X, -rotation->Y, -rotation->Z);
+	*view = Mtrx4::CreateRotationQ(quat);
 	*view *= Mtrx4::CreateTranslation(&Vect3::Negate(position));
 }
 

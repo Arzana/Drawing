@@ -26,6 +26,7 @@
     <ClInclude Include="MathEx.h" />
     <ClInclude Include="Mtrx3.h" />
     <ClInclude Include="Mtrx4.h" />
+    <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Shapes.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Vect2.h" />
@@ -41,6 +42,7 @@
     <ClCompile Include="MathEx.cpp" />
     <ClCompile Include="Mtrx3.cpp" />
     <ClCompile Include="Mtrx4.cpp" />
+    <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="Shapes.cpp" />
     <ClCompile Include="Vect2.cpp" />
     <ClCompile Include="Vect3.cpp" />

@@ -50,6 +50,7 @@ public:
 
 private:
 	Vect3 *position, *rotation;
+	Quat *quat;
 	Mtrx4 *view;
 
 	float GetClampedRads(float rads);

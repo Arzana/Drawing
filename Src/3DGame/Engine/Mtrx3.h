@@ -2,7 +2,7 @@
 #include "Vect2.h"
 #include "Vect3.h"
 
-#define MTRX3_IDENTITY		Matrix3(1, 0, 0, 0, 1, 0, 0, 0, 1)
+#define MTRX3_IDENTITY		Mtrx3(1, 0, 0, 0, 1, 0, 0, 0, 1)
 
 typedef struct Matrix3
 {

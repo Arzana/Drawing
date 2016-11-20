@@ -1,8 +1,8 @@
 #pragma once
-#include "Vect3.h"
-#include "Vect4.h"
 
-#define MTRX4_IDENTITY		Matrix4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+#include "Quaternion.h"
+
+#define MTRX4_IDENTITY		Mtrx4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
 
 typedef struct Matrix4
 {
@@ -40,6 +40,7 @@ typedef struct Matrix4
 	static Matrix4 CreateRotationX(float rads);
 	static Matrix4 CreateRotationY(float rads);
 	static Matrix4 CreateRotationZ(float rads);
+	static Matrix4 CreateRotationQ(const Quaternion *q);
 	static Matrix4 CreateScale(float scale);
 	static Matrix4 CreateScale(const Vector3 *scale);
 	static Matrix4 CreateTranslation(const Vector3 *pos);

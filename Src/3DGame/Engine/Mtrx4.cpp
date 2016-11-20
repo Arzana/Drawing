@@ -201,6 +201,35 @@ Matrix4 Matrix4::CreateRotationZ(float rads)
 		0, 0, 0, 1);
 }
 
+Matrix4 Matrix4::CreateRotationQ(const Quaternion * q)
+{
+	float xx = square(q->X);
+	float yy = square(q->Y);
+	float zz = square(q->Z);
+	float xy = q->X * q->Y;
+	float zw = q->Z * q->W;
+	float zx = q->Z * q->X;
+	float yw = q->Y * q->W;
+	float yz = q->Y * q->Z;
+	float xw = q->X * q->W;
+
+	float m11 = 1.0f - (2.0f * (yy + zz));
+	float m12 = 2.0f * (xy + zw);
+	float m13 = 2.0f * (zx - yw);
+	float m21 = 2.0f * (xy - zw);
+	float m22 = 1.0f - (2.0f * (zz + xx));
+	float m23 = 2.0f * (yz + xw);
+	float m31 = 2.0f * (zx + yw);
+	float m32 = 2.0f * (yz - xw);
+	float m33 = 1.0f - (2.0f * (yy + xx));
+
+	return Matrix4(
+		m11, m12, m13, 0,
+		m21, m22, m23, 0,
+		m31, m32, m33, 0,
+		0, 0, 0, 1);
+}
+
 Matrix4 Matrix4::CreateScale(float scale)
 {
 	return Matrix4(scale, 0, 0, 0, 0, scale, 0, 0, 0, 0, scale, 0, 0, 0, 0, 1);

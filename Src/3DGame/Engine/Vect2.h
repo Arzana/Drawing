@@ -1,10 +1,10 @@
 #pragma once
 
-#define VECT2_ONE		Vector2(1)
-#define VECT2_UNITX		Vector2(1, 0)
-#define VECT2_UNITY		Vector2(0, 1)
-#define VECT2_ZERO		Vector2()
-#define VECT2_NEGATIVE	Vector2(-1)
+#define VECT2_ONE		Vect2(1)
+#define VECT2_UNITX		Vect2(1, 0)
+#define VECT2_UNITY		Vect2(0, 1)
+#define VECT2_ZERO		Vect2()
+#define VECT2_NEGATIVE	Vect2(-1)
 
 typedef struct Vector2
 {
