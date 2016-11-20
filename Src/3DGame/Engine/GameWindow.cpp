@@ -4,14 +4,21 @@
 #include "Utils.h"
 #include "GameWindow.h"
 
-#define pix		((Color*)window->pixels)
+#define pix					((Color*)window->pixels)
+#define GET_X_LPARAM(lp)	((int)(short)LOWORD(lp))
+#define GET_Y_LPARAM(lp)	((int)(short)HIWORD(lp))
+
 void(**KD)(int vk);
+void(**MM)(int x, int y, int dX, int dY);
+
+Vect3 oldMousePos;
 
 GameWindow::GameWindow(const char * title, const uint width, const uint height)
 	: inactiveSleepTime(0), accumelatedElapsedTime(0), previousTicks(0), timer(0), totalGameTime(0), elapsedGameTime(0), updateFrameLag(0)
 	, Update(NULL), Draw(NULL), KeyDown(NULL), MouseMove(NULL), OnTerminate(NULL)
 {
 	KD = &KeyDown;
+	MM = &MouseMove;
 
 	if (isRunning) return;
 	else isRunning = new bool(false);
@@ -244,6 +251,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_KEYDOWN:
 		if (KD) (*KD)(wParam);
+		break;
+	case WM_MOUSEMOVE:
+		if (MM)
+		{
+			int x = GET_X_LPARAM(lParam);
+			int y = GET_Y_LPARAM(lParam);
+			int dX = oldMousePos.X - x;
+			int dY = oldMousePos.Y - y;
+
+			if (oldMousePos.Z) (*MM)(x, y, dX, dY);
+			oldMousePos = Vect3(x, y, 1);
+		}
 		break;
 	case WM_PAINT:
 		PAINTSTRUCT		ps;

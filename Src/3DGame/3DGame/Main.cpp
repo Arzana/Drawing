@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
 	GF_SetWindow(window);
 	GF_SetFrustrum(FOV_Y, aspr, DEPTH_NEAR, DEPTH_FAR);
 
+	printf("...\n");
 	window->Run();
 	GF_End();
 
@@ -81,5 +82,10 @@ void Render(void)
 	//GF_EndRender();
 	RenderTriangle(2);
 
-	printf("%7.3f|%7.3f\n", window->GetAvarageFPS(), window->GetFps());
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	HANDLE chndl = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD cPos = GetConsoleScreenBufferInfo(chndl, &csbi) ? csbi.dwCursorPosition : COORD();
+	cPos.Y -= 1;
+	SetConsoleCursorPosition(chndl, cPos);
+	printf("FPS: %7.3f|%7.3f\n", window->GetAvarageFPS(), window->GetFps());
 }
