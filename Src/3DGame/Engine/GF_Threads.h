@@ -39,13 +39,19 @@ extern bool *thrdsRun;
 
 extern inline void AddHLine(hline line);
 extern inline void AddVLine(vline line);
+extern inline void AddLine(int i, int j);
+extern inline void AddPoint(int start, int end);
 
 void SetHLineThreads(size_t start, size_t length);
 void SetVLineThreads(size_t start, size_t length);
+void SetLineThreads(size_t start, size_t length);
+void SetPointThreads(size_t start, size_t length);
 void WaitThreads(void);
 void JoinThreads(void);
 
 #ifdef _USE_GF_THREADS_INTERNAL
 void hline_func(const size_t thrdId);
 void vline_func(const size_t thrdId);
+void line_func(const size_t thrdId);
+void point_func(const size_t thrdId);
 #endif

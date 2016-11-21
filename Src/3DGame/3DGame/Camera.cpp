@@ -199,7 +199,7 @@ void Camera::Move(Vect3 direction)
 
 void Camera::Update(void)
 {
-	*quat = Quat::CreateYawPitchRoll(-rotation->X, -rotation->Y, -rotation->Z);
+	*quat = Quat::CreateYawPitchRoll(rotation->X, -rotation->Y, rotation->Z);
 	*view = Mtrx4::CreateRotationQ(quat);
 	*view *= Mtrx4::CreateTranslation(&Vect3::Negate(position));
 }

@@ -23,7 +23,7 @@ typedef struct Line
 
 	Line(Vertex v0, Vertex v1);
 	Line(const Vertex *v0, const Vertex *v1);
-} Line;
+} line;
 
 typedef struct Triangle
 {

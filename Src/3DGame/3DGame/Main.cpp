@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
 	cam = new Camera(Vect3(0, 0, Z_DIST(1)));
 
-	GF_Init();
+	GF_Init(OPTMZ_LINES);
 	GF_SetWindow(window);
 	GF_SetFrustrum(FOV_Y, aspr, DEPTH_NEAR, DEPTH_FAR);
 
@@ -70,17 +70,7 @@ void Render(void)
 	window->Clear(CLR_BLACK);
 	GF_SetViewMatrix(cam->GetView());
 
-	//GF_StartRender(GF_LINES);
-	//GF_SetBufferLength(lLen << 1);
-
-	//for (size_t i = 0; i < lLen; i++)
-	//{
-	//	GF_AddPoint(vertices[lines[i][0]]);
-	//	GF_AddPoint(vertices[lines[i][1]]);
-	//}
-
-	//GF_EndRender();
-	RenderTriangle(2);
+	RenderCube(CUBE_LINES);
 
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	HANDLE chndl = GetStdHandle(STD_OUTPUT_HANDLE);

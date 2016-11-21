@@ -4,18 +4,27 @@
 #define get_pop(v)			v.back(); v.pop_back()
 const chrono::microseconds st = chrono::microseconds(1);
 
+struct indices { int i, j; };
+
 bool *thrdsRun;
+int *pRun;
 thread ths[N_THREADS];
 mutex mtx;
 
 vector<hline> hlBuff;
 vector<vline> vlBuff;
+vector<indices> lBuff;
+vector<indices> pBuff;
 
 inline void AddHLine(hline line) { mtx.lock(); hlBuff.push_back(line); mtx.unlock(); }
 inline void AddVLine(vline line) { mtx.lock(); vlBuff.push_back(line); mtx.unlock(); }
+inline void AddLine(int i, int j) { mtx.lock(); lBuff.push_back({ i, j }); mtx.unlock(); }
+inline void AddPoint(int start, int end) { mtx.lock(); pBuff.push_back({ start, end }); mtx.unlock(); }
 
 void SetHLineThreads(size_t start, size_t length)
 {
+	if (!pRun) pRun = new int(0);
+
 	size_t end = start + length;
 	for (size_t i = start; i < end; i++)
 	{
@@ -25,6 +34,8 @@ void SetHLineThreads(size_t start, size_t length)
 
 void SetVLineThreads(size_t start, size_t length)
 {
+	if (!pRun) pRun = new int(0);
+
 	size_t end = start + length;
 	for (size_t i = start; i < end; i++)
 	{
@@ -32,9 +43,31 @@ void SetVLineThreads(size_t start, size_t length)
 	}
 }
 
+void SetLineThreads(size_t start, size_t length)
+{
+	if (!pRun) pRun = new int(0);
+
+	size_t end = start + length;
+	for (size_t i = 0; i < end; i++)
+	{
+		ths[i] = thread(line_func, i);
+	}
+}
+
+void SetPointThreads(size_t start, size_t length)
+{
+	if (!pRun) pRun = new int(0);
+
+	size_t end = start + length;
+	for (size_t i = 0; i < end; i++)
+	{
+		ths[i] = thread(point_func, i);
+	}
+}
+
 void WaitThreads(void)
 {
-	while (hlBuff.size() || vlBuff.size()) this_thread::sleep_for(st);
+	while (hlBuff.size() || vlBuff.size() || lBuff.size() || pBuff.size() || *pRun) this_thread::sleep_for(st);
 }
 
 void JoinThreads(void)
@@ -42,6 +75,12 @@ void JoinThreads(void)
 	for (size_t i = 0; i < N_THREADS; i++)
 	{
 		ths[i].join();
+	}
+
+	if (pRun)
+	{
+		delete pRun;
+		pRun = NULL;
 	}
 }
 
@@ -89,4 +128,62 @@ void vline_func(const size_t thrdId)
 			this_thread::sleep_for(st);
 		}
 	}
+
+	printf("stopping vline(%d)\n", thrdId);
+}
+
+void line_func(const size_t thrdId)
+{
+	printf("starting line(%d)\n", thrdId);
+
+	while (*thrdsRun)
+	{
+		mtx.lock();
+		if (lBuff.size() > 0)
+		{
+			indices l = get_pop(lBuff);
+			mtx.unlock();
+
+			single_line(l.i, l.j);
+		}
+		else
+		{
+			mtx.unlock();
+			this_thread::sleep_for(st);
+		}
+	}
+
+	printf("stopping line(%d)\n", thrdId);
+}
+
+void point_func(const size_t thrdId)
+{
+	printf("starting point(%d)\n", thrdId);
+
+	while (*thrdsRun)
+	{
+		mtx.lock();
+		if (pBuff.size() > 0)
+		{
+			indices p = get_pop(pBuff);
+			*pRun += 1;
+			mtx.unlock();
+
+			for (size_t i = p.i; i < p.j; i++)
+			{
+				single_point(i);
+			}
+
+			mtx.lock();
+			*pRun -= 1;
+			mtx.unlock();
+		}
+		else
+		{
+			mtx.unlock();
+			this_thread::sleep_for(st);
+		}
+	}
+
+	printf("stopping point(%d)\n", thrdId);
 }

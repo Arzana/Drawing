@@ -12,12 +12,16 @@
 #define GF_TRIANGLE_STRIP	5
 #define GF_TRIANGLE_FAN		6
 
+#define OPTMZ_POINTS		0
+#define OPTMZ_LINES			1
+#define OPTMZ_TRGLS			2
+
 #ifndef ENABLE
 #define ENABLE	1
 #define DISABLE 0
 #endif
 
-void GF_Init(void);
+void GF_Init(const int optmz);
 void GF_End(void);
 void GF_SetWindow(GameWindow *window);
 void GF_StartRender(const int primitiveType);
@@ -81,6 +85,7 @@ inline Vect3 GF_ToScreen(Vect4 *v)
 	GF_ToScreen(&r);
 	return r;
 }
+void single_point(const int i);
 void single_line(const int i, const int j);
 void single_triangle(const int i, const int j, const int k);
 #endif

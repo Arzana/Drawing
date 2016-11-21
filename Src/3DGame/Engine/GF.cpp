@@ -32,7 +32,7 @@ Mtrx4 model = MTRX4_IDENTITY;
 Mtrx4 view = MTRX4_IDENTITY;
 Mtrx4 pers = MTRX4_IDENTITY;
 
-void GF_Init(void)
+void GF_Init(const int optmz)
 {
 	if (flags.init)
 	{
@@ -40,10 +40,27 @@ void GF_Init(void)
 		return;
 	}
 
-	flags.init = true;
-	running = true;
 	thrdsRun = &running;
-	SetHLineThreads(0, N_THREADS);
+	running = true;
+
+	switch (optmz)
+	{
+	case OPTMZ_POINTS:
+		SetPointThreads(0, N_THREADS);
+		break;
+	case OPTMZ_LINES:
+		SetLineThreads(0, N_THREADS);
+		break;
+	case OPTMZ_TRGLS:
+		SetHLineThreads(0, N_THREADS);
+		break;
+	default:
+		running = false;
+		printf("Unknown optimize type!");
+		return;
+	}
+
+	flags.init = true;
 }
 
 void GF_End(void)
@@ -217,12 +234,16 @@ void GF_AddPoint(const Vertex vtx)
 
 void GF_Points(void)
 {
-	get_zvc_plt;
-
-	for (size_t i = 0; i < bufferLength; i++)
+	int ppthd = bufferLength / N_THREADS;
+	if (!ppthd) AddPoint(0, bufferLength);
+	else
 	{
-		if (hbuffer[i].Clip()) continue;
-		plot(vrtxat(i));
+		for (size_t s = 0, e = ppthd; e < bufferLength;)
+		{
+			AddPoint(s, e);
+			s += ppthd;
+			e += e + ppthd < bufferLength ? ppthd : bufferLength - e;
+		}
 	}
 }
 
@@ -230,7 +251,7 @@ void GF_Lines(void)
 {
 	for (size_t i = 0, j = 1; i < bufferLength; i += 2, j += 2)
 	{
-		single_line(i, j);
+		AddLine(i, j);
 	}
 }
 
@@ -238,7 +259,7 @@ void GF_LineStrip(void)
 {
 	for (size_t i = 0, j = 1; i < bufferLength - 1; i++, j++)
 	{
-		single_line(i, j);
+		AddLine(i, j);
 	}
 }
 
@@ -246,10 +267,10 @@ void GF_LineLoop(void)
 {
 	for (size_t i = 0, j = 1; i < bufferLength - 1; i++, j++)
 	{
-		single_line(i, j);
+		AddLine(i, j);
 	}
 
-	single_line(bufferLength - 1, 0);
+	AddLine(bufferLength - 1, 0);
 }
 
 void GF_Triangles(void)
@@ -286,6 +307,13 @@ void GF_ToScreen(Vect3 * v)
 	v->X = cPort.X * v->X + cPort.X;
 	v->Y = cPort.Y * v->Y + cPort.Y;
 	v->Z = cPort.Z * v->Z + cPort.W;
+}
+
+void single_point(const int i)
+{
+	get_zvc_plt;
+	if (hbuffer[i].Clip()) return;
+	plot(vrtxat(i));
 }
 
 void single_line(const int i, const int j)
