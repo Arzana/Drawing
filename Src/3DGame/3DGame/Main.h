@@ -4,9 +4,6 @@
 #include <Utils.h>
 #include <GF.h>
 #include "Camera.h"
-#include "Cube.h"
-#include "Triangle.h"
-#include "Sectors.h"
 
 //#define _USE_FULL_HD
 
@@ -27,4 +24,5 @@ const float aspr = WIDTH / HEIGHT;
 
 void MouseMove(int, int, int, int);
 void KeyPress(int);
+void Update(void);
 void Render(void);

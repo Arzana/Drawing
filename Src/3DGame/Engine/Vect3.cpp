@@ -60,6 +60,7 @@ Vector3 Vector3::operator+=(const Vector3 & r)
 {
 	X += r.X;
 	Y += r.Y;
+	Z += r.Z;
 	return *this;
 }
 

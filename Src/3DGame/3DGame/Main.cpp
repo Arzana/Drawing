@@ -3,10 +3,23 @@
 GameWindow *window;
 Camera *cam;
 const float scalar = 0.1f;
+const float pScalar = 0.001f;
+
+const size_t pSize = 6;
+struct particle { Vrtx vrtx; Vect3 vel; } part[pSize]
+{
+	{ Vrtx(VECT3_ZERO, CLR_RED), VECT3_LEFT * pScalar },
+	{ Vrtx(VECT3_ZERO, CLR_RED), VECT3_RIGHT * pScalar },
+	{ Vrtx(VECT3_ZERO, CLR_GREEN), VECT3_DOWN * pScalar },
+	{ Vrtx(VECT3_ZERO, CLR_GREEN), VECT3_UP * pScalar },
+	{ Vrtx(VECT3_ZERO, CLR_BLUE), VECT3_FORWARD * pScalar },
+	{ Vrtx(VECT3_ZERO, CLR_BLUE), VECT3_BACK * pScalar }
+};
 
 int main(int argc, char *argv[])
 {
 	window = new GameWindow("Test", WIDTH, HEIGHT);
+	window->Update = Update;
 	window->Draw = Render;
 	window->KeyDown = KeyPress;
 	window->MouseMove = MouseMove;
@@ -63,6 +76,14 @@ void KeyPress(int scanCode)
 	}
 }
 
+void Update(void)
+{
+	for (size_t i = 0; i < pSize; i++)
+	{
+		part[i].vrtx.v += part[i].vel;
+	}
+}
+
 void Render(void)
 {
 	cam->Update();
@@ -70,12 +91,21 @@ void Render(void)
 	window->Clear(CLR_BLACK);
 	GF_SetViewMatrix(cam->GetView());
 
-	RenderCube(CUBE_LINES);
+	GF_StartRender(GF_LINES);
+	GF_SetBufferLength(pSize << 1);
+	for (size_t i = 0; i < pSize; i++)
+	{
+		GF_AddPoint(Vrtx(VECT3_ZERO, part[i].vrtx.c));
+		GF_AddPoint(part[i].vrtx);
+	}
+	GF_EndRender();
 
+#pragma region FPS VIEW
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	HANDLE chndl = GetStdHandle(STD_OUTPUT_HANDLE);
 	COORD cPos = GetConsoleScreenBufferInfo(chndl, &csbi) ? csbi.dwCursorPosition : COORD();
 	cPos.Y -= 1;
 	SetConsoleCursorPosition(chndl, cPos);
 	printf("FPS: %7.3f|%7.3f\n", window->GetAvarageFPS(), window->GetFps());
+#pragma endregion
 }

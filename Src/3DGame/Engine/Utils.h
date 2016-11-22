@@ -9,13 +9,16 @@
 
 #ifdef __cplusplus
 #include <cstdlib>
-#define malloc_s(t, l)	(t*)malloc(sizeof(t) * (l))
+#define malloc_s(t, l)			(t*)malloc(sizeof(t) * (l))
 #else
 #include <stdlib.h>
-#define malloc_s(t, l)	malloc(sizeof(t) * (l))
+#define malloc_s(t, l)			malloc(sizeof(t) * (l))
 #endif
 
-#define free_s(t)		free(t); t = NULL
+#define free_s(t)				free(t); t = NULL
+
+#define xy2i(x, y, w)			((y) * (w) + (x))
+#define xyz2i(x, y, z, w, h)	((z) * (w) * (h) + xy2i(x, y, w))
 
 #ifdef _VECT_CONV
 #include "Vect2.h"
