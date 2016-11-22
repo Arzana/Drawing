@@ -320,11 +320,15 @@ void GF_ToScreen(Vect3 * v)
 	v->Z = cPort.Z * v->Z + cPort.W;
 }
 
-void single_point(const int i)
+void mult_point(int i, const int j)
 {
 	get_zvc_plt;
-	if (hbuffer[i].Clip()) return;
-	plot(vrtxat(i));
+
+	for (; i < j; i++)
+	{
+		if (hbuffer[i].Clip()) continue;
+		plot(vrtxat(i));
+	}
 }
 
 void single_line(const int i, const int j)

@@ -169,10 +169,7 @@ void point_func(const size_t thrdId)
 			*pRun += 1;
 			mtx.unlock();
 
-			for (size_t i = p.i; i < p.j; i++)
-			{
-				single_point(i);
-			}
+			mult_point(p.i, p.j);
 
 			mtx.lock();
 			*pRun -= 1;

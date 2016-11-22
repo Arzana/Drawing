@@ -4,7 +4,7 @@ GameWindow *window;
 Camera *cam;
 const float scalar = 0.1f;
 
-const size_t ppAxis = 25;
+const size_t ppAxis = 35;
 const size_t pSize = cube(ppAxis);
 struct particle { Vrtx vrtx; Vect3 vel; } part[pSize];
 
@@ -96,22 +96,11 @@ void Init(void)
 	}
 }
 
-size_t updCount = 0;
 void Update(void)
 {
-	++updCount;
 	for (size_t i = 0; i < pSize; i++)
 	{
 		part[i].vrtx.v += part[i].vel;
-	}
-
-	if (updCount > 500)
-	{
-		updCount = 0;
-		for (size_t i = 0; i < pSize; i++)
-		{
-			part[i].vel *= -1;
-		}
 	}
 }
 

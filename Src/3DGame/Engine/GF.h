@@ -87,7 +87,7 @@ inline Vect3 GF_ToScreen(Vect4 *v)
 	GF_ToScreen(&r);
 	return r;
 }
-void single_point(const int i);
+void mult_point(int i, const int j);
 void single_line(const int i, const int j);
 void single_triangle(const int i, const int j, const int k);
 #endif
