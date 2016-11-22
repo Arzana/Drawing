@@ -24,5 +24,6 @@ const float aspr = WIDTH / HEIGHT;
 
 void MouseMove(int, int, int, int);
 void KeyPress(int);
+void Init(void);
 void Update(void);
 void Render(void);

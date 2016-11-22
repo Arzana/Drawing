@@ -3,6 +3,10 @@
 #define N_THREADS			8
 #define _USE_GF_INTERNAL
 
+#undef abs
+#undef floor
+#undef round
+
 #include <thread>
 #include <mutex>
 #include "GF.h"

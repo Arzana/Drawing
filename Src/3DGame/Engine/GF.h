@@ -8,9 +8,10 @@
 #define GF_LINES			1
 #define GF_LINE_STRIP		2
 #define GF_LINE_LOOP		3
-#define GF_TRIANGLES		4
-#define GF_TRIANGLE_STRIP	5
-#define GF_TRIANGLE_FAN		6
+#define GF_LINE_FAN			4
+#define GF_TRIANGLES		5
+#define GF_TRIANGLE_STRIP	6
+#define GF_TRIANGLE_FAN		7
 
 #define OPTMZ_POINTS		0
 #define OPTMZ_LINES			1
@@ -74,6 +75,7 @@ void GF_Points(void);
 void GF_Lines(void);
 void GF_LineStrip(void);
 void GF_LineLoop(void);
+void GF_LineFan(void);
 void GF_Triangles(void);
 void GF_TriangleStrip(void);
 void GF_TriangleFan(void);

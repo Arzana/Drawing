@@ -25,6 +25,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam);
 class GameWindow
 {
 public:
+	void(*OnInitialize)(void);
 	void(*Update)(void);
 	void(*Draw)(void);
 	void(*KeyDown)(int);

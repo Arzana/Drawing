@@ -15,7 +15,7 @@ Vect3 oldMousePos;
 
 GameWindow::GameWindow(const char * title, const uint width, const uint height)
 	: inactiveSleepTime(0), accumelatedElapsedTime(0), previousTicks(0), timer(0), totalGameTime(0), elapsedGameTime(0), updateFrameLag(0)
-	, Update(NULL), Draw(NULL), KeyDown(NULL), MouseMove(NULL), OnTerminate(NULL)
+	, OnInitialize(NULL), Update(NULL), Draw(NULL), KeyDown(NULL), MouseMove(NULL), OnTerminate(NULL)
 {
 	KD = &KeyDown;
 	MM = &MouseMove;
@@ -101,6 +101,8 @@ void GameWindow::Run(void)
 
 	*isRunning = true;
 	timer = clock();
+
+	if (OnInitialize) OnInitialize();
 
 	while (*isRunning)
 	{

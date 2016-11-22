@@ -3,22 +3,15 @@
 GameWindow *window;
 Camera *cam;
 const float scalar = 0.1f;
-const float pScalar = 0.001f;
 
-const size_t pSize = 6;
-struct particle { Vrtx vrtx; Vect3 vel; } part[pSize]
-{
-	{ Vrtx(VECT3_ZERO, CLR_RED), VECT3_LEFT * pScalar },
-	{ Vrtx(VECT3_ZERO, CLR_RED), VECT3_RIGHT * pScalar },
-	{ Vrtx(VECT3_ZERO, CLR_GREEN), VECT3_DOWN * pScalar },
-	{ Vrtx(VECT3_ZERO, CLR_GREEN), VECT3_UP * pScalar },
-	{ Vrtx(VECT3_ZERO, CLR_BLUE), VECT3_FORWARD * pScalar },
-	{ Vrtx(VECT3_ZERO, CLR_BLUE), VECT3_BACK * pScalar }
-};
+const size_t ppAxis = 25;
+const size_t pSize = cube(ppAxis);
+struct particle { Vrtx vrtx; Vect3 vel; } part[pSize];
 
 int main(int argc, char *argv[])
 {
 	window = new GameWindow("Test", WIDTH, HEIGHT);
+	window->OnInitialize = Init;
 	window->Update = Update;
 	window->Draw = Render;
 	window->KeyDown = KeyPress;
@@ -26,7 +19,7 @@ int main(int argc, char *argv[])
 
 	cam = new Camera(Vect3(0, 0, Z_DIST(1)));
 
-	GF_Init(OPTMZ_LINES);
+	GF_Init(OPTMZ_POINTS);
 	GF_SetWindow(window);
 	GF_SetFrustrum(FOV_Y, aspr, DEPTH_NEAR, DEPTH_FAR);
 
@@ -76,11 +69,49 @@ void KeyPress(int scanCode)
 	}
 }
 
+void Init(void)
+{
+	for (size_t yaw = 0; yaw < ppAxis; yaw++)
+	{
+		float yawf = lerp(0, M_TAU, invLerp(0, ppAxis, yaw));
+		int red = lerp(0, 255, invLerp(0, ppAxis, yaw));
+		for (size_t pitch = 0; pitch < ppAxis; pitch++)
+		{
+			float pitchf = lerp(0, M_TAU, invLerp(0, ppAxis, pitch));
+			int green = lerp(0, 255, invLerp(0, ppAxis, pitch));
+			for (size_t roll = 0; roll < ppAxis; roll++)
+			{
+				float rollf = lerp(0, M_TAU, invLerp(0, ppAxis, roll));
+				int blue = lerp(0, 255, invLerp(0, ppAxis, roll));
+				Mtrx4 m = Mtrx4::CreateRotationQ(&Quat::CreateYawPitchRoll(yawf, pitchf, rollf));
+				Vect4 vel = m * (VECT3_BACK * (rand() % 100) * 0.0001f);
+
+				part[xyz2i(roll, pitch, yaw, ppAxis, ppAxis)] =
+				{
+					Vrtx(VECT3_ZERO, Color(red, green, blue)),
+					Vect3(vel.X, vel.Y, vel.Z)
+				};
+			}
+		}
+	}
+}
+
+size_t updCount = 0;
 void Update(void)
 {
+	++updCount;
 	for (size_t i = 0; i < pSize; i++)
 	{
 		part[i].vrtx.v += part[i].vel;
+	}
+
+	if (updCount > 500)
+	{
+		updCount = 0;
+		for (size_t i = 0; i < pSize; i++)
+		{
+			part[i].vel *= -1;
+		}
 	}
 }
 
@@ -91,11 +122,10 @@ void Render(void)
 	window->Clear(CLR_BLACK);
 	GF_SetViewMatrix(cam->GetView());
 
-	GF_StartRender(GF_LINES);
-	GF_SetBufferLength(pSize << 1);
+	GF_StartRender(GF_POINTS);
+	GF_SetBufferLength(pSize);
 	for (size_t i = 0; i < pSize; i++)
 	{
-		GF_AddPoint(Vrtx(VECT3_ZERO, part[i].vrtx.c));
 		GF_AddPoint(part[i].vrtx);
 	}
 	GF_EndRender();

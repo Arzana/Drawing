@@ -126,6 +126,9 @@ void GF_EndRender(void)
 	case GF_LINE_LOOP:
 		GF_LineLoop();
 		break;
+	case GF_LINE_FAN:
+		GF_LineFan();
+		break;
 	case GF_TRIANGLES:
 		GF_Triangles();
 		break;
@@ -271,6 +274,14 @@ void GF_LineLoop(void)
 	}
 
 	AddLine(bufferLength - 1, 0);
+}
+
+void GF_LineFan(void)
+{
+	for (size_t i = 1; i < bufferLength; i++)
+	{
+		AddLine(0, i);
+	}
 }
 
 void GF_Triangles(void)
