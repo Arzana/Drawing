@@ -38,11 +38,11 @@ Color::Color(const int r, const int g, const int b, const int a)
 }
 
 Color::Color(const float r, const float g, const float b)
-	: Color(ipart(r), ipart(g), ipart(b))
+	: Color(ipart(r * 255), ipart(g * 255), ipart(b * 255))
 { }
 
 Color::Color(const float r, const float g, const float b, const float a)
-	: Color(ipart(r), ipart(g), ipart(b), ipart(a))
+	: Color(ipart(r * 255), ipart(g * 255), ipart(b * 255), ipart(a * 255))
 { }
 
 Color::Color(const Vect3 * v)
@@ -96,6 +96,16 @@ Color Color::Divide(const Color * c, float divider)
 bool Color::Equals(const Color * c1, const Color * c2)
 {
 	return c1->packed == c2->packed;
+}
+
+Color Color::FromNonPremultiplied(int r, int g, int b, int a)
+{
+	return Color(r * a / 255, g * a / 255, b * a / 255, a);
+}
+
+void Color::FromNonPremultiplied(Color * c, float a)
+{
+	*c = FromNonPremultiplied(c->GetR(), c->GetG(), c->GetB(), ipart(a * 255));
 }
 
 inline octet Color::GetA(void) const

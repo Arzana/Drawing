@@ -40,6 +40,8 @@ typedef struct Color
 	static Color Add(const Color *c1, const Color *c2);
 	static Color Divide(const Color *c, float divider);
 	static bool Equals(const Color *c1, const Color *c2);
+	static Color FromNonPremultiplied(int r, int g, int b, int a);
+	static void FromNonPremultiplied(Color *c, float a);
 	inline octet GetA(void) const;
 	inline octet GetR(void) const;
 	inline octet GetG(void) const;
@@ -49,4 +51,4 @@ typedef struct Color
 	static Color Subtract(const Color *c1, const Color *c2);
 	Vect3 ToVect3(void) const;
 	Vect4 ToVect4(void) const;
-} Color;
+} Clr;

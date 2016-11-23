@@ -257,6 +257,11 @@ Vect3 * GF_GetVectBuffer(void)
 	return vbuffer;
 }
 
+Clr * GF_GetColorBuffer(void)
+{
+	return cbuffer;
+}
+
 void GF_Points(void)
 {
 	int ppthd = bufferLength / N_THREADS;

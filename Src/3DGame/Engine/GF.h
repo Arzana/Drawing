@@ -40,6 +40,7 @@ void GF_AddPoint(const Vector3 v, const Color c);
 void GF_AddPoint(const float x, const float y, const float z, const Color c);
 void GF_AddPoint(const Vertex vtx);
 Vect3* GF_GetVectBuffer(void);
+Clr* GF_GetColorBuffer(void);
 
 #ifdef _USE_GF_INTERNAL
 typedef struct flags
