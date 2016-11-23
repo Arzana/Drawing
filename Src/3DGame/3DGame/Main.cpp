@@ -25,7 +25,6 @@ int main(int argc, char *argv[])
 	GF_SetWindow(window);
 	GF_SetFrustrum(FOV_Y, aspr, DEPTH_NEAR, DEPTH_FAR);
 
-	printf("...\n");
 	window->Run();
 	GF_End();
 
@@ -73,6 +72,7 @@ void KeyPress(int scanCode)
 
 void Init(void)
 {
+	printf("Starting particle creation.\n");
 	GF_SetFlagVBuff(true);
 	GF_SetBufferLength(pSize);
 	vel = malloc_s(Vect3, pSize);
@@ -97,6 +97,8 @@ void Init(void)
 			}
 		}
 	}
+
+	printf("Particle creation complete.\nCreateed %d vertexes.\n...\n", pSize);
 }
 
 void Term(void)
