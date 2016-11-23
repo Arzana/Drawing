@@ -1,5 +1,7 @@
 #pragma once
 
+#define _VECT_CONV
+
 #include <cstdio>
 #include <Utils.h>
 #include <GF.h>
@@ -25,5 +27,6 @@ const float aspr = WIDTH / HEIGHT;
 void MouseMove(int, int, int, int);
 void KeyPress(int);
 void Init(void);
+void Term(void);
 void Update(void);
 void Render(void);

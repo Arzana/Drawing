@@ -26,7 +26,7 @@ void GF_Init(const int optmz);
 void GF_End(void);
 void GF_SetWindow(GameWindow *window);
 void GF_StartRender(const int primitiveType);
-void GF_EndRender(void);
+int GF_EndRender(void);
 void GF_SetBufferLength(const size_t length);
 void GF_SetModelMatrix(const Matrix4 *m);
 void GF_SetViewMatrix(const Matrix4 *m);
@@ -35,9 +35,11 @@ void GF_SetOrthographic(const float width, const float height, const float front
 void GF_SetViewport(const Rect *rect);
 void GF_SetFlag_Clip(const bool value);
 void GF_SetFlag_ZBuff(const bool value);
+void GF_SetFlagVBuff(const bool value);
 void GF_AddPoint(const Vector3 v, const Color c);
 void GF_AddPoint(const float x, const float y, const float z, const Color c);
 void GF_AddPoint(const Vertex vtx);
+Vect3* GF_GetVectBuffer(void);
 
 #ifdef _USE_GF_INTERNAL
 typedef struct flags
@@ -47,15 +49,17 @@ typedef struct flags
 	bool zBuff : 1;
 	bool proj : 1;
 	bool strt : 1;
+	bool vBuff : 1;
 	octet prim : 3;
 
 	flags(void) 
 		: init(false)
 		, clip(ENABLE)
 		, zBuff(ENABLE)
-		, prim(GF_POINTS)
 		, proj(ENABLE)
 		, strt(false)
+		, vBuff(false)
+		, prim(GF_POINTS)
 	{ }
 } Flags;
 

@@ -70,7 +70,7 @@ void GF_End(void)
 		printf("GF_Init must be called before calling GF_End!");
 		return;
 	}
-	
+
 	flags.init = false;
 	running = false;
 	JoinThreads();
@@ -80,7 +80,6 @@ void GF_SetWindow(GameWindow * window)
 {
 	w = window;
 	GF_SetViewport(&Rect(0, 0, w->GetWidth() - 1, w->GetHeight() - 1));
-	w->OnTerminate = [](void) { running = false; };
 }
 
 void GF_StartRender(const int primitiveType)
@@ -97,7 +96,7 @@ void GF_StartRender(const int primitiveType)
 	flags.strt = 1;
 }
 
-void GF_EndRender(void)
+int GF_EndRender(void)
 {
 	if (!flags.init || !flags.strt || bufferIndex < bufferLength || !w)
 	{
@@ -105,7 +104,7 @@ void GF_EndRender(void)
 		if (!flags.strt) Raise("GF_StartRender must be called before calling GF_EndRender!");
 		if (bufferIndex < bufferLength) Raise("Not all points in the buffer have been set!");
 		if (!w) Raise("GF_SetWindow must be called before calling GF_EndRender!");
-		return;
+		return 1;
 	}
 
 	Mtrx4 modelView = model * view;
@@ -146,12 +145,18 @@ void GF_EndRender(void)
 	WaitThreads();
 
 	flags.strt = 0;
-	bufferIndex = 0;
-	bufferLength = 0;
 	model = MTRX4_IDENTITY;
-	free(vbuffer);
-	free(cbuffer);
 	free(hbuffer);
+
+	if (!flags.vBuff)
+	{
+		bufferIndex = 0;
+		bufferLength = 0;
+		free_s(vbuffer);
+		free_s(cbuffer);
+	}
+
+	return 0;
 }
 
 void GF_SetBufferLength(size_t length)
@@ -210,12 +215,24 @@ void GF_SetFlag_ZBuff(const bool value)
 	flags.zBuff = value;
 }
 
+void GF_SetFlagVBuff(const bool value)
+{
+	if (flags.vBuff && !value)
+	{
+		bufferIndex = 0;
+		bufferLength = 0;
+		free_s(vbuffer);
+		free_s(cbuffer);
+	}
+
+	flags.vBuff = value;
+}
+
 void GF_AddPoint(const Vector3 v, const Color c)
 {
-	if (!flags.init || !flags.strt || bufferIndex >= bufferLength)
+	if (!flags.init || bufferIndex >= bufferLength)
 	{
 		if (!flags.init) Raise("GF_Init must be called before calling any graphics functions!");
-		if (!flags.strt) Raise("GF_StartRender must be called before calling GF_AddPoint!");
 		if (bufferLength < 1) Raise("GF_SetBufferLength must be called before calling GF_AddPoint!");
 		if (bufferIndex >= bufferLength) Raise("Cannot add any more points to the buffer!");
 		return;
@@ -233,6 +250,11 @@ void GF_AddPoint(const float x, const float y, float z, const Color c)
 void GF_AddPoint(const Vertex vtx)
 {
 	GF_AddPoint(vtx.v, vtx.c);
+}
+
+Vect3 * GF_GetVectBuffer(void)
+{
+	return vbuffer;
 }
 
 void GF_Points(void)
@@ -613,5 +635,5 @@ void GF_SetDepth(const float front, const float back)
 void Raise(const char *msg)
 {
 	printf("%s\n", msg);
-	w->Terminate();
+	if (w) w->Terminate();
 }
