@@ -46,13 +46,13 @@ void GF_Init(const int optmz)
 	switch (optmz)
 	{
 	case OPTMZ_POINTS:
-		SetPointThreads(0, N_THREADS);
+		SetPointThreads(0, n_threads);
 		break;
 	case OPTMZ_LINES:
-		SetLineThreads(0, N_THREADS);
+		SetLineThreads(0, n_threads);
 		break;
 	case OPTMZ_TRGLS:
-		SetHLineThreads(0, N_THREADS);
+		SetHLineThreads(0, n_threads);
 		break;
 	default:
 		running = false;
@@ -264,7 +264,7 @@ Clr * GF_GetColorBuffer(void)
 
 void GF_Points(void)
 {
-	int ppthd = bufferLength / N_THREADS;
+	int ppthd = bufferLength / n_threads;
 	if (!ppthd) AddPoint(0, bufferLength);
 	else
 	{

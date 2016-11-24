@@ -1,6 +1,4 @@
 #pragma once
-
-#define N_THREADS			8
 #define _USE_GF_INTERNAL
 
 #undef abs
@@ -12,6 +10,8 @@
 #include "GF.h"
 
 using namespace std;
+
+const uint n_threads = thread::hardware_concurrency();
 
 typedef struct HorizontalLine
 {

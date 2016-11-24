@@ -1,5 +1,6 @@
 #define _USE_GF_THREADS_INTERNAL
 #include "GF_Threads.h"
+#include "Utils.h"
 
 #define get_pop(v)			v.back(); v.pop_back()
 const chrono::microseconds st = chrono::microseconds(1);
@@ -8,9 +9,9 @@ struct indices { int i, j; };
 
 bool *thrdsRun;
 int *pRun;
-thread ths[N_THREADS];
 mutex mtx;
 
+vector<thread> ths;
 vector<hline> hlBuff;
 vector<vline> vlBuff;
 vector<indices> lBuff;
@@ -28,7 +29,7 @@ void SetHLineThreads(size_t start, size_t length)
 	size_t end = start + length;
 	for (size_t i = start; i < end; i++)
 	{
-		ths[i] = thread(hline_func, i);
+		ths.push_back(thread(hline_func, i));
 	}
 }
 
@@ -39,7 +40,7 @@ void SetVLineThreads(size_t start, size_t length)
 	size_t end = start + length;
 	for (size_t i = start; i < end; i++)
 	{
-		ths[i] = thread(vline_func, i);
+		ths.push_back(thread(vline_func, i));
 	}
 }
 
@@ -50,7 +51,7 @@ void SetLineThreads(size_t start, size_t length)
 	size_t end = start + length;
 	for (size_t i = 0; i < end; i++)
 	{
-		ths[i] = thread(line_func, i);
+		ths.push_back(thread(line_func, i));
 	}
 }
 
@@ -61,7 +62,7 @@ void SetPointThreads(size_t start, size_t length)
 	size_t end = start + length;
 	for (size_t i = 0; i < end; i++)
 	{
-		ths[i] = thread(point_func, i);
+		ths.push_back(thread(point_func, i));
 	}
 }
 
@@ -72,9 +73,10 @@ void WaitThreads(void)
 
 void JoinThreads(void)
 {
-	for (size_t i = 0; i < N_THREADS; i++)
+	for (size_t i = 0; i < n_threads; i++)
 	{
-		ths[i].join();
+		ths.back().join();
+		ths.pop_back();
 	}
 
 	if (pRun)
