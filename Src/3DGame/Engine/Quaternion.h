@@ -2,7 +2,7 @@
 
 #include "Vect4.h"
 
-#define QUAT_IDENTITY	Quat(0, 0, 0, 1)
+#define QUAT_IDENTITY	quat(0, 0, 0, 1)
 
 typedef struct Quaternion
 {
@@ -10,8 +10,8 @@ typedef struct Quaternion
 
 	Quaternion(void);
 	Quaternion(float x, float y, float z, float w);
-	Quaternion(Vect3 vect, float w);
-	Quaternion(Vect4 vect);
+	Quaternion(vect3 vect, float w);
+	Quaternion(vect4 vect);
 
 	Quaternion operator +(const Quaternion &r) const;
 	Quaternion operator -(const Quaternion &r) const;
@@ -21,7 +21,7 @@ typedef struct Quaternion
 
 	static Quaternion Add(const Quaternion *q1, const Quaternion *q2);
 	static Quaternion Concat(const Quaternion *q1, const Quaternion *q2);
-	static Quaternion CreateRotation(const Vect3 *axis, float rads);
+	static Quaternion CreateRotation(const vect3 *axis, float rads);
 	static Quaternion CreateYawPitchRoll(float yaw, float pitch, float roll);
 	static bool Equals(const Quaternion *q1, const Quaternion *q2);
 	float Length(void) const;
@@ -29,4 +29,4 @@ typedef struct Quaternion
 	static Quaternion Lerp(const Quaternion *min, const Quaternion *max, float a);
 	static Quaternion SLerp(const Quaternion *min, const Quaternion *max, float a);
 	static Quaternion Subtract(const Quaternion *q1, const Quaternion *q2);
-} Quat;
+} quat;

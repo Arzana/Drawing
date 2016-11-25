@@ -12,7 +12,7 @@
 extern HBITMAP hbmp;
 #endif
 
-class WindowBase
+typedef struct WindowBase
 {
 public:
 	uint width, height;
@@ -29,4 +29,4 @@ private:
 
 	int WndInit(const char g_szClassName[], const char title[]);
 	int BmpInit(void);
-};
+} wndBase;

@@ -4,14 +4,14 @@
 #include "Vect3.h"
 #include "Vect4.h"
 
-#define CLR_BLACK		((Color)0xFF000000)
-#define CLR_RED			((Color)0xFFFF0000)
-#define CLR_GREEN		((Color)0xFF00FF00)
-#define CLR_BLUE		((Color)0xFF0000FF)
-#define CLR_WHITE		((Color)0xFFFFFFFF)
-#define CLR_CYAN		((Color)0xFF00FFFF)
-#define CLR_MAGENTA		((Color)0xFFFF00FF)
-#define CLR_YELLOW		((Color)0xFFFFFF00)
+#define CLR_BLACK		((clr)0xFF000000)
+#define CLR_RED			((clr)0xFFFF0000)
+#define CLR_GREEN		((clr)0xFF00FF00)
+#define CLR_BLUE		((clr)0xFF0000FF)
+#define CLR_WHITE		((clr)0xFFFFFFFF)
+#define CLR_CYAN		((clr)0xFF00FFFF)
+#define CLR_MAGENTA		((clr)0xFFFF00FF)
+#define CLR_YELLOW		((clr)0xFFFFFF00)
 
 typedef struct Color
 {
@@ -27,8 +27,8 @@ typedef struct Color
 	Color(const int r, const int g, const int b, const int a);
 	Color(const float r, const float g, const float b);
 	Color(const float r, const float g, const float b, const float a);
-	Color(const Vect3 *v);
-	Color(const Vect4 *v);
+	Color(const vect3 *v);
+	Color(const vect4 *v);
 
 	Color operator +(const Color &r) const;
 	Color operator -(const Color &r) const;
@@ -49,6 +49,6 @@ typedef struct Color
 	static Color Lerp(const Color min, const Color max, float a);
 	static Color Multiply(const Color *c, float multiplier);
 	static Color Subtract(const Color *c1, const Color *c2);
-	Vect3 ToVect3(void) const;
-	Vect4 ToVect4(void) const;
-} Clr;
+	vect3 ToVect3(void) const;
+	vect4 ToVect4(void) const;
+} clr;

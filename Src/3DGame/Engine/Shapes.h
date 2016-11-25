@@ -5,35 +5,35 @@
 
 typedef struct Vertex
 {
-	Vect3 v;
+	vect3 v;
 	Color c;
 
 	Vertex(void);
-	Vertex(Vect3 v, Color c);
+	Vertex(vect3 v, Color c);
 	Vertex(float x, float y, float z);
 	Vertex(float x, float y, float z, Color c);
 
 	inline bool operator ==(const Vertex &r) const { return v == r.v && c == r.c; }
 	inline bool operator !=(const Vertex &r) const { return v != r.v || c != r.c; }
-} Vrtx;
+} vrtx;
 
 typedef struct Line 
 {
-	Vertex v0, v1;
+	vrtx v0, v1;
 
-	Line(Vertex v0, Vertex v1);
-	Line(const Vertex *v0, const Vertex *v1);
+	Line(vrtx v0, vrtx v1);
+	Line(const vrtx *v0, const vrtx *v1);
 } line;
 
 typedef struct Triangle
 {
-	Vertex v0, v1, v2;
+	vrtx v0, v1, v2;
 
-	Triangle(Vertex v0, Vertex v1, Vertex v2);
-	Triangle(const Vertex *v0, const Vertex *v1, const Vertex *v2);
-	Line GetLine(int l) const;
-	bool IsInside(Vertex *v);
-} Trgl;
+	Triangle(vrtx v0, vrtx v1, vrtx v2);
+	Triangle(const vrtx *v0, const vrtx *v1, const vrtx *v2);
+	line GetLine(int l) const;
+	bool IsInside(vrtx *v);
+} trgl;
 
 typedef struct Rectangle
 {
@@ -42,14 +42,6 @@ typedef struct Rectangle
 	Rectangle(void);
 	Rectangle(int x, int y, int w, int h);
 } Rect;
-
-typedef struct Polygon
-{
-	Vertex *v;
-	int polyVLen;
-
-	Polygon(void);
-} Poly;
 
 typedef struct ViewPort
 {
@@ -75,12 +67,12 @@ typedef struct ViewPort
 
 #include <vector>
 
-int ComputeMask(const Vect3 v, const ViewPort viewPort);
-bool LineClip(Line *l, const ViewPort viewPort);
-Vertex* TriangleClip(Triangle *t, int *len, const ViewPort viewPort);
-void SortVerticesBySpecial(Vertex * v0, Vertex * v1, Vertex * v2, const ViewPort vp);
+int ComputeMask(const vect3 v, const ViewPort viewPort);
+bool LineClip(line *l, const ViewPort viewPort);
+vrtx* TriangleClip(trgl *t, int *len, const ViewPort viewPort);
+void SortVerticesBySpecial(vrtx *v0, vrtx *v1, vrtx *v2, const ViewPort vp);
 #endif
 
 #ifdef _USE_GF_INTERNAL
-void SortVerticesByY(Vertex *v0, Vertex *v1, Vertex *v2);
+void SortVerticesByY(vrtx *v0, vrtx *v1, vrtx *v2);
 #endif

@@ -321,7 +321,7 @@ Vector4 Vector4::Normalize(const Vector4 * v)
 
 Vector4 Vector4::Reflect(const Vector4 * v, const Vector4 * n)
 {
-	return *v - Vect4(2) * (*v * *n) * *n;
+	return *v - vect4(2) * (*v * *n) * *n;
 }
 
 Vector4 Vector4::SmoothStep(const Vector4 * v1, const Vector4 * v2, float a)

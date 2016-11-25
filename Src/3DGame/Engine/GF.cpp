@@ -1,5 +1,6 @@
 #define _USE_GF_INTERNAL
 #define _USE_CLIPPING
+#define _VECT_CONV
 
 #define vrtxat(x)			(&Vertex(GF_ToScreen(hbuffer + x), cbuffer[x]))
 #define ZVC_ARGS			(const Vertex*)
@@ -20,17 +21,17 @@ bool running;
 GameWindow *w = NULL;
 Flags flags;
 ViewPort port = ViewPort(0, 0, 0, 0, 0, FLT_MAX);
-Vect4 cPort;
+vect4 cPort;
 
 size_t bufferLength = 0;
 size_t bufferIndex = 0;
-Vect3 *vbuffer = NULL;
+vect3 *vbuffer = NULL;
 Color *cbuffer = NULL;
-Vect4 *hbuffer = NULL;
+vect4 *hbuffer = NULL;
 
-Mtrx4 model = MTRX4_IDENTITY;
-Mtrx4 view = MTRX4_IDENTITY;
-Mtrx4 pers = MTRX4_IDENTITY;
+mtrx4 model = MTRX4_IDENTITY;
+mtrx4 view = MTRX4_IDENTITY;
+mtrx4 pers = MTRX4_IDENTITY;
 
 void GF_Init(const int optmz)
 {
@@ -107,9 +108,9 @@ int GF_EndRender(void)
 		return 1;
 	}
 
-	Mtrx4 modelView = model * view;
-	Mtrx4 full = pers * modelView;
-	hbuffer = Mtrx4::Transform(&full, vbuffer, bufferLength);
+	mtrx4 modelView = model * view;
+	mtrx4 full = pers * modelView;
+	hbuffer = mtrx4::Transform(&full, vbuffer, bufferLength);
 
 	switch (flags.prim)
 	{
@@ -170,7 +171,7 @@ void GF_SetBufferLength(size_t length)
 	}
 
 	bufferLength = length;
-	vbuffer = malloc_s(Vect3, length);
+	vbuffer = malloc_s(vect3, length);
 	cbuffer = malloc_s(Color, length);
 }
 
@@ -186,14 +187,14 @@ void GF_SetViewMatrix(const Matrix4 * m)
 
 void GF_SetFrustrum(const float fovY, const float aspr, const float front, const float back)
 {
-	pers = Mtrx4::CreateFrustrum(fovY, aspr, front, back);
+	pers = mtrx4::CreateFrustrum(fovY, aspr, front, back);
 	flags.proj = 1;
 	GF_SetDepth(front, back);
 }
 
 void GF_SetOrthographic(const float width, const float height, const float front, const float back)
 {
-	pers = Mtrx4::CreateOrthographic(width, height, front, back);
+	pers = mtrx4::CreateOrthographic(width, height, front, back);
 	flags.proj = 0;
 	GF_SetDepth(front, back);
 }
@@ -244,7 +245,7 @@ void GF_AddPoint(const Vector3 v, const Color c)
 
 void GF_AddPoint(const float x, const float y, float z, const Color c)
 {
-	GF_AddPoint(Vect3(x, y, z), c);
+	GF_AddPoint(vect3(x, y, z), c);
 }
 
 void GF_AddPoint(const Vertex vtx)
@@ -252,12 +253,12 @@ void GF_AddPoint(const Vertex vtx)
 	GF_AddPoint(vtx.v, vtx.c);
 }
 
-Vect3 * GF_GetVectBuffer(void)
+vect3 * GF_GetVectBuffer(void)
 {
 	return vbuffer;
 }
 
-Clr * GF_GetColorBuffer(void)
+clr * GF_GetColorBuffer(void)
 {
 	return cbuffer;
 }
@@ -335,12 +336,12 @@ void GF_TriangleFan(void)
 	}
 }
 
-Vect3 GF_ToNDC(const Vect4 * v)
+vect3 GF_ToNDC(const vect4 * v)
 {
-	return flags.proj ? v->ToNDC() : Vect3(v->X, v->Y, v->Z);
+	return flags.proj ? v->ToNDC() : V4ToV3(v);
 }
 
-void GF_ToScreen(Vect3 * v)
+void GF_ToScreen(vect3 * v)
 {
 	v->X = cPort.X * v->X + cPort.X;
 	v->Y = cPort.Y * v->Y + cPort.Y;
@@ -375,12 +376,12 @@ void single_triangle(const int i, const int j, const int k)
 	if ((hbuffer + i)->Clip() + (hbuffer + j)->Clip() + (hbuffer + k)->Clip())
 	{
 		if (!flags.clip) return;
-		Trgl *t = &Trgl(vrtxat(i), vrtxat(j), vrtxat(k));
-		Poly p;
+		trgl *t = &trgl(vrtxat(i), vrtxat(j), vrtxat(k));
+		struct poly { vrtx *v; int l; } p;
 
-		if (p.v = TriangleClip(t, &p.polyVLen, port))
+		if (p.v = TriangleClip(t, &p.l, port))
 		{
-			for (size_t l = 1, m = 2; l < p.polyVLen - 1; l++, m++)
+			for (size_t l = 1, m = 2; l < p.l - 1; l++, m++)
 			{
 				GF_FullTrgl(p.v, p.v + l, p.v + m);
 			}
@@ -622,7 +623,7 @@ void GF_FullTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 		float a = invLerp(vt0.v.Y, vt2.v.Y, y);
 		float z = lerp(vt0.v.Z, vt2.v.Z, a);
 
-		Vertex vt3 = Vertex(Vect3(x, y, z), Color::Lerp(vt0.c, vt2.c, a));
+		Vertex vt3 = Vertex(vect3(x, y, z), Color::Lerp(vt0.c, vt2.c, a));
 
 		GF_BFTrgl(&vt0, &vt3, &vt1);
 		GF_TFTrgl(&vt3, &vt1, &vt2);

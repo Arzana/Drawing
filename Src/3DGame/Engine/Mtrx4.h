@@ -2,7 +2,7 @@
 
 #include "Quaternion.h"
 
-#define MTRX4_IDENTITY		Mtrx4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+#define MTRX4_IDENTITY		mtrx4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
 
 typedef struct Matrix4
 {
@@ -48,4 +48,4 @@ typedef struct Matrix4
 	static Vector4 Transform(const Matrix4 *m, const Vector3 *v);
 	static Vector4* Transform(const Matrix4 *m, const Vector3 *v, int length);
 	static Matrix4 Transpose(const Matrix4 *m);
-} Mtrx4;
+} mtrx4;

@@ -3,17 +3,17 @@
 
 Camera::Camera(void)
 {
-	position = new Vect3();
-	rotation = new Vect3();
-	quat = new QUAT_IDENTITY;
+	position = new VECT3_ZERO;
+	rotation = new VECT3_ZERO;
+	rot = new QUAT_IDENTITY;
 	view = new MTRX4_IDENTITY;
 }
 
-Camera::Camera(const Vect3 pos)
+Camera::Camera(const vect3 pos)
 { 
-	position = new Vect3(pos);
-	rotation = new Vect3();
-	quat = new QUAT_IDENTITY;
+	position = new vect3(pos);
+	rotation = new VECT3_ZERO;
+	rot = new QUAT_IDENTITY;
 	view = new MTRX4_IDENTITY;
 }
 
@@ -21,7 +21,7 @@ Camera::~Camera(void)
 {
 	delete position;
 	delete rotation;
-	delete quat;
+	delete rot;
 	delete view;
 }
 
@@ -55,14 +55,14 @@ void Camera::SetRollDegr(float degr)
 	SetRollRads(degr * deg2rad);
 }
 
-void Camera::SetRotationRads(Vect3 rads)
+void Camera::SetRotationRads(vect3 rads)
 {
 	rotation->X = GetClampedRads(rads.X);
 	rotation->Y = GetClampedRads(rads.Y);
 	rotation->Z = GetClampedRads(rads.Z);
 }
 
-void Camera::SetRotationDegr(Vect3 degr)
+void Camera::SetRotationDegr(vect3 degr)
 {
 	SetRotationRads(degr * deg2rad);
 }
@@ -97,12 +97,12 @@ void Camera::AppendRollDegr(float degr)
 	AppendRollDegr(degr * deg2rad);
 }
 
-void Camera::AppendRotationRads(Vect3 rads)
+void Camera::AppendRotationRads(vect3 rads)
 {
 	SetRotationRads(*rotation + rads);
 }
 
-void Camera::AppendRotationDegr(Vect3 degr)
+void Camera::AppendRotationDegr(vect3 degr)
 {
 	AppendRotationRads(degr * deg2rad);
 }
@@ -122,7 +122,7 @@ float Camera::GetRoll(void) const
 	return rotation->Z;
 }
 
-Vect3 Camera::GetRotation(void) const
+vect3 Camera::GetRotation(void) const
 {
 	return *rotation;
 }
@@ -142,7 +142,7 @@ void Camera::SetZ(float z)
 	position->Z = z;
 }
 
-void Camera::SetPosition(Vect3 pos)
+void Camera::SetPosition(vect3 pos)
 {
 	*position = pos;
 }
@@ -162,7 +162,7 @@ void Camera::AppendZ(float z)
 	position->Z += z;
 }
 
-void Camera::AppendPosition(Vect3 pos)
+void Camera::AppendPosition(vect3 pos)
 {
 	*position += pos;
 }
@@ -182,15 +182,15 @@ float Camera::GetZ(void) const
 	return position->Z;
 }
 
-Vect3 Camera::GetPosition(void) const
+vect3 Camera::GetPosition(void) const
 {
 	return *position;
 }
 
-void Camera::Move(Vect3 direction)
+void Camera::Move(vect3 direction)
 {
-	Mtrx4 movement = Mtrx4::CreateYawPitchRoll(rotation->X, rotation->Y, rotation->Z);
-	Vect4 vH = movement * direction;
+	mtrx4 movement = mtrx4::CreateYawPitchRoll(rotation->X, rotation->Y, rotation->Z);
+	vect4 vH = movement * direction;
 
 	AppendX(vH.X);
 	AppendY(vH.Y);
@@ -199,12 +199,12 @@ void Camera::Move(Vect3 direction)
 
 void Camera::Update(void)
 {
-	*quat = Quat::CreateYawPitchRoll(rotation->X, -rotation->Y, rotation->Z);
-	*view = Mtrx4::CreateRotationQ(quat);
-	*view *= Mtrx4::CreateTranslation(&Vect3::Negate(position));
+	*rot = quat::CreateYawPitchRoll(rotation->X, -rotation->Y, rotation->Z);
+	*view = mtrx4::CreateRotationQ(rot);
+	*view *= mtrx4::CreateTranslation(&vect3::Negate(position));
 }
 
-const Mtrx4 * Camera::GetView(void) const
+const mtrx4 * Camera::GetView(void) const
 {
 	return view;
 }

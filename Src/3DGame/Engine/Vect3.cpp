@@ -305,7 +305,7 @@ Vector3 Vector3::Normalize(const Vector3 * v)
 
 Vector3 Vector3::Reflect(const Vector3 * v, const Vector3 * n)
 {
-	return *v - Vect3(2) * (*v * *n) * *n;
+	return *v - vect3(2) * (*v * *n) * *n;
 }
 
 Vector3 Vector3::SmoothStep(const Vector3 * v1, const Vector3 * v2, float a)

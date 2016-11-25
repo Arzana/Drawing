@@ -1,14 +1,14 @@
 #pragma once
 
-#define VECT3_ONE		Vect3(1)
-#define VECT3_RIGHT		Vect3(1, 0, 0)
-#define VECT3_LEFT		Vect3(-1, 0, 0)
-#define VECT3_UP		Vect3(0, 1, 0)
-#define VECT3_DOWN		Vect3(0, -1, 0)
-#define VECT3_BACK		Vect3(0, 0, 1)
-#define VECT3_FORWARD	Vect3(0, 0, -1)
-#define VECT3_ZERO		Vect3()
-#define VECT3_NEGATIVE	Vect3(-1)
+#define VECT3_ONE		vect3(1)
+#define VECT3_RIGHT		vect3(1, 0, 0)
+#define VECT3_LEFT		vect3(-1, 0, 0)
+#define VECT3_UP		vect3(0, 1, 0)
+#define VECT3_DOWN		vect3(0, -1, 0)
+#define VECT3_BACK		vect3(0, 0, 1)
+#define VECT3_FORWARD	vect3(0, 0, -1)
+#define VECT3_ZERO		vect3()
+#define VECT3_NEGATIVE	vect3(-1)
 
 typedef struct Vector3
 {
@@ -69,4 +69,4 @@ typedef struct Vector3
 	static Vector3 SmoothStep(const Vector3 *v1, const Vector3 *v2, float a);
 	static Vector3 Subtract(const Vector3 *v1, const Vector3 *v2);
 	float Volume(void) const;
-} Vect3;
+} vect3;

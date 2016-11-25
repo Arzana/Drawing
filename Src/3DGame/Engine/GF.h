@@ -39,8 +39,8 @@ void GF_SetFlagVBuff(const bool value);
 void GF_AddPoint(const Vector3 v, const Color c);
 void GF_AddPoint(const float x, const float y, const float z, const Color c);
 void GF_AddPoint(const Vertex vtx);
-Vect3* GF_GetVectBuffer(void);
-Clr* GF_GetColorBuffer(void);
+vect3* GF_GetVectBuffer(void);
+clr* GF_GetColorBuffer(void);
 
 #ifdef _USE_GF_INTERNAL
 typedef struct flags
@@ -84,11 +84,11 @@ void GF_LineFan(void);
 void GF_Triangles(void);
 void GF_TriangleStrip(void);
 void GF_TriangleFan(void);
-Vect3 GF_ToNDC(const Vector4 *v);
-void GF_ToScreen(Vect3 *v);
-inline Vect3 GF_ToScreen(Vect4 *v)
+vect3 GF_ToNDC(const vect4 *v);
+void GF_ToScreen(vect3 *v);
+inline vect3 GF_ToScreen(vect4 *v)
 {
-	Vect3 r = GF_ToNDC(v);
+	vect3 r = GF_ToNDC(v);
 	GF_ToScreen(&r);
 	return r;
 }

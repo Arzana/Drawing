@@ -1,10 +1,10 @@
 #pragma once
 
-#define VECT2_ONE		Vect2(1)
-#define VECT2_UNITX		Vect2(1, 0)
-#define VECT2_UNITY		Vect2(0, 1)
-#define VECT2_ZERO		Vect2()
-#define VECT2_NEGATIVE	Vect2(-1)
+#define VECT2_ONE		vect2(1)
+#define VECT2_UNITX		vect2(1, 0)
+#define VECT2_UNITY		vect2(0, 1)
+#define VECT2_ZERO		vect2()
+#define VECT2_NEGATIVE	vect2(-1)
 
 typedef struct Vector2
 {
@@ -65,4 +65,4 @@ typedef struct Vector2
 	static Vector2 Reflect(const Vector2 *v, const Vector2 *n);
 	static Vector2 SmoothStep(const Vector2 *v1, const Vector2 *v2, float a);
 	static Vector2 Subtract(const Vector2 *v1, const Vector2 *v2);
-} Vect2;
+} vect2;

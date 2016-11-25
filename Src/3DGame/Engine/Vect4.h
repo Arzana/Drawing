@@ -2,13 +2,13 @@
 
 #include "Vect3.h"
 
-#define VECT4_ONE		Vect4(1)
-#define VECT4_UNITX		Vect4(1, 0, 0, 0)
-#define VECT4_UNITY		Vect4(0, 1, 0, 0)
-#define VECT4_UNITZ		Vect4(0, 0, 1, 0)
-#define VECT4_UNITW		Vect4(0, 0, 0, 1)
-#define VECT4_ZERO		Vect4()
-#define VECT4_NEGATIVE	Vect4(-1)
+#define VECT4_ONE		vect4(1)
+#define VECT4_UNITX		vect4(1, 0, 0, 0)
+#define VECT4_UNITY		vect4(0, 1, 0, 0)
+#define VECT4_UNITZ		vect4(0, 0, 1, 0)
+#define VECT4_UNITW		vect4(0, 0, 0, 1)
+#define VECT4_ZERO		vect4()
+#define VECT4_NEGATIVE	vect4(-1)
 
 typedef struct Vector4
 {
@@ -71,4 +71,4 @@ typedef struct Vector4
 	Vector3 ToNDC(void) const;
 	float Volume(void) const;
 	float Volume4D(void) const;
-} Vect4;
+} vect4;

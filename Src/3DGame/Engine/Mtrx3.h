@@ -30,4 +30,4 @@ typedef struct Matrix3
 	static Vector3* Transform(const Matrix3 *m, const Vector2 *v, int length);
 	Vector2 Translation(void) const;
 	static Matrix3 Transpose(const Matrix3 *m);
-} Mtrx3;
+} mtrx3;

@@ -9,11 +9,11 @@ Quaternion::Quaternion(float x, float y, float z, float w)
 	: X(x), Y(y), Z(z), W(w)
 { }
 
-Quaternion::Quaternion(Vect3 v, float w)
+Quaternion::Quaternion(vect3 v, float w)
 	: X(v.X), Y(v.Y), Z(v.Z), W(w)
 { }
 
-Quaternion::Quaternion(Vect4 v)
+Quaternion::Quaternion(vect4 v)
 	: X(v.X), Y(v.Y), Z(v.Z), W(v.W)
 { }
 
@@ -51,7 +51,7 @@ Quaternion Quaternion::Concat(const Quaternion * q1, const Quaternion * q2)
 		(q2->W * q1->W) - (((q2->X * q1->X) + (q2->Y * q1->Y)) + (q2->Z * q1->Z)));
 }
 
-Quaternion Quaternion::CreateRotation(const Vect3 * axis, float rads)
+Quaternion Quaternion::CreateRotation(const vect3 * axis, float rads)
 {
 	float hafR = rads * 0.5f;
 	float sin = sinf(hafR);
@@ -98,7 +98,7 @@ float Quaternion::LengthSquared(void) const
 
 Quaternion Quaternion::Lerp(const Quaternion * min, const Quaternion * max, float a)
 {
-	Quat qr;
+	quat qr;
 	float a2 = 1.0f - a;
 
 	if ((((min->X * max->X) + (min->Y * max->Y)) + (min->Z * max->Z)) + (min->W * max->W) >= 0.5f)

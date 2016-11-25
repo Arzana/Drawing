@@ -1,13 +1,13 @@
 #include "Main.h"
 
 GameWindow *window;
-Camera *cam;
+Camera *player;
 const float scalar = 0.1f;
 
 const size_t ppAxis = 43;
 const size_t pSize = cube(ppAxis);
 size_t updCount = 0;
-Vect3 *vertices, *vel;
+vect3 *vertices, *vel;
 
 int main(int argc, char *argv[])
 {
@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 	window->KeyDown = KeyPress;
 	window->MouseMove = MouseMove;
 
-	cam = new Camera(Vect3(0, 0, Z_DIST(1)));
+	player = new Camera(vect3(0, 0, Z_DIST(1)));
 
 	GF_Init(OPTMZ_POINTS);
 	GF_SetWindow(window);
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 	GF_End();
 
 	delete window;
-	delete cam;
+	delete player;
 
 	printf("Press any key to continue...");
 	getchar();
@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
 
 void MouseMove(int x, int y, int dX, int dY)
 {
-	cam->AppendYawDegr(dX * scalar);
-	cam->AppendPitchDegr(dY * scalar);
+	player->AppendYawDegr(dX * scalar);
+	player->AppendPitchDegr(dY * scalar);
 }
 
 void KeyPress(int scanCode)
@@ -50,22 +50,22 @@ void KeyPress(int scanCode)
 		window->Terminate();
 		break;
 	case 0x57: // W
-		cam->Move(VECT3_FORWARD * scalar);
+		player->Move(VECT3_FORWARD * scalar);
 		break;
 	case 0x53: // S
-		cam->Move(VECT3_BACK * scalar);
+		player->Move(VECT3_BACK * scalar);
 		break;
 	case 0x41: // A
-		cam->Move(VECT3_LEFT * scalar);
+		player->Move(VECT3_LEFT * scalar);
 		break;
 	case 0x44: // D
-		cam->Move(VECT3_RIGHT * scalar);
+		player->Move(VECT3_RIGHT * scalar);
 		break;
 	case 0x45: // E
-		cam->Move(VECT3_UP * scalar);
+		player->Move(VECT3_UP * scalar);
 		break;
 	case 0x51: // Q
-		cam->Move(VECT3_DOWN * scalar);
+		player->Move(VECT3_DOWN * scalar);
 		break;
 	}
 }
@@ -75,7 +75,7 @@ void Init(void)
 	printf("Starting particle creation.\n");
 	GF_SetFlagVBuff(true);
 	GF_SetBufferLength(pSize);
-	vel = malloc_s(Vect3, pSize);
+	vel = malloc_s(vect3, pSize);
 	vertices = GF_GetVectBuffer();
 
 	for (size_t yaw = 0; yaw < ppAxis; yaw++)
@@ -90,7 +90,7 @@ void Init(void)
 			{
 				float rollf = lerp(0, M_TAU, invLerp(0, ppAxis, roll));
 				int blue = lerp(0, 255, invLerp(0, ppAxis, roll));
-				Mtrx4 m = Mtrx4::CreateRotationQ(&Quat::CreateYawPitchRoll(yawf, pitchf, rollf));
+				mtrx4 m = mtrx4::CreateRotationQ(&quat::CreateYawPitchRoll(yawf, pitchf, rollf));
 
 				GF_AddPoint(VECT3_ZERO, Color(red, green, blue));
 				vel[xyz2i(roll, pitch, yaw, ppAxis, ppAxis)] = V4ToV3(&(m * (VECT3_BACK * (rand() % 100) * 0.0001f)));
@@ -128,10 +128,10 @@ void Update(void)
 
 void Render(void)
 {
-	cam->Update();
+	player->Update();
 
 	window->Clear(CLR_BLACK);
-	GF_SetViewMatrix(cam->GetView());
+	GF_SetViewMatrix(player->GetView());
 
 	GF_StartRender(GF_POINTS);
 	if (GF_EndRender()) return;

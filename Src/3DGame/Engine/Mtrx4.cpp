@@ -88,9 +88,9 @@ bool Matrix4::Equals(const Matrix4 * m1, const Matrix4 * m2)
 
 Matrix4 Matrix4::CreateYawPitchRoll(float yaw, float pitch, float roll)
 {
-	Mtrx4 result = Mtrx4::CreateRotation(&VECT3_FORWARD, roll);
-	result *= Mtrx4::CreateRotation(&VECT3_UP, yaw);
-	return result * Mtrx4::CreateRotation(&VECT3_RIGHT, pitch);
+	mtrx4 result = mtrx4::CreateRotation(&VECT3_FORWARD, roll);
+	result *= mtrx4::CreateRotation(&VECT3_UP, yaw);
+	return result * mtrx4::CreateRotation(&VECT3_RIGHT, pitch);
 }
 
 Matrix4 Matrix4::CreateFrustrum(float fovY, float aspr, float n, float f)
@@ -286,7 +286,7 @@ Vector4 Matrix4::Transform(const Matrix4 * m, const Vector3 * v)
 
 Vector4* Matrix4::Transform(const Matrix4 * m, const Vector3 * v, int length)
 {
-	Vector4 *result = malloc_s(Vect4, length);
+	vect4 *result = malloc_s(vect4, length);
 
 	for (size_t i = 0; i < length; i++)
 	{

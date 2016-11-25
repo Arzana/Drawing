@@ -22,7 +22,7 @@ bool *isRunning;
 LRESULT CALLBACK WndProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam);
 #endif
 
-class GameWindow
+typedef struct GameWindow
 {
 public:
 	void(*OnInitialize)(void);
@@ -39,11 +39,11 @@ public:
 	~GameWindow();
 
 	void Plot(const Vertex *vrtx);
-	void Plot(const Vect3 *v, const Color c);
+	void Plot(const vect3 *v, const Color c);
 	void Plot(const float x, const float y, const float z, const Color c);
 
 	void TryPlot(const Vertex *vrtx);
-	void TryPlot(const Vect3 *v, const Color c);
+	void TryPlot(const vect3 *v, const Color c);
 	void TryPlot(const float  x, const float y, const float z, const Color c);
 
 	void Clear(const Color c);
@@ -76,8 +76,6 @@ private:
 	const uint buffLen = 100;
 	std::queue<float> *frameBuffer;
 
-	void InitWindow(void);
-	void TerminateWindow(void);
 	template <typename T>
 	inline bool PointVisible(T x, T y) const;
 	void Tick(void);
@@ -85,4 +83,4 @@ private:
 	void DoDraw(void);
 	void HandleEvents(void);
 	void ResetZBuffer(void);
-};
+} wndGame;

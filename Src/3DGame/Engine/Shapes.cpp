@@ -6,7 +6,7 @@
 #define vx(vrtx)		vect(vrtx).X
 #define vy(vrtx)		vect(vrtx).Y
 #define vz(vrtx)		vect(vrtx).Z
-#define SORT_ARGS		(const Vertex *v0, const Vertex *v1)
+#define SORT_ARGS		(const vrtx *v0, const vrtx *v1)
 #define SPEC_VEC(mask)	(bool(mask & HORIZONTAL) + bool(mask & VERTICAL) + bool(mask & DEPTH) > 1)
 
 #include <vector>
@@ -20,51 +20,51 @@ Vertex::Vertex(void)
 	: v(), c()
 { }
 
-Vertex::Vertex(Vect3 v, Color c)
+Vertex::Vertex(vect3 v, Color c)
 	: v(v), c(c)
 { }
 
 Vertex::Vertex(float x, float y, float z)
-	: v(Vect3(x, y, z)), c(CLR_WHITE)
+	: v(vect3(x, y, z)), c(CLR_WHITE)
 { }
 
 Vertex::Vertex(float x, float y, float z, Color c)
-	: v(Vect3(x, y, z)), c(c)
+	: v(vect3(x, y, z)), c(c)
 { }
 
-Line::Line(Vertex v0, Vertex v1)
+Line::Line(vrtx v0, vrtx v1)
 	: v0(v0), v1(v1)
 { }
 
-Line::Line(const Vertex * v0, const Vertex * v1)
+Line::Line(const vrtx * v0, const vrtx * v1)
 	: v0(*v0), v1(*v1)
 { }
 
-Triangle::Triangle(Vertex v0, Vertex v1, Vertex v2)
+Triangle::Triangle(vrtx v0, vrtx v1, vrtx v2)
 	: v0(v0), v1(v1), v2(v2)
 { }
 
-Triangle::Triangle(const Vertex * v0, const Vertex * v1, const Vertex * v2)
+Triangle::Triangle(const vrtx * v0, const vrtx * v1, const vrtx * v2)
 	: v0(*v0), v1(*v1), v2(*v2)
 { }
 
-Line Triangle::GetLine(int l) const
+line Triangle::GetLine(int l) const
 {
 	l = clamp(0, 2, l);
-	if (l == 0) return Line(v0, v1);
-	if (l == 1) return Line(v1, v2);
-	return Line(v2, v0);
+	if (l == 0) return line(v0, v1);
+	if (l == 1) return line(v1, v2);
+	return line(v2, v0);
 }
 
-bool Triangle::IsInside(Vertex *v)
+bool Triangle::IsInside(vrtx *v)
 {
-	Vect2 *vs1 = &V3ToV2(&(v1.v - v0.v));
-	Vect2 *vs2 = &V3ToV2(&(v2.v - v0.v));
-	Vect2 *vs3 = &V3ToV2(&(v->v - v0.v));
+	vect2 *vs1 = &V3ToV2(&(v1.v - v0.v));
+	vect2 *vs2 = &V3ToV2(&(v2.v - v0.v));
+	vect2 *vs3 = &V3ToV2(&(v->v - v0.v));
 
-	float r = Vect2::PrepDot(vs1, vs2);
-	float s = Vect2::PrepDot(vs3, vs2) / r;
-	float t = Vect2::PrepDot(vs1, vs3) / r;
+	float r = vect2::PrepDot(vs1, vs2);
+	float s = vect2::PrepDot(vs3, vs2) / r;
+	float t = vect2::PrepDot(vs1, vs3) / r;
 
 	if (s >= 0 && t >= 0 && s + t <= 1)
 	{
@@ -86,10 +86,6 @@ Rectangle::Rectangle(int x, int y, int w, int h)
 	: x(x), y(y), w(w), h(h)
 { }
 
-Polygon::Polygon(void)
-	: v(NULL), polyVLen(0)
-{ }
-
 ViewPort::ViewPort(Rectangle screen, float far, float near)
 	: screen(screen), far(far), near(near)
 { }
@@ -98,7 +94,7 @@ ViewPort::ViewPort(int x, int y, int w, int h, float f, float n)
 	: screen(x, y, w, h), far(f), near(n)
 { }
 
-int ComputeMask(const Vect3 v, const ViewPort vp)
+int ComputeMask(const vect3 v, const ViewPort vp)
 {
 	int code = INSIDE;
 
@@ -112,7 +108,7 @@ int ComputeMask(const Vect3 v, const ViewPort vp)
 	return code;
 }
 
-bool LineClip(Line * p, const ViewPort vp)
+bool LineClip(line * p, const ViewPort vp)
 {
 	int m0 = ComputeMask(vect(v0), vp);
 	int m1 = ComputeMask(vect(v1), vp);
@@ -152,13 +148,13 @@ bool LineClip(Line * p, const ViewPort vp)
 
 		if (mc == m0)
 		{
-			vect(v0) = Vect3(x, y, z);
+			vect(v0) = vect3(x, y, z);
 			clr(v0) = Color::Lerp(clr(v0), clr(v1), a);
 			m0 = ComputeMask(vect(v0), vp);
 		}
 		else
 		{
-			vect(v1) = Vect3(x, y, z);
+			vect(v1) = vect3(x, y, z);
 			clr(v1) = Color::Lerp(clr(v0), clr(v1), a);
 			m1 = ComputeMask(vect(v1), vp);
 		}
@@ -167,16 +163,16 @@ bool LineClip(Line * p, const ViewPort vp)
 	return true;
 }
 
-Vertex* TriangleClip(Triangle * p, int * len, const ViewPort vp)
+vrtx* TriangleClip(trgl * p, int * len, const ViewPort vp)
 {
-	std::vector<Vertex> temp;
+	std::vector<vrtx> temp;
 	SortVerticesBySpecial(&p->v0, &p->v1, &p->v2, vp);
 
-	Vertex v;
-	if (p->IsInside(&(v = Vertex(vp.screen.x, vp.screen.y, vp.near)))) temp.push_back(v);
-	if (p->IsInside(&(v = Vertex(vp.screen.w, vp.screen.y, vp.near)))) temp.push_back(v);
-	if (p->IsInside(&(v = Vertex(vp.screen.x, vp.screen.h, vp.near)))) temp.push_back(v);
-	if (p->IsInside(&(v = Vertex(vp.screen.w, vp.screen.h, vp.near))))
+	vrtx v;
+	if (p->IsInside(&(v = vrtx(vp.screen.x, vp.screen.y, vp.near)))) temp.push_back(v);
+	if (p->IsInside(&(v = vrtx(vp.screen.w, vp.screen.y, vp.near)))) temp.push_back(v);
+	if (p->IsInside(&(v = vrtx(vp.screen.x, vp.screen.h, vp.near)))) temp.push_back(v);
+	if (p->IsInside(&(v = vrtx(vp.screen.w, vp.screen.h, vp.near))))
 	{
 		temp.push_back(v);
 		if (temp.size() > 3) Swap(&temp[2], &temp[3]);
@@ -194,7 +190,7 @@ Vertex* TriangleClip(Triangle * p, int * len, const ViewPort vp)
 
 	if ((*len = temp.size()) == 0) return NULL;
 
-	Vertex *poly = malloc_s(Vertex, *len);
+	vrtx *poly = malloc_s(vrtx, *len);
 	for (size_t i = 0; i < *len; i++)
 	{
 		poly[i] = temp.at(i);
@@ -210,17 +206,17 @@ void Swap(T *v0, T *v1)
 	*v1 = temp;
 }
 
-void SortVerticesByY(Vertex * v0, Vertex * v1, Vertex * v2)
+void SortVerticesByY(vrtx * v0, vrtx * v1, vrtx * v2)
 {
 	if (v0->v.Y > v1->v.Y) Swap(v0, v1);
 	if (v0->v.Y > v2->v.Y) Swap(v0, v2);
 	if (v1->v.Y > v2->v.Y) Swap(v1, v2);
 }
 
-void SortVerticesBySpecial(Vertex * v0, Vertex * v1, Vertex * v2, const ViewPort vp)
+void SortVerticesBySpecial(vrtx * v0, vrtx * v1, vrtx * v2, const ViewPort vp)
 {
-	std::vector<Vertex> mult;
-	std::vector<Vertex> norm;
+	std::vector<vrtx> mult;
+	std::vector<vrtx> norm;
 
 	int mask = ComputeMask(v0->v, vp);
 	if (SPEC_VEC(mask)) mult.push_back(*v0);

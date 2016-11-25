@@ -45,11 +45,11 @@ Color::Color(const float r, const float g, const float b, const float a)
 	: Color(ipart(r * 255), ipart(g * 255), ipart(b * 255), ipart(a * 255))
 { }
 
-Color::Color(const Vect3 * v)
+Color::Color(const vect3 * v)
 	: Color(v->X, v->Y, v->Z)
 { }
 
-Color::Color(const Vect4 * v)
+Color::Color(const vect4 * v)
 	: Color(v->X, v->Y, v->Z, v->W)
 { }
 
@@ -149,12 +149,12 @@ Color Color::Subtract(const Color * c1, const Color * c2)
 	return Color(c1->GetR() - c2->GetR(), c1->GetG() - c2->GetG(), c1->GetB() - c2->GetB());
 }
 
-Vect3 Color::ToVect3(void) const
+vect3 Color::ToVect3(void) const
 {
-	return Vect3(GetA() / 255.0f, GetG() / 255.0f, GetB() / 255.0f);
+	return vect3(GetA() / 255.0f, GetG() / 255.0f, GetB() / 255.0f);
 }
 
-Vect4 Color::ToVect4(void) const
+vect4 Color::ToVect4(void) const
 {
-	return Vect4(GetR() / 255.0f, GetG() / 255.0f, GetB() / 255.0f, GetA() / 255.0f);
+	return vect4(GetR() / 255.0f, GetG() / 255.0f, GetB() / 255.0f, GetA() / 255.0f);
 }

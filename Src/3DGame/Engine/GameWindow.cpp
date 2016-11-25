@@ -11,7 +11,7 @@
 void(**KD)(int vk);
 void(**MM)(int x, int y, int dX, int dY);
 
-Vect3 oldMousePos;
+vect3 oldMousePos;
 
 GameWindow::GameWindow(const char * title, const uint width, const uint height)
 	: inactiveSleepTime(0), accumelatedElapsedTime(0), previousTicks(0), timer(0), totalGameTime(0), elapsedGameTime(0), updateFrameLag(0)
@@ -50,7 +50,7 @@ void GameWindow::Plot(const Vertex *vrtx)
 	pix[ipart(vrtx->v.Y) * window->width + ipart(vrtx->v.X)] = vrtx->c;
 }
 
-void GameWindow::Plot(const Vect3 * v, const Color c)
+void GameWindow::Plot(const vect3 * v, const Color c)
 {
 	pix[ipart(v->Y) * window->width + ipart(v->X)] = c;
 }
@@ -69,7 +69,7 @@ void GameWindow::TryPlot(const Vertex * vtx)
 	pix[i] = vtx->c;
 }
 
-void GameWindow::TryPlot(const Vect3 * v, const Color c)
+void GameWindow::TryPlot(const vect3 * v, const Color c)
 {
 	uint i = ipart(v->Y) * window->width + ipart(v->X);
 	if (v->Z > zBuffer[i]) return;
@@ -263,7 +263,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
 			int dY = oldMousePos.Y - y;
 
 			if (oldMousePos.Z) (*MM)(x, y, dX, dY);
-			oldMousePos = Vect3(x, y, 1);
+			oldMousePos = vect3(x, y, 1);
 		}
 		break;
 	case WM_PAINT:
