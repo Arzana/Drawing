@@ -4,10 +4,14 @@ GameWindow *window;
 Camera *player;
 const float scalar = 0.1f;
 
-const size_t ppAxis = 43;
+const size_t ppAxis = 47;
 const size_t pSize = cube(ppAxis);
+const size_t ppthd = pSize / thread::hardware_concurrency();
 size_t updCount = 0;
 vect3 *vertices, *vel;
+
+struct indices { size_t start, end; };
+ParallelMath<indices> *updater = new ParallelMath<indices>();
 
 int main(int argc, char *argv[])
 {
@@ -98,20 +102,28 @@ void Init(void)
 		}
 	}
 
-	printf("Particle creation complete.\nCreateed %d vertexes.\n...\n", pSize);
+	printf("Particle creation complete.\nCreated %d vertexes.\n", pSize);
+	updater->Start(updPart_func);
 }
 
 void Term(void)
 {
 	free_s(vel);
+	delete updater;
 	GF_SetFlagVBuff(false);
 }
 
 void Update(void)
 {
-	for (size_t i = 0; i < pSize; i++)
+	if (!ppthd) updater->Add({ 0, *updater->num });
+	else
 	{
-		vertices[i] += vel[i];
+		for (size_t s = 0, e = ppthd; e < pSize;)
+		{
+			updater->Add({ s, e });
+			s += ppthd;
+			e += e + ppthd < pSize ? ppthd : pSize - e;
+		}
 	}
 
 	if (updCount > 500)
@@ -124,6 +136,32 @@ void Update(void)
 		}
 	}
 	else ++updCount;
+
+	updater->Wait();
+}
+
+void updPart_func(const size_t thrdId, const bool *running)
+{
+	printf("starting updPart_func(%d)\n", thrdId);
+
+	while (*running)
+	{
+		indices part;
+		if (updater->Get(&part))
+		{
+			updater->SetWorking();
+
+			for (size_t i = part.start; i < part.end; i++)
+			{
+				vertices[i] += vel[i];
+			}
+
+			updater->SetDone();
+		}
+		else updater->SetSleep();
+	}
+
+	printf("stopping updPart_func(%d)\n", thrdId);
 }
 
 void Render(void)

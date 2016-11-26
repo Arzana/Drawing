@@ -22,10 +22,10 @@
     <ClInclude Include="Color.h" />
     <ClInclude Include="GameWindow.h" />
     <ClInclude Include="GF.h" />
-    <ClInclude Include="GF_Threads.h" />
     <ClInclude Include="MathEx.h" />
     <ClInclude Include="Mtrx3.h" />
     <ClInclude Include="Mtrx4.h" />
+    <ClInclude Include="ParallelMath.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Shapes.h" />
     <ClInclude Include="Utils.h" />
@@ -38,7 +38,6 @@
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="GameWindow.cpp" />
     <ClCompile Include="GF.cpp" />
-    <ClCompile Include="GF_Threads.cpp" />
     <ClCompile Include="MathEx.cpp" />
     <ClCompile Include="Mtrx3.cpp" />
     <ClCompile Include="Mtrx4.cpp" />

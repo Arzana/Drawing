@@ -15,9 +15,8 @@
 #include <cfloat>
 #include "Utils.h"
 #include "GF.h"
-#include "GF_Threads.h"
+#include "ParallelMath.h"
 
-bool running;
 GameWindow *w = NULL;
 Flags flags;
 ViewPort port = ViewPort(0, 0, 0, 0, 0, FLT_MAX);
@@ -33,6 +32,34 @@ mtrx4 model = MTRX4_IDENTITY;
 mtrx4 view = MTRX4_IDENTITY;
 mtrx4 pers = MTRX4_IDENTITY;
 
+typedef tuple<int, int> arg_pl;
+typedef hline arg_t;
+typedef void(*func_hndl_pl)(arg_pl);
+typedef void(*func_hndl_t)(arg_t);
+ParallelMath<arg_pl> rndr_p;
+ParallelMath<arg_pl> rndr_l;
+ParallelMath<arg_t> rndr_t;
+
+template <class _Fn, class _Arg>
+void templ_rndr_func(const size_t thrdId, const bool *running, _Fn&& func, ParallelMath<_Arg> *sender)
+{
+	printf("starting templ_rndr_func<%d>(%d)\n", func, thrdId);
+
+	while (*running)
+	{
+		_Arg arg;
+		if (sender->Get(&arg))
+		{
+			sender->SetWorking();
+			func(arg);
+			sender->SetDone();
+		}
+		else sender->SetSleep();
+	}
+
+	printf("stopping templ_rndr_func<%d>(%d)\n", func, thrdId);
+}
+
 void GF_Init(const int optmz)
 {
 	if (flags.init)
@@ -41,22 +68,18 @@ void GF_Init(const int optmz)
 		return;
 	}
 
-	thrdsRun = &running;
-	running = true;
-
 	switch (optmz)
 	{
 	case OPTMZ_POINTS:
-		SetPointThreads(0, n_threads);
+		rndr_p.Start(templ_rndr_func<func_hndl_pl, arg_pl>, mult_point, &rndr_p);
 		break;
 	case OPTMZ_LINES:
-		SetLineThreads(0, n_threads);
+		rndr_l.Start(templ_rndr_func<func_hndl_pl, arg_pl>, single_line, &rndr_l);
 		break;
 	case OPTMZ_TRGLS:
-		SetHLineThreads(0, n_threads);
+		rndr_t.Start(templ_rndr_func<func_hndl_t, arg_t>, GF_HLine, &rndr_t);
 		break;
 	default:
-		running = false;
 		printf("Unknown optimize type!");
 		return;
 	}
@@ -73,8 +96,10 @@ void GF_End(void)
 	}
 
 	flags.init = false;
-	running = false;
-	JoinThreads();
+
+	rndr_p.Join();
+	rndr_l.Join();
+	rndr_t.Join();
 }
 
 void GF_SetWindow(GameWindow * window)
@@ -143,7 +168,9 @@ int GF_EndRender(void)
 		break;
 	}
 
-	WaitThreads();
+	rndr_p.Wait();
+	rndr_l.Wait();
+	rndr_t.Wait();
 
 	flags.strt = 0;
 	model = MTRX4_IDENTITY;
@@ -265,13 +292,13 @@ clr * GF_GetColorBuffer(void)
 
 void GF_Points(void)
 {
-	int ppthd = bufferLength / n_threads;
-	if (!ppthd) AddPoint(0, bufferLength);
+	int ppthd = bufferLength / *rndr_p.num;
+	if (!ppthd) rndr_p.Add(make_tuple(0, bufferLength));
 	else
 	{
 		for (size_t s = 0, e = ppthd; e < bufferLength;)
 		{
-			AddPoint(s, e);
+			rndr_p.Add(make_tuple(s, e));
 			s += ppthd;
 			e += e + ppthd < bufferLength ? ppthd : bufferLength - e;
 		}
@@ -282,7 +309,7 @@ void GF_Lines(void)
 {
 	for (size_t i = 0, j = 1; i < bufferLength; i += 2, j += 2)
 	{
-		AddLine(i, j);
+		rndr_l.Add(make_tuple(i, j));
 	}
 }
 
@@ -290,7 +317,7 @@ void GF_LineStrip(void)
 {
 	for (size_t i = 0, j = 1; i < bufferLength - 1; i++, j++)
 	{
-		AddLine(i, j);
+		rndr_l.Add(make_tuple(i, j));
 	}
 }
 
@@ -298,17 +325,17 @@ void GF_LineLoop(void)
 {
 	for (size_t i = 0, j = 1; i < bufferLength - 1; i++, j++)
 	{
-		AddLine(i, j);
+		rndr_l.Add(make_tuple(i, j));
 	}
 
-	AddLine(bufferLength - 1, 0);
+	rndr_l.Add(make_tuple(bufferLength - 1, 0));
 }
 
 void GF_LineFan(void)
 {
 	for (size_t i = 1; i < bufferLength; i++)
 	{
-		AddLine(0, i);
+		rndr_l.Add(make_tuple(0, i));
 	}
 }
 
@@ -348,23 +375,24 @@ void GF_ToScreen(vect3 * v)
 	v->Z = cPort.Z * v->Z + cPort.W;
 }
 
-void mult_point(int i, const int j)
+void mult_point(arg_pl t)
 {
 	get_zvc_plt;
 
-	for (; i < j; i++)
+	for (int i = get<0>(t), j = get<1>(t); i < j; i++)
 	{
 		if (hbuffer[i].Clip()) continue;
 		plot(vrtxat(i));
 	}
 }
 
-void single_line(const int i, const int j)
+void single_line(arg_pl t)
 {
-	int clp = (hbuffer + i)->Clip() + (hbuffer + j)->Clip();
-	if (clp)
+	int i = get<0>(t), j = get<1>(t);
+
+	if ((hbuffer + i)->Clip() + (hbuffer + j)->Clip())
 	{
-		if (!flags.clip || clp > 1) return;
+		if (!flags.clip) return;
 		Line *l = &Line(vrtxat(i), vrtxat(j));
 		if (LineClip(l, port)) GF_Line(l);
 	}
@@ -446,116 +474,29 @@ void GF_Line(const Line * line)
 	GF_Line(line->v0.v.X, line->v0.v.Y, line->v0.v.Z, line->v0.c, line->v1.v.X, line->v1.v.Y, line->v1.v.Z, line->v1.c);
 }
 
-void GF_HLine(const float x0, const float z0, const Color c0, const float x1, const float z1, const Color c1, const float y)
+void GF_HLine(hline l)
 {
 	get_zxy_plt;
 
-	if (x0 == x1)
+	if (l.x0 == l.x1)
 	{
-		if (z0 > z1) plot(x0, y, z0, c0);
-		else plot(x1, y, z1, c1);
+		if (l.z0 > l.z1) plot(l.x0, l.y, l.z0, l.c0);
+		else plot(l.x1, l.y, l.z1, l.c1);
 	}
-	else if (x0 < x1)
+	else if (l.x0 < l.x1)
 	{
-		for (float x = x0; x <= x1; ++x)
+		for (float x = l.x0; x <= l.x1; ++x)
 		{
-			float a = invLerp(x0, x1, x);
-			plot(x, y, lerp(z0, z1, a), Color::Lerp(c0, c1, a));
+			float a = invLerp(l.x0, l.x1, x);
+			plot(x, l.y, lerp(l.z0, l.z1, a), Color::Lerp(l.c0, l.c1, a));
 		}
 	}
 	else
 	{
-		for (float x = x1; x <= x0; ++x)
+		for (float x = l.x1; x <= l.x0; ++x)
 		{
-			float a = invLerp(x1, x0, x);
-			plot(x, y, lerp(z1, z0, a), Color::Lerp(c1, c0, a));
-		}
-	}
-}
-
-void GF_HLine(const float x0, const float z0, const float x1, const float z1, const float y, const Color c)
-{
-	get_zxy_plt;
-
-	if (x0 == x1)
-	{
-		if (z0 > z1) plot(x0, y, z0, c);
-		else plot(x1, y, z1, c);
-	}
-	else
-	{
-		if (x0 < x1)
-		{
-			float dz = (z1 - z0) / (x1 - x0);
-			for (float x = x0, z = z0; x <= x1; ++x, z += dz)
-			{
-				plot(x, y, z, c);
-			}
-		}
-		else
-		{
-			float dz = (z0 - z1) / (x0 - x1);
-			for (float x = x1, z = z1; x <= x0; ++x, z += dz)
-			{
-				plot(x, y, z, c);
-			}
-		}
-	}
-}
-
-void GF_VLine(const float y0, const float z0, const Color c0, const float y1, const float z1, const Color c1, const float x)
-{
-	get_zxy_plt;
-
-	if (y0 == y1)
-	{
-		if (z0 > z1) plot(x, y0, z0, c0);
-		else plot(x, y1, z1, c1);
-	}
-	else if (y0 < y1)
-	{
-		for (float y = y0; x <= y1; ++y)
-		{
-			float a = invLerp(y0, y1, y);
-			plot(x, y, lerp(z0, z1, a), Color::Lerp(c0, c1, a));
-		}
-	}
-	else
-	{
-		for (float y = y1; x <= y0; ++y)
-		{
-			float a = invLerp(y1, y0, y);
-			plot(x, y, lerp(z1, z0, a), Color::Lerp(c1, c0, a));
-		}
-	}
-}
-
-void GF_VLine(const float y0, const float z0, const float y1, const float z1, const float x, const Color c)
-{
-	get_zxy_plt;
-
-	if (y0 == y1)
-	{
-		if (z0 > z1) plot(x, y0, z0, c);
-		else plot(x, y1, z1, c);
-	}
-	else
-	{
-		if (y0 < y1)
-		{
-			float dz = (z1 - z0) / (y1 - y0);
-			for (float y = y0, z = z0; y <= y1; ++y, z += dz)
-			{
-				plot(x, y, z, c);
-			}
-		}
-		else
-		{
-			float dz = (z0 - z1) / (y0 - y1);
-			for (float y = y1, z = z1; y <= y0; ++y, z += dz)
-			{
-				plot(x, y, z, c);
-			}
+			float a = invLerp(l.x1, l.x0, x);
+			plot(x, l.y, lerp(l.z1, l.z0, a), Color::Lerp(l.c1, l.c0, a));
 		}
 	}
 }
@@ -576,7 +517,7 @@ void GF_BFTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 		float z0 = lerp(v0->v.Z, v1->v.Z, a);
 		float z1 = lerp(v0->v.Z, v2->v.Z, a);
 
-		AddHLine(hline(x0, z0, c0, x1, z1, c1, y));
+		rndr_t.Add({ x0, x1, (float)y, z0, z1, c0, c1 });
 
 		x0 += invSlp0;
 		x1 += invSlp1;
@@ -599,7 +540,7 @@ void GF_TFTrgl(const Vertex * v0, const Vertex * v1, const Vertex * v2)
 		float z0 = lerp(v2->v.Z, v0->v.Z, a);
 		float z1 = lerp(v2->v.Z, v1->v.Z, a);
 
-		AddHLine(hline(x0, z0, c0, x1, z1, c1, y));
+		rndr_t.Add({ x0, x1, (float)y, z0, z1, c0, c1 });
 
 		x0 -= invSlp0;
 		x1 -= invSlp1;

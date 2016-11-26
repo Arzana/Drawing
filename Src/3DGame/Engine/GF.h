@@ -64,15 +64,18 @@ typedef struct flags
 	{ }
 } Flags;
 
+typedef struct HorizontalLine
+{
+	float x0, x1, y, z0, z1;
+	clr c0, c1;
+} hline;
+
 void GF_SetDepth(const float front, const float back);
 void Raise(const char *msg);
 void GF_Line(const int x0, const int y0, const int z0, const Color c0, const int x1, const int y1, const int z1, const Color c1);
 void GF_Line(const Vertex *v0, const Vertex *v1);
 void GF_Line(const Line *line);
-void GF_HLine(const float x0, const float z0, const Color c0, const float x1, const float z1, const Color c1, const float y);
-void GF_HLine(const float x0, const float z0, const float x1, const float z1, const float y, const Color c);
-void GF_VLine(const float y0, const float z0, const Color c0, const float y1, const float z1, const Color c1, const float x);
-void GF_VLine(const float y0, const float z0, const float y1, const float z1, const float x, const Color c);
+void GF_HLine(hline l);
 void GF_BFTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);
 void GF_TFTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);
 void GF_FullTrgl(const Vertex *v0, const Vertex *v1, const Vertex *v2);
@@ -92,7 +95,7 @@ inline vect3 GF_ToScreen(vect4 *v)
 	GF_ToScreen(&r);
 	return r;
 }
-void mult_point(int i, const int j);
-void single_line(const int i, const int j);
+void mult_point(std::tuple<int, int>);
+void single_line(std::tuple<int, int>);
 void single_triangle(const int i, const int j, const int k);
 #endif
