@@ -1,48 +1,14 @@
 #include "Quaternion.h"
 #include "MathEx.h"
 
-Quaternion::Quaternion(void)
-	: X(0), Y(0), Z(0), W(0)
-{ }
+#define	__GPU	restrict(cpu, amp)
 
-Quaternion::Quaternion(float x, float y, float z, float w)
-	: X(x), Y(y), Z(z), W(w)
-{ }
-
-Quaternion::Quaternion(vect3 v, float w)
-	: X(v.X), Y(v.Y), Z(v.Z), W(w)
-{ }
-
-Quaternion::Quaternion(vect4 v)
-	: X(v.X), Y(v.Y), Z(v.Z), W(v.W)
-{ }
-
-Quaternion Quaternion::operator+(const Quaternion & r) const
-{
-	return Add(this, &r);
-}
-
-Quaternion Quaternion::operator-(const Quaternion & r) const
-{
-	return Subtract(this, &r);
-}
-
-bool Quaternion::operator==(const Quaternion & r) const
-{
-	return Equals(this, &r);
-}
-
-bool Quaternion::operator!=(const Quaternion & r) const
-{
-	return !Equals(this, &r);
-}
-
-Quaternion Quaternion::Add(const Quaternion * q1, const Quaternion * q2)
+Quaternion Quaternion::Add(const Quaternion * q1, const Quaternion * q2) __GPU
 {
 	return Quaternion(q1->X + q2->X, q1->Y + q2->Y, q1->Z + q2->Z, q1->W + q2->W);
 }
 
-Quaternion Quaternion::Concat(const Quaternion * q1, const Quaternion * q2)
+Quaternion Quaternion::Concat(const Quaternion * q1, const Quaternion * q2) __GPU
 {
 	return Quaternion(
 		((q2->X * q1->W) + (q1->X * q2->W)) + ((q2->Y * q1->Z) - (q2->Z * q1->Y)),
@@ -78,7 +44,7 @@ Quaternion Quaternion::CreateYawPitchRoll(float yaw, float pitch, float roll)
 		(cosY * cosP * cosR) + (sinY * sinP * sinR));
 }
 
-bool Quaternion::Equals(const Quaternion * q1, const Quaternion * q2)
+bool Quaternion::Equals(const Quaternion * q1, const Quaternion * q2) __GPU
 {
 	return q1->X == q2->X
 		&& q1->Y == q2->Y
@@ -91,7 +57,7 @@ float Quaternion::Length(void) const
 	return sqrtf(LengthSquared());
 }
 
-float Quaternion::LengthSquared(void) const
+float Quaternion::LengthSquared(void) const __GPU
 {
 	return square(X) + square(Y) + square(Z) + square(W);
 }
@@ -156,7 +122,7 @@ Quaternion Quaternion::SLerp(const Quaternion * min, const Quaternion * max, flo
 		(a3 * min->W) + (a2 * max->W));
 }
 
-Quaternion Quaternion::Subtract(const Quaternion * q1, const Quaternion * q2)
+Quaternion Quaternion::Subtract(const Quaternion * q1, const Quaternion * q2) __GPU
 {
 	return Quaternion(q1->X - q2->X, q1->Y - q2->Y, q1->Z - q2->Z, q1->W - q2->W);
 }

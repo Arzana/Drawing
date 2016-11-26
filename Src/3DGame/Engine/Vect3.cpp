@@ -1,129 +1,26 @@
 #include "Vect3.h"
 #include "MathEx.h"
 
-Vector3::Vector3(void)
-	: X(0), Y(0), Z(0)
-{ }
+#define __GPU	restrict(cpu, amp)
 
-Vector3::Vector3(float v)
-	: X(v), Y(v), Z(v)
-{ }
-
-Vector3::Vector3(float x, float y, float z)
-	: X(x), Y(y), Z(z)
-{ }
-
-Vector3 Vector3::operator-(void) const
-{
-	return Negate(this);
-}
-
-Vector3 Vector3::operator-(const Vector3 & r) const
-{
-	return Subtract(this, &r);
-}
-
-Vector3 Vector3::operator+(const Vector3 & r) const
-{
-	return Add(this, &r);
-}
-
-Vector3 Vector3::operator/(float r) const
-{
-	return Divide(this, r);
-}
-
-Vector3 Vector3::operator/(const Vector3 & r) const
-{
-	return Divide(this, &r);
-}
-
-Vector3 Vector3::operator*(float r) const
-{
-	return Multiply(this, r);
-}
-
-Vector3 Vector3::operator*(const Vector3 & r) const
-{
-	return Multiply(this, &r);
-}
-
-Vector3 Vector3::operator-=(const Vector3 & r)
-{
-	X -= r.X;
-	Y -= r.Y;
-	Z -= r.Z;
-	return *this;
-}
-
-Vector3 Vector3::operator+=(const Vector3 & r)
-{
-	X += r.X;
-	Y += r.Y;
-	Z += r.Z;
-	return *this;
-}
-
-Vector3 Vector3::operator/=(float r)
-{
-	X /= r;
-	Y /= r;
-	Z /= r;
-	return *this;
-}
-
-Vector3 Vector3::operator/=(const Vector3 & r)
-{
-	X /= r.X;
-	Y /= r.Y;
-	Z /= r.Z;
-	return *this;
-}
-
-Vector3 Vector3::operator*=(float r)
-{
-	X *= r;
-	Y *= r;
-	Z *= r;
-	return *this;
-}
-
-Vector3 Vector3::operator*=(const Vector3 & r)
-{
-	X *= r.X;
-	Y *= r.Y;
-	Z *= r.Z;
-	return *this;
-}
-
-bool Vector3::operator==(const Vector3 & r) const
-{
-	return Equals(this, &r);
-}
-
-bool Vector3::operator!=(const Vector3 & r) const
-{
-	return !Equals(this, &r);
-}
-
-Vector3 Vector3::Abs(const Vector3 * v)
+Vector3 Vector3::Abs(const Vector3 * v) __GPU
 {
 	return Vector3(abs(v->X), abs(v->Y), abs(v->Z));
 }
 
-void Vector3::Abs(void)
+void Vector3::Abs(void) __GPU
 {
 	X = abs(X);
 	Y = abs(Y);
 	Z = abs(Z);
 }
 
-Vector3 Vector3::Add(const Vector3 * v1, const Vector3 * v2)
+Vector3 Vector3::Add(const Vector3 * v1, const Vector3 * v2) __GPU
 {
 	return Vector3(v1->X + v2->X, v1->Y + v2->Y, v1->Z + v2->Z);
 }
 
-float Vector3::Area(void) const
+float Vector3::Area(void) const __GPU
 {
 	return X * Z;
 }
@@ -146,7 +43,7 @@ Vector3 Vector3::CatmullRom(const Vector3 * v1, const Vector3 * v2, const Vector
 	return Vector3(x, y, z);
 }
 
-Vector3 Vector3::Clamp(const Vector3 * mi, const Vector3 * ma, const Vector3 * v)
+Vector3 Vector3::Clamp(const Vector3 * mi, const Vector3 * ma, const Vector3 * v) __GPU
 {
 	return Vector3(
 		clamp(mi->X, ma->X, v->X),
@@ -154,14 +51,14 @@ Vector3 Vector3::Clamp(const Vector3 * mi, const Vector3 * ma, const Vector3 * v
 		clamp(mi->Z, ma->Z, v->Z));
 }
 
-void Vector3::Clamp(const Vector3 * mi, const Vector3 * ma)
+void Vector3::Clamp(const Vector3 * mi, const Vector3 * ma) __GPU
 {
 	X = clamp(mi->X, ma->X, X);
 	Y = clamp(mi->Y, ma->Y, Y);
 	Z = clamp(mi->Z, ma->Z, Z);
 }
 
-Vector3 Vector3::Cross(const Vector3 * v1, const Vector3 * v2)
+Vector3 Vector3::Cross(const Vector3 * v1, const Vector3 * v2) __GPU
 {
 	float x = (v1->Y * v2->Z) - (v1->Z * v2->Y);
 	float y = (v1->Z * v2->X) - (v1->X * v2->Z);
@@ -175,7 +72,7 @@ float Vector3::Distance(const Vector3 * v1, const Vector3 * v2)
 	return sqrtf(DistanceSquared(v1, v2));
 }
 
-float Vector3::DistanceSquared(const Vector3 * v1, const Vector3 * v2)
+float Vector3::DistanceSquared(const Vector3 * v1, const Vector3 * v2) __GPU
 {
 	float diffX = abs(v2->X - v1->X);
 	float diffY = abs(v2->Y - v1->Y);
@@ -184,27 +81,27 @@ float Vector3::DistanceSquared(const Vector3 * v1, const Vector3 * v2)
 	return square(diffX) + square(diffY) + square(diffZ);
 }
 
-Vector3 Vector3::Divide(const Vector3 * v1, float v2)
+Vector3 Vector3::Divide(const Vector3 * v1, float v2) __GPU
 {
 	return Vector3(v1->X / v2, v1->Y / v2, v1->Z / v2);
 }
 
-Vector3 Vector3::Divide(const Vector3 * v1, const Vector3 * v2)
+Vector3 Vector3::Divide(const Vector3 * v1, const Vector3 * v2) __GPU
 {
 	return Vector3(v1->X / v2->X, v1->Y / v2->Y, v1->Z / v2->Z);
 }
 
-float Vector3::Dot(const Vector3 * v1, const Vector3 * v2)
+float Vector3::Dot(const Vector3 * v1, const Vector3 * v2) __GPU
 {
 	return v1->X * v2->X + v1->Y * v2->Y + v1->Z * v2->Z;
 }
 
-bool Vector3::Equals(const Vector3 * v1, const Vector3 * v2)
+bool Vector3::Equals(const Vector3 * v1, const Vector3 * v2) __GPU
 {
 	return v1->X == v2->X && v1->Y == v2->Y && v1->Z == v2->Z;
 }
 
-Vector3 Vector3::Hermite(const Vector3 * v1, const Vector3 * t1, const Vector3 * v2, const Vector3 * t2, float a)
+Vector3 Vector3::Hermite(const Vector3 * v1, const Vector3 * t1, const Vector3 * v2, const Vector3 * t2, float a) __GPU
 {
 	float num = square(a);
 	float num2 = cube(a);
@@ -225,12 +122,12 @@ float Vector3::Length(void) const
 	return sqrtf(LengthSquared());
 }
 
-float Vector3::LengthSquared(void) const
+float Vector3::LengthSquared(void) const __GPU
 {
 	return square(X) + square(Y) + square(Z);
 }
 
-Vector3 Vector3::Lerp(const Vector3 * mi, const Vector3 * ma, float a)
+Vector3 Vector3::Lerp(const Vector3 * mi, const Vector3 * ma, float a) __GPU
 {
 	float x = lerp(mi->X, ma->X, a);
 	float y = lerp(mi->Y, ma->Y, a);
@@ -239,7 +136,7 @@ Vector3 Vector3::Lerp(const Vector3 * mi, const Vector3 * ma, float a)
 	return Vector3(x, y, z);
 }
 
-Vector3 Vector3::Lerp(const Vector3 * mi, const Vector3 * ma, const Vector3 * a)
+Vector3 Vector3::Lerp(const Vector3 * mi, const Vector3 * ma, const Vector3 * a) __GPU
 {
 	float x = lerp(mi->X, ma->X, a->X);
 	float y = lerp(mi->Y, ma->Y, a->Y);
@@ -248,7 +145,7 @@ Vector3 Vector3::Lerp(const Vector3 * mi, const Vector3 * ma, const Vector3 * a)
 	return Vector3(x, y, z);
 }
 
-Vector3 Vector3::InvLerp(const Vector3 * mi, const Vector3 * ma, float v)
+Vector3 Vector3::InvLerp(const Vector3 * mi, const Vector3 * ma, float v) __GPU
 {
 	float x = invLerp(mi->X, ma->X, v);
 	float y = invLerp(mi->Y, ma->Y, v);
@@ -257,7 +154,7 @@ Vector3 Vector3::InvLerp(const Vector3 * mi, const Vector3 * ma, float v)
 	return Vector3(x, y, z);
 }
 
-Vector3 Vector3::InvLerp(const Vector3 * mi, const Vector3 * ma, const Vector3 * v)
+Vector3 Vector3::InvLerp(const Vector3 * mi, const Vector3 * ma, const Vector3 * v) __GPU
 {
 	float x = invLerp(mi->X, ma->X, v->X);
 	float y = invLerp(mi->Y, ma->Y, v->Y);
@@ -266,27 +163,27 @@ Vector3 Vector3::InvLerp(const Vector3 * mi, const Vector3 * ma, const Vector3 *
 	return Vector3(x, y, z);
 }
 
-Vector3 Vector3::Max(const Vector3 * v1, const Vector3 * v2)
+Vector3 Vector3::Max(const Vector3 * v1, const Vector3 * v2) __GPU
 {
 	return Vector3(max(v1->X, v2->X), max(v1->Y, v2->Y), max(v1->Z, v2->Z));
 }
 
-Vector3 Vector3::Min(const Vector3 * v1, const Vector3 * v2)
+Vector3 Vector3::Min(const Vector3 * v1, const Vector3 * v2) __GPU
 {
 	return Vector3(min(v1->X, v2->X), min(v1->Y, v2->Y), min(v1->Z, v2->Z));
 }
 
-Vector3 Vector3::Multiply(const Vector3 * v1, float v2)
+Vector3 Vector3::Multiply(const Vector3 * v1, float v2) __GPU
 {
 	return Vector3(v1->X * v2, v1->Y * v2, v1->Z * v2);
 }
 
-Vector3 Vector3::Multiply(const Vector3 * v1, const Vector3 * v2)
+Vector3 Vector3::Multiply(const Vector3 * v1, const Vector3 * v2) __GPU
 {
 	return Vector3(v1->X * v2->X, v1->Y * v2->Y, v1->Z * v2->Z);
 }
 
-Vector3 Vector3::Negate(const Vector3 * v)
+Vector3 Vector3::Negate(const Vector3 * v) __GPU
 {
 	return Vector3(-v->X, -v->Y, -v->Z);
 }
@@ -303,12 +200,12 @@ Vector3 Vector3::Normalize(const Vector3 * v)
 	return Divide(v, l);
 }
 
-Vector3 Vector3::Reflect(const Vector3 * v, const Vector3 * n)
+Vector3 Vector3::Reflect(const Vector3 * v, const Vector3 * n) __GPU
 {
 	return *v - vect3(2) * (*v * *n) * *n;
 }
 
-Vector3 Vector3::SmoothStep(const Vector3 * v1, const Vector3 * v2, float a)
+Vector3 Vector3::SmoothStep(const Vector3 * v1, const Vector3 * v2, float a) __GPU
 {
 	a = clamp(0.0f, 1.0f, a);
 	a = square(a) * (3.0f - (2.0f * a));
@@ -320,12 +217,12 @@ Vector3 Vector3::SmoothStep(const Vector3 * v1, const Vector3 * v2, float a)
 	return Vector3(x, y, z);
 }
 
-Vector3 Vector3::Subtract(const Vector3 * v1, const Vector3 * v2)
+Vector3 Vector3::Subtract(const Vector3 * v1, const Vector3 * v2) __GPU
 {
 	return Vector3(v1->X - v2->X, v1->Y - v2->Y, v1->Z - v2->Z);
 }
 
-float Vector3::Volume(void) const
+float Vector3::Volume(void) const __GPU
 {
 	return X * Y * Z;
 }

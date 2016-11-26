@@ -1,122 +1,25 @@
 #include "vect2.h"
 #include "MathEx.h"
 
-Vector2::Vector2(void)
-	: X(0), Y(0)
-{ }
+#define __GPU	restrict(cpu, amp)
 
-Vector2::Vector2(float v)
-	: X(v), Y(v)
-{ }
-
-Vector2::Vector2(float x, float y)
-	: X(x), Y(y)
-{ }
-
-Vector2 Vector2::operator-(void) const
-{
-	return Negate(this);
-}
-
-Vector2 Vector2::operator-(const Vector2 & r) const
-{
-	return Subtract(this, &r);
-}
-
-Vector2 Vector2::operator+(const Vector2 & r) const
-{
-	return Add(this, &r);
-}
-
-Vector2 Vector2::operator/(float r) const
-{
-	return Divide(this, r);
-}
-
-Vector2 Vector2::operator/(const Vector2 & r) const
-{
-	return Divide(this, &r);
-}
-
-Vector2 Vector2::operator*(float r) const
-{
-	return Multiply(this, r);
-}
-
-Vector2 Vector2::operator*(const Vector2 & right) const
-{
-	return Multiply(this, &right);
-}
-
-Vector2 Vector2::operator-=(const Vector2 & r)
-{
-	X -= r.X;
-	Y -= r.Y;
-	return *this;
-}
-
-Vector2 Vector2::operator+=(const Vector2 & r)
-{
-	X += r.X;
-	Y += r.Y;
-	return *this;
-}
-
-Vector2 Vector2::operator/=(float r)
-{
-	X /= r;
-	Y /= r;
-	return *this;
-}
-
-Vector2 Vector2::operator/=(const Vector2 & r)
-{
-	X /= r.X;
-	Y /= r.Y;
-	return *this;
-}
-
-Vector2 Vector2::operator*=(float r)
-{
-	X *= r;
-	Y *= r;
-	return *this;
-}
-
-Vector2 Vector2::operator*=(const Vector2 & r)
-{
-	X *= r.X;
-	Y *= r.Y;
-	return *this;
-}
-
-bool Vector2::operator==(const Vector2 & r) const
-{
-	return Equals(this, &r);
-}
-
-bool Vector2::operator!=(const Vector2 & r) const
-{
-	return !Equals(this, &r);
-}
-
-Vector2 Vector2::Abs(const Vector2 * v)
+Vector2 Vector2::Abs(const Vector2 * v) __GPU
 {
 	return vect2(abs(v->X), abs(v->Y));
 }
 
-void Vector2::Abs()
+void Vector2::Abs() __GPU
 {
 	X = abs(X);
 	Y = abs(Y);
 }
 
-float Vector2::Area(void) const
+float Vector2::Area(void) const __GPU
 {
 	return X * Y;
 }
 
-Vector2 Vector2::Add(const Vector2 * v1, const Vector2 * v2)
+Vector2 Vector2::Add(const Vector2 * v1, const Vector2 * v2) __GPU
 {
 	return vect2(v1->X + v2->X, v1->Y + v2->Y);
 }
@@ -140,12 +43,12 @@ Vector2 Vector2::CatmullRom(const Vector2 * v1, const Vector2 * v2, const Vector
 	return vect2(x, y);
 }
 
-Vector2 Vector2::Clamp(const Vector2 * mi, const Vector2 * ma, const Vector2 * v)
+Vector2 Vector2::Clamp(const Vector2 * mi, const Vector2 * ma, const Vector2 * v) __GPU
 {
 	return vect2(clamp(mi->X, ma->X, v->X), clamp(mi->Y, ma->Y, v->Y));
 }
 
-void Vector2::Clamp(const Vector2 * mi, const Vector2 * ma)
+void Vector2::Clamp(const Vector2 * mi, const Vector2 * ma) __GPU
 {
 	X = clamp(mi->X, ma->X, X);
 	Y = clamp(mi->Y, ma->Y, Y);
@@ -156,32 +59,32 @@ float Vector2::Distance(const Vector2 * v1, const Vector2 * v2)
 	return sqrtf(DistanceSquared(v1, v2));
 }
 
-float Vector2::DistanceSquared(const Vector2 * v1, const Vector2 * v2)
+float Vector2::DistanceSquared(const Vector2 * v1, const Vector2 * v2) __GPU
 {
 	return square(abs(v2->X - v1->X)) + square(abs(v2->Y - v1->Y));
 }
 
-Vector2 Vector2::Divide(const Vector2 * v1, const Vector2 * v2)
+Vector2 Vector2::Divide(const Vector2 * v1, const Vector2 * v2) __GPU
 {
 	return vect2(v1->X / v2->X, v1->Y / v2->Y);
 }
 
-Vector2 Vector2::Divide(const Vector2 * v1, float v2)
+Vector2 Vector2::Divide(const Vector2 * v1, float v2) __GPU
 {
 	return vect2(v1->X / v2, v1->Y / v2);
 }
 
-float Vector2::Dot(const Vector2 * v1, const Vector2 * v2)
+float Vector2::Dot(const Vector2 * v1, const Vector2 * v2) __GPU
 {
 	return v1->X * v2->X + v1->Y * v2->Y;
 }
 
-bool Vector2::Equals(const Vector2 * v1, const Vector2 * v2)
+bool Vector2::Equals(const Vector2 * v1, const Vector2 * v2) __GPU
 {
 	return v1->X == v2->X && v1->Y == v2->Y;
 }
 
-Vector2 Vector2::Hermite(const Vector2 * v1, const Vector2 * t1, const Vector2 * v2, const Vector2 * t2, float a)
+Vector2 Vector2::Hermite(const Vector2 * v1, const Vector2 * t1, const Vector2 * v2, const Vector2 * t2, float a) __GPU
 {
 	float num = square(a);
 	float num2 = cube(a);
@@ -201,54 +104,54 @@ float Vector2::Length(void) const
 	return sqrtf(LengthSquared());
 }
 
-float Vector2::LengthSquared(void) const
+float Vector2::LengthSquared(void) const __GPU
 {
 	return square(X) + square(Y);
 }
 
-Vector2 Vector2::Lerp(const Vector2 * mi, const Vector2 * ma, float a)
+Vector2 Vector2::Lerp(const Vector2 * mi, const Vector2 * ma, float a) __GPU
 {
 	a = clamp(0.0f, 1.0f, a);
 	return vect2(lerp(mi->X, ma->X, a), lerp(mi->Y, ma->Y, a));
 }
 
-Vector2 Vector2::Lerp(const Vector2 * mi, const Vector2 * ma, const Vector2 * a)
+Vector2 Vector2::Lerp(const Vector2 * mi, const Vector2 * ma, const Vector2 * a) __GPU
 {
 	a = &vect2::Clamp(&VECT2_ZERO, &VECT2_ONE, a);
 	return vect2(lerp(mi->X, ma->X, a->X), lerp(mi->Y, ma->Y, a->Y));
 }
 
-Vector2 Vector2::InvLerp(const Vector2 * mi, const Vector2 * ma, float v)
+Vector2 Vector2::InvLerp(const Vector2 * mi, const Vector2 * ma, float v) __GPU
 {
 	return vect2(invLerp(mi->X, ma->X, v), invLerp(mi->Y, ma->Y, v));
 }
 
-Vector2 Vector2::InvLerp(const Vector2 * mi, const Vector2 * ma, const Vector2 * v)
+Vector2 Vector2::InvLerp(const Vector2 * mi, const Vector2 * ma, const Vector2 * v) __GPU
 {
 	return vect2(invLerp(mi->X, ma->X, v->X), invLerp(mi->Y, ma->Y, v->Y));
 }
 
-Vector2 Vector2::Max(const Vector2 * v1, const Vector2 * v2)
+Vector2 Vector2::Max(const Vector2 * v1, const Vector2 * v2) __GPU
 {
 	return vect2(max(v1->X, v2->X), max(v1->Y, v2->Y));
 }
 
-Vector2 Vector2::Min(const Vector2 * v1, const Vector2 * v2)
+Vector2 Vector2::Min(const Vector2 * v1, const Vector2 * v2) __GPU
 {
 	return vect2(min(v1->X, v2->X), min(v1->Y, v2->Y));
 }
 
-Vector2 Vector2::Multiply(const Vector2 * v1, const Vector2 * v2)
+Vector2 Vector2::Multiply(const Vector2 * v1, const Vector2 * v2) __GPU
 {
 	return vect2(v1->X * v2->X, v1->Y * v2->Y);
 }
 
-Vector2 Vector2::Multiply(const Vector2 * v1, float v2)
+Vector2 Vector2::Multiply(const Vector2 * v1, float v2) __GPU
 {
 	return vect2(v1->X * v2, v1->Y * v2);
 }
 
-Vector2 Vector2::Negate(const Vector2 * v)
+Vector2 Vector2::Negate(const Vector2 * v) __GPU
 {
 	return vect2(-v->X, -v->Y);
 }
@@ -265,17 +168,17 @@ Vector2 Vector2::Normalize(const Vector2 * v)
 	return Divide(v, l);
 }
 
-float Vector2::PrepDot(const Vector2 * v1, const Vector2 * v2)
+float Vector2::PrepDot(const Vector2 * v1, const Vector2 * v2) __GPU
 {
 	return v1->X * v2->Y - v1->Y * v2->X;
 }
 
-Vector2 Vector2::Reflect(const Vector2 * v, const Vector2 * n)
+Vector2 Vector2::Reflect(const Vector2 * v, const Vector2 * n) __GPU
 {
 	return *v - vect2(2) * (*v * *n) * *n;
 }
 
-Vector2 Vector2::SmoothStep(const Vector2 * v1, const Vector2 * v2, float a)
+Vector2 Vector2::SmoothStep(const Vector2 * v1, const Vector2 * v2, float a) __GPU
 {
 	a = clamp(0.0f, 1.0f, a);
 	a = square(a) * (3.0f - (2.0f * a));
@@ -286,7 +189,7 @@ Vector2 Vector2::SmoothStep(const Vector2 * v1, const Vector2 * v2, float a)
 	return vect2(x, y);
 }
 
-Vector2 Vector2::Subtract(const Vector2 * v1, const Vector2 * v2)
+Vector2 Vector2::Subtract(const Vector2 * v1, const Vector2 * v2) __GPU
 {
 	return vect2(v1->X - v2->X, v1->Y - v2->Y);
 }

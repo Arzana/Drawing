@@ -135,7 +135,7 @@ int GF_EndRender(void)
 
 	mtrx4 modelView = model * view;
 	mtrx4 full = pers * modelView;
-	hbuffer = mtrx4::Transform(&full, vbuffer, bufferLength);
+	mtrx4::Transform(&full, vbuffer, hbuffer, bufferLength);
 
 	switch (flags.prim)
 	{
@@ -173,15 +173,15 @@ int GF_EndRender(void)
 	rndr_t.Wait();
 
 	flags.strt = 0;
-	model = MTRX4_IDENTITY;
-	free(hbuffer);
 
 	if (!flags.vBuff)
 	{
+		model = MTRX4_IDENTITY;
 		bufferIndex = 0;
 		bufferLength = 0;
 		free_s(vbuffer);
 		free_s(cbuffer);
+		free_s(hbuffer);
 	}
 
 	return 0;
@@ -200,6 +200,7 @@ void GF_SetBufferLength(size_t length)
 	bufferLength = length;
 	vbuffer = malloc_s(vect3, length);
 	cbuffer = malloc_s(Color, length);
+	hbuffer = malloc_s(vect4, length);
 }
 
 void GF_SetModelMatrix(const Matrix4 * m)

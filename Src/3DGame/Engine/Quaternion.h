@@ -3,30 +3,33 @@
 #include "Vect4.h"
 
 #define QUAT_IDENTITY	quat(0, 0, 0, 1)
+#define __GPU			restrict(cpu, amp)
 
 typedef struct Quaternion
 {
 	float X, Y, Z, W;
 
-	Quaternion(void);
-	Quaternion(float x, float y, float z, float w);
-	Quaternion(vect3 vect, float w);
-	Quaternion(vect4 vect);
+	Quaternion(void) __GPU : X(0), Y(0), Z(0), W(0) { }
+	Quaternion(float x, float y, float z, float w) __GPU : X(x), Y(y), Z(z), W(w) { }
+	Quaternion(vect3 v, float w) __GPU : X(v.X), Y(v.Y), Z(v.Z), W(w) { }
+	Quaternion(vect4 v) __GPU : X(v.X), Y(v.Y), Z(v.Z), W(v.W) { }
 
-	Quaternion operator +(const Quaternion &r) const;
-	Quaternion operator -(const Quaternion &r) const;
+	inline Quaternion operator +(const Quaternion &r) const __GPU { return Quaternion(X + r.X, Y + r.Y, Z + r.Z, W + r.W); }
+	inline Quaternion operator -(const Quaternion &r) const __GPU { return Quaternion(X - r.X, Y - r.Y, Z - r.Z, W - r.W); }
 
-	bool operator ==(const Quaternion &r) const;
-	bool operator !=(const Quaternion &r) const;
+	inline bool operator ==(const Quaternion &r) const __GPU { return r.X == X && r.Y == Y && r.Z == Z && r.W == W; }
+	inline bool operator !=(const Quaternion &r) const __GPU { return r.X != X || r.Y != Y || r.Z != Z || r.W != W; }
 
-	static Quaternion Add(const Quaternion *q1, const Quaternion *q2);
-	static Quaternion Concat(const Quaternion *q1, const Quaternion *q2);
+	static Quaternion Add(const Quaternion *q1, const Quaternion *q2) __GPU;
+	static Quaternion Concat(const Quaternion *q1, const Quaternion *q2) __GPU;
 	static Quaternion CreateRotation(const vect3 *axis, float rads);
 	static Quaternion CreateYawPitchRoll(float yaw, float pitch, float roll);
-	static bool Equals(const Quaternion *q1, const Quaternion *q2);
+	static bool Equals(const Quaternion *q1, const Quaternion *q2) __GPU;
 	float Length(void) const;
-	float LengthSquared(void) const;
+	float LengthSquared(void) const __GPU;
 	static Quaternion Lerp(const Quaternion *min, const Quaternion *max, float a);
 	static Quaternion SLerp(const Quaternion *min, const Quaternion *max, float a);
-	static Quaternion Subtract(const Quaternion *q1, const Quaternion *q2);
+	static Quaternion Subtract(const Quaternion *q1, const Quaternion *q2) __GPU;
 } quat;
+
+#undef __GPU

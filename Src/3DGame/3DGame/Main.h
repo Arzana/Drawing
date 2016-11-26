@@ -2,10 +2,10 @@
 
 #define _VECT_CONV
 
+#include <amp.h>
 #include <cstdio>
 #include <Utils.h>
 #include <GF.h>
-#include <ParallelMath.h>
 #include "Camera.h"
 
 //#define _USE_FULL_HD
@@ -30,5 +30,4 @@ void KeyPress(int);
 void Init(void);
 void Term(void);
 void Update(void);
-void updPart_func(const size_t thrdId, const bool *running);
 void Render(void);

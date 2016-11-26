@@ -1,123 +1,14 @@
 #include "Vect4.h"
 #include "MathEx.h"
 
-Vector4::Vector4(void)
-	: X(0), Y(0), Z(0), W(0)
-{ }
+#define __GPU	restrict(cpu, amp)
 
-Vector4::Vector4(float v)
-	: X(v), Y(v), Z(v), W(v)
-{ }
-
-Vector4::Vector4(float x, float y, float z, float w)
-	: X(x), Y(y), Z(z), W(w)
-{ }
-
-Vector4 Vector4::operator-(void) const
-{
-	return Negate(this);
-}
-
-Vector4 Vector4::operator-(const Vector4 & r) const
-{
-	return Subtract(this, &r);
-}
-
-Vector4 Vector4::operator+(const Vector4 & r) const
-{
-	return Add(this, &r);
-}
-
-Vector4 Vector4::operator/(float r) const
-{
-	return Divide(this, r);
-}
-
-Vector4 Vector4::operator/(const Vector4 & r) const
-{
-	return Divide(this, &r);
-}
-
-Vector4 Vector4::operator*(float r) const
-{
-	return Multiply(this, r);
-}
-
-Vector4 Vector4::operator*(const Vector4 & r) const
-{
-	return Multiply(this, &r);
-}
-
-Vector4 Vector4::operator-=(const Vector4 & r)
-{
-	X -= r.X;
-	Y -= r.Y;
-	Z -= r.Z;
-	W -= r.W;
-	return *this;
-}
-
-Vector4 Vector4::operator+=(const Vector4 & r)
-{
-	X += r.X;
-	Y += r.Y;
-	Z += r.Z;
-	W += r.W;
-	return *this;
-}
-
-Vector4 Vector4::operator/=(float r)
-{
-	X /= r;
-	Y /= r;
-	Z /= r;
-	W /= r;
-	return *this;
-}
-
-Vector4 Vector4::operator/=(const Vector4 & r)
-{
-	X /= r.X;
-	Y /= r.Y;
-	Z /= r.Z;
-	W /= r.W;
-	return *this;
-}
-
-Vector4 Vector4::operator*=(float r)
-{
-	X *= r;
-	Y *= r;
-	Z *= r;
-	W *= r;
-	return *this;
-}
-
-Vector4 Vector4::operator*=(const Vector4 & r)
-{
-	X *= r.X;
-	Y *= r.Y;
-	Z *= r.Z;
-	W *= r.W;
-	return *this;
-}
-
-bool Vector4::operator==(const Vector4 & r) const
-{
-	return Equals(this, &r);
-}
-
-bool Vector4::operator!=(const Vector4 & r) const
-{
-	return !Equals(this, &r);
-}
-
-Vector4 Vector4::Abs(const Vector4 * v)
+Vector4 Vector4::Abs(const Vector4 * v) __GPU
 {
 	return Vector4(abs(v->X), abs(v->Y), abs(v->Z), abs(v->W));
 }
 
-void Vector4::Abs(void)
+void Vector4::Abs(void) __GPU
 {
 	X = abs(X);
 	Y = abs(Y);
@@ -125,12 +16,12 @@ void Vector4::Abs(void)
 	W = abs(W);
 }
 
-Vector4 Vector4::Add(const Vector4 * v1, const Vector4 * v2)
+Vector4 Vector4::Add(const Vector4 * v1, const Vector4 * v2) __GPU
 {
 	return Vector4(v1->X + v2->X, v1->Y + v2->Y, v1->Z + v2->Z, v1->W + v2->W);
 }
 
-float Vector4::Area(void) const
+float Vector4::Area(void) const __GPU
 {
 	return X * Z;
 }
@@ -155,7 +46,7 @@ Vector4 Vector4::CatmullRom(const Vector4 * v1, const Vector4 * v2, const Vector
 	return Vector4(x, y, z, w);
 }
 
-Vector4 Vector4::Clamp(const Vector4 * mi, const Vector4 * ma, const Vector4 * v)
+Vector4 Vector4::Clamp(const Vector4 * mi, const Vector4 * ma, const Vector4 * v) __GPU
 {
 	return Vector4(
 		clamp(mi->X, ma->X, v->X),
@@ -164,7 +55,7 @@ Vector4 Vector4::Clamp(const Vector4 * mi, const Vector4 * ma, const Vector4 * v
 		clamp(mi->W, ma->W, v->W));
 }
 
-void Vector4::Clamp(const Vector4 * mi, const Vector4 * ma)
+void Vector4::Clamp(const Vector4 * mi, const Vector4 * ma) __GPU
 {
 	X = clamp(mi->X, ma->X, X);
 	Y = clamp(mi->Y, ma->Y, Y);
@@ -172,7 +63,7 @@ void Vector4::Clamp(const Vector4 * mi, const Vector4 * ma)
 	W = clamp(mi->W, ma->W, W);
 }
 
-bool Vector4::Clip(void) const
+bool Vector4::Clip(void) const __GPU
 {
 	float pW = abs(W);
 	float nW = -pW;
@@ -185,7 +76,7 @@ float Vector4::Distance(const Vector4 * v1, const Vector4 * v2)
 	return sqrtf(DistanceSquared(v1, v2));
 }
 
-float Vector4::DistanceSquared(const Vector4 * v1, const Vector4 * v2)
+float Vector4::DistanceSquared(const Vector4 * v1, const Vector4 * v2) __GPU
 {
 	float diffX = abs(v2->X - v1->X);
 	float diffY = abs(v2->Y - v1->Y);
@@ -195,27 +86,27 @@ float Vector4::DistanceSquared(const Vector4 * v1, const Vector4 * v2)
 	return square(diffX) + square(diffY) + square(diffZ) + square(diffW);
 }
 
-Vector4 Vector4::Divide(const Vector4 * v1, float v2)
+Vector4 Vector4::Divide(const Vector4 * v1, float v2) __GPU
 {
 	return Vector4(v1->X / v2, v1->Y / v2, v1->Z / v2, v1->W / v2);
 }
 
-Vector4 Vector4::Divide(const Vector4 * v1, const Vector4 * v2)
+Vector4 Vector4::Divide(const Vector4 * v1, const Vector4 * v2) __GPU
 {
 	return Vector4(v1->X / v2->X, v1->Y / v2->Y, v1->Z / v2->Z, v1->W / v2->W);
 }
 
-float Vector4::Dot(const Vector4 * v1, const Vector4 * v2)
+float Vector4::Dot(const Vector4 * v1, const Vector4 * v2) __GPU
 {
 	return v1->X * v2->X + v1->Y * v2->Y + v1->Z * v2->Z + v1->W * v2->W;
 }
 
-bool Vector4::Equals(const Vector4 * v1, const Vector4 * v2)
+bool Vector4::Equals(const Vector4 * v1, const Vector4 * v2) __GPU
 {
 	return v1->X == v2->X && v1->Y == v2->Y && v1->Z == v2->Z && v1->W == v2->W;
 }
 
-Vector4 Vector4::Hermite(const Vector4 * v1, const Vector4 * t1, const Vector4 * v2, const Vector4 * t2, float a)
+Vector4 Vector4::Hermite(const Vector4 * v1, const Vector4 * t1, const Vector4 * v2, const Vector4 * t2, float a) __GPU
 {
 	float num = square(a);
 	float num2 = cube(a);
@@ -237,12 +128,12 @@ float Vector4::Length(void) const
 	return sqrtf(LengthSquared());
 }
 
-float Vector4::LengthSquared(void) const
+float Vector4::LengthSquared(void) const __GPU
 {
 	return square(X) + square(Y) + square(Z) + square(W);
 }
 
-Vector4 Vector4::Lerp(const Vector4 * mi, const Vector4 * ma, float a)
+Vector4 Vector4::Lerp(const Vector4 * mi, const Vector4 * ma, float a) __GPU
 {
 	float x = lerp(mi->X, ma->X, a);
 	float y = lerp(mi->Y, ma->Y, a);
@@ -252,7 +143,7 @@ Vector4 Vector4::Lerp(const Vector4 * mi, const Vector4 * ma, float a)
 	return Vector4(x, y, z, w);
 }
 
-Vector4 Vector4::Lerp(const Vector4 * mi, const Vector4 * ma, const Vector4 * a)
+Vector4 Vector4::Lerp(const Vector4 * mi, const Vector4 * ma, const Vector4 * a) __GPU
 {
 	float x = lerp(mi->X, ma->X, a->X);
 	float y = lerp(mi->Y, ma->Y, a->Y);
@@ -262,7 +153,7 @@ Vector4 Vector4::Lerp(const Vector4 * mi, const Vector4 * ma, const Vector4 * a)
 	return Vector4(x, y, z, w);
 }
 
-Vector4 Vector4::InvLerp(const Vector4 * mi, const Vector4 * ma, float v)
+Vector4 Vector4::InvLerp(const Vector4 * mi, const Vector4 * ma, float v) __GPU
 {
 	float x = invLerp(mi->X, ma->X, v);
 	float y = invLerp(mi->Y, ma->Y, v);
@@ -272,7 +163,7 @@ Vector4 Vector4::InvLerp(const Vector4 * mi, const Vector4 * ma, float v)
 	return Vector4(x, y, z, w);
 }
 
-Vector4 Vector4::InvLerp(const Vector4 * mi, const Vector4 * ma, const Vector4 * v)
+Vector4 Vector4::InvLerp(const Vector4 * mi, const Vector4 * ma, const Vector4 * v) __GPU
 {
 	float x = invLerp(mi->X, ma->X, v->X);
 	float y = invLerp(mi->Y, ma->Y, v->Y);
@@ -282,27 +173,27 @@ Vector4 Vector4::InvLerp(const Vector4 * mi, const Vector4 * ma, const Vector4 *
 	return Vector4(x, y, z, w);
 }
 
-Vector4 Vector4::Max(const Vector4 * v1, const Vector4 * v2)
+Vector4 Vector4::Max(const Vector4 * v1, const Vector4 * v2) __GPU
 {
 	return Vector4(max(v1->X, v2->X), max(v1->Y, v2->Y), max(v1->Z, v2->Z), max(v1->W, v2->W));
 }
 
-Vector4 Vector4::Min(const Vector4 * v1, const Vector4 * v2)
+Vector4 Vector4::Min(const Vector4 * v1, const Vector4 * v2) __GPU
 {
 	return Vector4(min(v1->X, v2->X), min(v1->Y, v2->Y), min(v1->Z, v2->Z), min(v1->W, v2->W));
 }
 
-Vector4 Vector4::Multiply(const Vector4 * v1, float v2)
+Vector4 Vector4::Multiply(const Vector4 * v1, float v2) __GPU
 {
 	return Vector4(v1->X * v2, v1->Y * v2, v1->Z * v2, v1->W * v2);
 }
 
-Vector4 Vector4::Multiply(const Vector4 * v1, const Vector4 * v2)
+Vector4 Vector4::Multiply(const Vector4 * v1, const Vector4 * v2) __GPU
 {
 	return Vector4(v1->X * v2->X, v1->Y * v2->Y, v1->Z * v2->Z, v1->W * v2->W);
 }
 
-Vector4 Vector4::Negate(const Vector4 * v)
+Vector4 Vector4::Negate(const Vector4 * v) __GPU
 {
 	return Vector4(-v->X, -v->Y, -v->Z, -v->W);
 }
@@ -319,12 +210,12 @@ Vector4 Vector4::Normalize(const Vector4 * v)
 	return Divide(v, l);
 }
 
-Vector4 Vector4::Reflect(const Vector4 * v, const Vector4 * n)
+Vector4 Vector4::Reflect(const Vector4 * v, const Vector4 * n) __GPU
 {
 	return *v - vect4(2) * (*v * *n) * *n;
 }
 
-Vector4 Vector4::SmoothStep(const Vector4 * v1, const Vector4 * v2, float a)
+Vector4 Vector4::SmoothStep(const Vector4 * v1, const Vector4 * v2, float a) __GPU
 {
 	a = clamp(0.0f, 1.0f, a);
 	a = square(a) * (3.0f - (2.0f * a));
@@ -337,22 +228,22 @@ Vector4 Vector4::SmoothStep(const Vector4 * v1, const Vector4 * v2, float a)
 	return Vector4(x, y, z, w);
 }
 
-Vector4 Vector4::Subtract(const Vector4 * v1, const Vector4 * v2)
+Vector4 Vector4::Subtract(const Vector4 * v1, const Vector4 * v2) __GPU
 {
 	return Vector4(v1->X - v2->X, v1->Y - v2->Y, v1->Z - v2->Z, v1->W - v2->W);
 }
 
-Vector3 Vector4::ToNDC(void) const
+Vector3 Vector4::ToNDC(void) const __GPU
 {
 	return Vector3(X / W, Y / W, Z / W);
 }
 
-float Vector4::Volume(void) const
+float Vector4::Volume(void) const __GPU
 {
 	return X * Y * Z;
 }
 
-float Vector4::Volume4D(void) const
+float Vector4::Volume4D(void) const __GPU
 {
 	return X * Y * Z * W;
 }

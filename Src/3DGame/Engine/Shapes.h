@@ -3,6 +3,9 @@
 #include "Vect2.h"
 #include "Color.h"
 
+#undef far
+#undef near
+
 typedef struct Vertex
 {
 	vect3 v;

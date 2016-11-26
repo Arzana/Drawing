@@ -1,84 +1,12 @@
+#include <amp.h>
 #include "Mtrx4.h"
-#include "Mtrx4.h"
-#include "Utils.h"
 #include "MathEx.h"
 
-Matrix4::Matrix4(void)
-	: M11(0), M12(0), M13(0), M14(0)
-	, M21(0), M22(0), M23(0), M24(0)
-	, M31(0), M32(0), M33(0), M34(0)
-	, M41(0), M42(0), M43(0), M44(0)
-{ }
+#define __GPU	restrict(cpu, amp)
 
-Matrix4::Matrix4(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31, float m32, float m33, float m34, float m41, float m42, float m43, float m44)
-	: M11(m11), M12(m12), M13(m13), M14(m14)
-	, M21(m21), M22(m22), M23(m23), M24(m24)
-	, M31(m31), M32(m32), M33(m33), M34(m34)
-	, M41(m41), M42(m42), M43(m43), M44(m44)
-{ }
+using namespace concurrency;
 
-Matrix4 Matrix4::operator*(const Matrix4 & r) const
-{
-	return Multiply(this, &r);
-}
-
-Vector4 Matrix4::operator*(const Vector3 & r) const
-{
-	return Transform(this, &r);
-}
-
-Matrix4 Matrix4::operator*=(const Matrix4 & r)
-{
-	*this = Multiply(this, &r);
-	return *this;
-}
-
-bool Matrix4::operator==(const Matrix4 & r) const
-{
-	return Equals(this, &r);
-}
-
-bool Matrix4::operator!=(const Matrix4 & r) const
-{
-	return !Equals(this, &r);
-}
-
-Vector3 Matrix4::Backwards(void) const
-{
-	return Vector3::Negate(&Forwards());
-}
-
-Vector3 Matrix4::Down(void) const
-{
-	return Vector3::Negate(&Up());
-}
-
-Vector3 Matrix4::Forwards(void) const
-{
-	return Vector3(M13, M23, M33);
-}
-
-Vector3 Matrix4::Left(void) const
-{
-	return Vector3(M11, M21, M31);
-}
-
-Vector3 Matrix4::Right(void) const
-{
-	return Vector3::Negate(&Left());
-}
-
-Vector3 Matrix4::Up(void) const
-{
-	return Vector3(M12, M22, M32);
-}
-
-Vector3 Matrix4::Translation(void) const
-{
-	return Vector3(M14, M24, M34);
-}
-
-bool Matrix4::Equals(const Matrix4 * m1, const Matrix4 * m2)
+bool Matrix4::Equals(const Matrix4 * m1, const Matrix4 * m2) __GPU
 {
 	return m1->M11 == m2->M11 && m1->M12 == m2->M12 && m1->M13 == m2->M13 && m1->M14 == m2->M14
 		&& m1->M21 == m2->M21 && m1->M22 == m2->M22 && m1->M23 == m2->M23 && m1->M24 == m2->M24
@@ -115,7 +43,7 @@ Matrix4 Matrix4::CreateFrustrum(float fovY, float aspr, float n, float f)
 		0, 0, -1, 0);
 }
 
-Matrix4 Matrix4::CreateOrthographic(float width, float height, float n, float f)
+Matrix4 Matrix4::CreateOrthographic(float width, float height, float n, float f) __GPU
 {
 	float t = height / 2;
 	float r = width / 2;
@@ -201,7 +129,7 @@ Matrix4 Matrix4::CreateRotationZ(float rads)
 		0, 0, 0, 1);
 }
 
-Matrix4 Matrix4::CreateRotationQ(const Quaternion * q)
+Matrix4 Matrix4::CreateRotationQ(const Quaternion * q) __GPU
 {
 	float xx = square(q->X);
 	float yy = square(q->Y);
@@ -230,22 +158,22 @@ Matrix4 Matrix4::CreateRotationQ(const Quaternion * q)
 		0, 0, 0, 1);
 }
 
-Matrix4 Matrix4::CreateScale(float scale)
+Matrix4 Matrix4::CreateScale(float scale) __GPU
 {
 	return Matrix4(scale, 0, 0, 0, 0, scale, 0, 0, 0, 0, scale, 0, 0, 0, 0, 1);
 }
 
-Matrix4 Matrix4::CreateScale(const Vector3 * scale)
+Matrix4 Matrix4::CreateScale(const Vector3 * scale) __GPU
 {
 	return Matrix4(scale->X, 0, 0, 0, 0, scale->Y, 0, 0, 0, 0, scale->Z, 0, 0, 0, 0, 1);
 }
 
-Matrix4 Matrix4::CreateTranslation(const Vector3 * pos)
+Matrix4 Matrix4::CreateTranslation(const Vector3 * pos) __GPU
 {
 	return Matrix4(1, 0, 0, pos->X, 0, 1, 0, pos->Y, 0, 0, 1, pos->Z, 0, 0, 0, 1);
 }
 
-Matrix4 Matrix4::Multiply(const Matrix4 * m1, const Matrix4 * m2)
+Matrix4 Matrix4::Multiply(const Matrix4 * m1, const Matrix4 * m2) __GPU
 {
 	float m11 = m1->M11 * m2->M11 + m1->M12 * m2->M21 + m1->M13 * m2->M31 + m1->M14 * m2->M41;
 	float m12 = m1->M11 * m2->M12 + m1->M12 * m2->M22 + m1->M13 * m2->M32 + m1->M14 * m2->M42;
@@ -274,7 +202,7 @@ Matrix4 Matrix4::Multiply(const Matrix4 * m1, const Matrix4 * m2)
 		m41, m42, m43, m44);
 }
 
-Vector4 Matrix4::Transform(const Matrix4 * m, const Vector3 * v)
+Vector4 Matrix4::Transform(const Matrix4 * m, const Vector3 * v) __GPU
 {
 	float x = v->X * m->M11 + v->Y * m->M12 + v->Z * m->M13 + m->M14;
 	float y = v->X * m->M21 + v->Y * m->M22 + v->Z * m->M23 + m->M24;
@@ -284,19 +212,21 @@ Vector4 Matrix4::Transform(const Matrix4 * m, const Vector3 * v)
 	return Vector4(x, y, z, w);
 }
 
-Vector4* Matrix4::Transform(const Matrix4 * m, const Vector3 * v, int length)
+void Matrix4::Transform(const Matrix4 * m, const Vector3 * src, Vector4 * dest, const size_t length)
 {
-	vect4 *result = malloc_s(vect4, length);
+	array_view<const vect3, 1> arr_src(length, src);
+	array_view<vect4, 1> arr_dest(length, dest);
+	const mtrx4 mtrx = *m;
 
-	for (size_t i = 0; i < length; i++)
+	parallel_for_each(
+		arr_dest.extent,
+		[=](index<1> i) __GPU
 	{
-		result[i] = Transform(m, v + i);
-	}
-
-	return result;
+		arr_dest[i] = mtrx * arr_src[i];
+	});
 }
 
-Matrix4 Matrix4::Transpose(const Matrix4 * m)
+Matrix4 Matrix4::Transpose(const Matrix4 * m) __GPU
 {
 	Matrix4 result = Matrix4(*m);
 

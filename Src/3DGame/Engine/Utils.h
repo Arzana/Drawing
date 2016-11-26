@@ -1,10 +1,10 @@
 #pragma once
 
 #ifndef ENABLE
-#define ENABLE		1
+#define ENABLE					1
 #endif
 #ifndef DISABLE
-#define DISABLE	0
+#define DISABLE					0
 #endif
 
 #ifdef __cplusplus
@@ -25,8 +25,8 @@
 #include "Vect3.h"
 #include "Vect4.h"
 
-inline vect3 V4ToV3(const vect4 *v) { return vect3(v->X, v->Y, v->Z); }
-inline vect2 V3ToV2(const vect3 *v) { return vect2(v->X, v->Y); }
+inline vect3 V4ToV3(const vect4 *v) restrict(cpu, amp) { return vect3(v->X, v->Y, v->Z); }
+inline vect2 V3ToV2(const vect3 *v) restrict(cpu, amp) { return vect2(v->X, v->Y); }
 #endif
 
 #ifdef _VECTOR_
