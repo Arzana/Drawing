@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vect3.h"
+#include "MathEx.h"
 
 #define VECT4_ONE		vect4(1)
 #define VECT4_UNITX		vect4(1, 0, 0, 0)
@@ -46,7 +47,12 @@ typedef struct Vector4
 	static Vector4 CatmullRom(const Vector4 *v1, const Vector4 *v2, const Vector4 *v3, const Vector4 *v4, float a);
 	static Vector4 Clamp(const Vector4 *min, const Vector4 *max, const Vector4 *v) __GPU;
 	void Clamp(const Vector4 *min, const Vector4 *max) __GPU;
-	bool Clip(void) const __GPU;
+	inline bool Clip(void) const __GPU
+	{
+		float pW = abs(W);
+		float nW = -pW;
+		return X < nW || Y < nW || Z < nW || X > pW || Y > pW || Z > pW;
+	}
 	static float Distance(const Vector4 *v1, const Vector4 *v2);
 	static float DistanceSquared(const Vector4 *v1, const Vector4 *v2) __GPU;
 	static Vector4 Divide(const Vector4 *v1, float v2) __GPU;
@@ -70,7 +76,7 @@ typedef struct Vector4
 	static Vector4 Reflect(const Vector4 *v, const Vector4 *n) __GPU;
 	static Vector4 SmoothStep(const Vector4 *v1, const Vector4 *v2, float a) __GPU;
 	static Vector4 Subtract(const Vector4 *v1, const Vector4 *v2) __GPU;
-	Vector3 ToNDC(void) const __GPU;
+	inline Vector3 ToNDC(void) const __GPU { return vect3(X / W, Y / W, Z / W); }
 	float Volume(void) const __GPU;
 	float Volume4D(void) const __GPU;
 } vect4;

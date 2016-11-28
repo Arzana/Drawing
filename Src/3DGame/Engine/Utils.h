@@ -10,6 +10,7 @@
 #ifdef __cplusplus
 #include <cstdlib>
 #define malloc_s(t, l)			(t*)malloc(sizeof(t) * (l))
+#define delete_s(t)				delete t; t = NULL				
 #else
 #include <stdlib.h>
 #define malloc_s(t, l)			malloc(sizeof(t) * (l))

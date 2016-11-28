@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="FireworksGame.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
@@ -167,8 +168,8 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cube.h" />
+    <ClInclude Include="FireworksGame.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="Sectors.h" />
     <ClInclude Include="Triangle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

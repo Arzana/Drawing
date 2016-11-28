@@ -44,16 +44,16 @@ typedef struct Rectangle
 
 	Rectangle(void);
 	Rectangle(int x, int y, int w, int h);
-} Rect;
+} rect;
 
 typedef struct ViewPort
 {
-	Rect screen;
+	rect screen;
 	float far, near;
 
-	ViewPort(Rect screen, float far, float near);
+	ViewPort(rect screen, float back, float front);
 	ViewPort(int x, int y, int w, int h, float f, float n);
-} ViewPort;
+} vPort;
 
 #ifdef _USE_CLIPPING
 #define INSIDE		0b000000

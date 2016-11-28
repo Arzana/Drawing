@@ -105,7 +105,7 @@ void GF_End(void)
 void GF_SetWindow(GameWindow * window)
 {
 	w = window;
-	GF_SetViewport(&Rect(0, 0, w->GetWidth() - 1, w->GetHeight() - 1));
+	GF_SetViewport(&rect(0, 0, w->GetWidth() - 1, w->GetHeight() - 1));
 }
 
 void GF_StartRender(const int primitiveType)
@@ -227,7 +227,7 @@ void GF_SetOrthographic(const float width, const float height, const float front
 	GF_SetDepth(front, back);
 }
 
-void GF_SetViewport(const Rect * rect)
+void GF_SetViewport(const rect * rect)
 {
 	port.screen = *rect;
 	cPort.X = rect->w * 0.5;

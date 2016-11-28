@@ -63,14 +63,6 @@ void Vector4::Clamp(const Vector4 * mi, const Vector4 * ma) __GPU
 	W = clamp(mi->W, ma->W, W);
 }
 
-bool Vector4::Clip(void) const __GPU
-{
-	float pW = abs(W);
-	float nW = -pW;
-
-	return X < nW || Y < nW || Z < nW || X > pW || Y > pW || Z > pW;
-}
-
 float Vector4::Distance(const Vector4 * v1, const Vector4 * v2)
 {
 	return sqrtf(DistanceSquared(v1, v2));
@@ -231,11 +223,6 @@ Vector4 Vector4::SmoothStep(const Vector4 * v1, const Vector4 * v2, float a) __G
 Vector4 Vector4::Subtract(const Vector4 * v1, const Vector4 * v2) __GPU
 {
 	return Vector4(v1->X - v2->X, v1->Y - v2->Y, v1->Z - v2->Z, v1->W - v2->W);
-}
-
-Vector3 Vector4::ToNDC(void) const __GPU
-{
-	return Vector3(X / W, Y / W, Z / W);
 }
 
 float Vector4::Volume(void) const __GPU

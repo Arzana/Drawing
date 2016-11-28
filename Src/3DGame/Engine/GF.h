@@ -32,7 +32,7 @@ void GF_SetModelMatrix(const Matrix4 *m);
 void GF_SetViewMatrix(const Matrix4 *m);
 void GF_SetFrustrum(const float fovY, const float aspr, const float front, const float back);
 void GF_SetOrthographic(const float width, const float height, const float front, const float back);
-void GF_SetViewport(const Rect *rect);
+void GF_SetViewport(const rect *rect);
 void GF_SetFlag_Clip(const bool value);
 void GF_SetFlag_ZBuff(const bool value);
 void GF_SetFlagVBuff(const bool value);

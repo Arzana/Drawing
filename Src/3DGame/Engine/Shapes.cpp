@@ -86,8 +86,8 @@ Rectangle::Rectangle(int x, int y, int w, int h)
 	: x(x), y(y), w(w), h(h)
 { }
 
-ViewPort::ViewPort(Rectangle screen, float far, float near)
-	: screen(screen), far(far), near(near)
+ViewPort::ViewPort(rect screen, float back, float front)
+	: screen(screen), far(back), near(front)
 { }
 
 ViewPort::ViewPort(int x, int y, int w, int h, float f, float n)
