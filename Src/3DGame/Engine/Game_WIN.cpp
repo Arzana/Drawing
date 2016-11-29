@@ -6,7 +6,7 @@
 Game_WIN::Game_WIN(const char * title, const uint width, const uint height)
 	: gfWinWnd(title, width, height)
 	, inactiveSleepTime(0), accumelatedElapsedTime(0), previousTicks(0), timer(0), gameTime(GameTime()), updateFrameLag(0)
-	, running(new bool(false)), IsFixedTimeStep(new bool(true)), oldMousePos(VECT3_ZERO), frameBuffer(new std::queue<float>())
+	, IsFixedTimeStep(new bool(true)), oldMousePos(VECT3_ZERO), frameBuffer(new std::queue<float>())
 {
 	ResetZBuff();
 }
@@ -14,19 +14,17 @@ Game_WIN::Game_WIN(const char * title, const uint width, const uint height)
 Game_WIN::~Game_WIN(void)
 {
 	delete IsFixedTimeStep;
-	delete running;
 	delete frameBuffer;
 }
 
 void Game_WIN::Run(void)
 {
 	ShowWnd();
-	*running = true;
 	timer = clock();
 
 	OnInitialize();
 
-	while (*running)
+	while (*isRunning)
 	{
 		Tick();
 	}

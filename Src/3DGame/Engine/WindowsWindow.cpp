@@ -40,7 +40,7 @@ LRESULT CALLBACK WindowsWindow::WndProc(uint msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_CLOSE:
-		isRunning = false;
+		*isRunning = false;
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);

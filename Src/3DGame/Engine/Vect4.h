@@ -51,6 +51,7 @@ typedef struct Vector4
 	{
 		float pW = abs(W);
 		float nW = -pW;
+
 		return X < nW || Y < nW || Z < nW || X > pW || Y > pW || Z > pW;
 	}
 	static float Distance(const Vector4 *v1, const Vector4 *v2);

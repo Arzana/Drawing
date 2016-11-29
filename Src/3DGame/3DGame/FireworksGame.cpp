@@ -46,7 +46,7 @@ void FireworksGame::OnInitialize(void)
 				mtrx4 m = mtrx4::CreateRotationQ(&quat::CreateYawPitchRoll(yawf, pitchf, rollf));
 
 				AddVertex(VECT3_ZERO, Color(red, green, blue));
-				vel[xyz2i(roll, pitch, yaw, ppAxis, ppAxis)] = V4ToV3(&(m * (VECT3_BACK * (rand() % 100) * 0.0001f)));
+				vel[xyz2i(roll, pitch, yaw, ppAxis, ppAxis)] = V4ToV3(m * (VECT3_BACK * (rand() % 100) * 0.0001f));
 			}
 		}
 	}

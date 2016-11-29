@@ -26,8 +26,8 @@
 #include "Vect3.h"
 #include "Vect4.h"
 
-inline vect3 V4ToV3(const vect4 *v) restrict(cpu, amp) { return vect3(v->X, v->Y, v->Z); }
-inline vect2 V3ToV2(const vect3 *v) restrict(cpu, amp) { return vect2(v->X, v->Y); }
+inline vect3 V4ToV3(const vect4 v) restrict(cpu, amp) { return vect3(v.X, v.Y, v.Z); }
+inline vect2 V3ToV2(const vect3 v) restrict(cpu, amp) { return vect2(v.X, v.Y); }
 #endif
 
 #ifdef _VECTOR_

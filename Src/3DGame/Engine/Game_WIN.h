@@ -23,7 +23,7 @@ public:
 	virtual void OnTerminate(void) { }
 
 	void Run(void);
-	inline void Terminate(void) { *running = false; }
+	inline void Terminate(void) { *isRunning = false; }
 	float GetFps(void) const;
 	float GetAvarageFPS(void) const;
 private:
@@ -39,7 +39,6 @@ private:
 	clock_t previousTicks;
 	int updateFrameLag;
 
-	bool *running;
 	vect3 oldMousePos;
 	std::queue<float> *frameBuffer;
 

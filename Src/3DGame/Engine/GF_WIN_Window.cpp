@@ -175,7 +175,7 @@ void GF_WIN_Window::ResetZBuff(void)
 
 vect3 GF_WIN_Window::ToScreen(const vect4 v, const vect4 cp, const bool proj) __GPU
 {
-	vect3 result = proj ? v.ToNDC() : V4ToV3(&v);
+	vect3 result = proj ? v.ToNDC() : V4ToV3(v);
 	result.X = cp.X * result.X + cp.X;
 	result.Y = cp.Y * result.Y + cp.Y;
 	result.Z = cp.Z * result.Z + cp.W;
@@ -197,9 +197,10 @@ void GF_WIN_Window::GF_Points(void)
 		arr_h.extent,
 		[=](index<1> i) __GPU_ONLY
 	{
-		if (arr_h[i].Clip()) return;
-		vect3 scr = GF_WIN_Window::ToScreen(arr_h[i], port, proj);
-		int pI = xy2i(ipart(scr.X), ipart(scr.Y), w);
+		vect4 c = arr_h[i];
+		if (c.Clip()) return;
+		vect3 scr = GF_WIN_Window::ToScreen(c, port, proj);
+		index<1> pI(xy2i(ipart(scr.X), ipart(scr.Y), w));
 
 		if (arr_z[pI] > scr.Z) return;
 		arr_z[pI] = scr.Z;

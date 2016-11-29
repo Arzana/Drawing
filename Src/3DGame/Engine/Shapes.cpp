@@ -58,9 +58,9 @@ line Triangle::GetLine(int l) const
 
 bool Triangle::IsInside(vrtx *v)
 {
-	vect2 *vs1 = &V3ToV2(&(v1.v - v0.v));
-	vect2 *vs2 = &V3ToV2(&(v2.v - v0.v));
-	vect2 *vs3 = &V3ToV2(&(v->v - v0.v));
+	vect2 *vs1 = &V3ToV2(v1.v - v0.v);
+	vect2 *vs2 = &V3ToV2(v2.v - v0.v);
+	vect2 *vs3 = &V3ToV2(v->v - v0.v);
 
 	float r = vect2::PrepDot(vs1, vs2);
 	float s = vect2::PrepDot(vs3, vs2) / r;
