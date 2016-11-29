@@ -21,9 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Color.h" />
     <ClInclude Include="GameTime.h" />
-    <ClInclude Include="GameWindow.h" />
     <ClInclude Include="Game_WIN.h" />
-    <ClInclude Include="GF.h" />
     <ClInclude Include="GF_WIN_Window.h" />
     <ClInclude Include="MathEx.h" />
     <ClInclude Include="Mtrx3.h" />
@@ -36,11 +34,9 @@
     <ClInclude Include="Vect2.h" />
     <ClInclude Include="Vect3.h" />
     <ClInclude Include="Vect4.h" />
-    <ClInclude Include="WindowBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Color.cpp" />
-    <ClCompile Include="GameWindow.cpp" />
     <ClCompile Include="Game_WIN.cpp" />
     <ClCompile Include="GF.cpp" />
     <ClCompile Include="GF_WIN_Window.cpp" />
@@ -53,7 +49,6 @@
     <ClCompile Include="Vect2.cpp" />
     <ClCompile Include="Vect3.cpp" />
     <ClCompile Include="Vect4.cpp" />
-    <ClCompile Include="WindowBase.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{05FF6B09-EFD4-4C3C-B09F-F970558CF2C8}</ProjectGuid>

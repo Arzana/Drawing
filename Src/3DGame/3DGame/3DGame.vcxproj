@@ -155,22 +155,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Cube.cpp" />
     <ClCompile Include="FireworksGame.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Triangle.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Engine\Engine.vcxproj">
-      <Project>{05ff6b09-efd4-4c3c-b09f-f970558cf2c8}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Cube.h" />
     <ClInclude Include="FireworksGame.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="Triangle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

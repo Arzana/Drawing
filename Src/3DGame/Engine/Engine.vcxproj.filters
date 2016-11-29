@@ -60,20 +60,11 @@
     <ClInclude Include="Mtrx4.h">
       <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
-    <ClInclude Include="GF.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Shapes.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Utils.h">
       <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="WindowBase.h">
-      <Filter>Header Files\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="GameWindow.h">
-      <Filter>Header Files\Window</Filter>
     </ClInclude>
     <ClInclude Include="Quaternion.h">
       <Filter>Header Files\Core\Math</Filter>
@@ -121,12 +112,6 @@
     </ClCompile>
     <ClCompile Include="Shapes.cpp">
       <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="WindowBase.cpp">
-      <Filter>Source Files\Window</Filter>
-    </ClCompile>
-    <ClCompile Include="GameWindow.cpp">
-      <Filter>Source Files\Window</Filter>
     </ClCompile>
     <ClCompile Include="Quaternion.cpp">
       <Filter>Source Files\Core\Math</Filter>

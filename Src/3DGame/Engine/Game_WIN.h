@@ -1,8 +1,8 @@
 #pragma once
 
 #include <queue>
-#include "GF_WIN_Window.h"
 #include "GameTime.h"
+#include "GF_WIN_Window.h"
 
 #define FPS_LOCK	60.0f
 

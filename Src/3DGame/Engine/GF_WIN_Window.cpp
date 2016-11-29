@@ -11,7 +11,7 @@ using namespace concurrency;
 
 GF_WIN_Window::GF_WIN_Window(const char * title, const uint width, const uint height)
 	: WindowsWindow(title, width, height), flags(new Flags()), scrArea(width * height)
-	, vp(new vPort(0, 0, width, height, FLT_MAX, 0)), cp(new vect4(width * 0.5f, height * 0.5f, 0, 0))
+	, vp(new vPort(0, 0, width - 1, height - 1, FLT_MAX, 0)), cp(new vect4((width - 1) * 0.5f, (height - 1) * 0.5f, 0, 0))
 	, buffLen(new size_t(0)), buffI(new size_t(0))
 	, vBuff(NULL), cBuff(NULL), hBuff(NULL), zBuff(malloc_s(float, scrArea))
 	, model(MTRX4_IDENTITY), view(MTRX4_IDENTITY), proj(MTRX4_IDENTITY)
@@ -199,7 +199,7 @@ void GF_WIN_Window::GF_Points(void)
 	{
 		if (arr_h[i].Clip()) return;
 		vect3 scr = GF_WIN_Window::ToScreen(arr_h[i], port, proj);
-		int pI = xy2i(scr.X, scr.Y, w);
+		int pI = xy2i(ipart(scr.X), ipart(scr.Y), w);
 
 		if (arr_z[pI] > scr.Z) return;
 		arr_z[pI] = scr.Z;

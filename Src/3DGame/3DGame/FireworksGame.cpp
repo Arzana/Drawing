@@ -61,7 +61,6 @@ void FireworksGame::OnTerminate(void)
 
 void FireworksGame::OnUpdate(GameTime time)
 {
-	return;
 	array_view<vect3, 1> a(pSize, vertices);
 	array_view<vect3, 1> b(pSize, vel);
 
@@ -71,6 +70,17 @@ void FireworksGame::OnUpdate(GameTime time)
 	{
 		a[i] += b[i];
 	});
+
+	if (++updCount > 500)
+	{
+		updCount = 0;
+		parallel_for_each(
+			a.extent,
+			[=](index<1> i) __GPU_ONLY
+		{
+			b[i] *= -1;
+		});
+	}
 }
 
 void FireworksGame::OnRender(void)
