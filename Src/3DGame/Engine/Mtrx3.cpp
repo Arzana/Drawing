@@ -1,8 +1,7 @@
 #include <math.h>
+#include <amp_math.h>
 #include <amp.h>
 #include "Mtrx3.h"
-
-#define __GPU	restrict(cpu, amp)
 
 using namespace concurrency;
 
@@ -13,10 +12,17 @@ bool Matrix3::Equals(const Matrix3 * m1, const Matrix3 * m2) __GPU
 		&& m1->M31 == m2->M31 && m1->M32 == m2->M32 && m1->M33 == m2->M33;
 }
 
-Matrix3 Matrix3::CreateRotation(float rads)
+Matrix3 Matrix3::CreateRotation(float rads) __CPU_ONLY
 {
 	float cos = cosf(rads);
 	float sin = sinf(rads);
+	return Matrix3(cos, -sin, 0, sin, cos, 0, 0, 0, 1);
+}
+
+Matrix3 Matrix3::CreateRotation(float rads) __GPU_ONLY
+{
+	float cos = fast_math::cosf(rads);
+	float sin = fast_math::sinf(rads);
 	return Matrix3(cos, -sin, 0, sin, cos, 0, 0, 0, 1);
 }
 
@@ -62,7 +68,7 @@ Vector3 Matrix3::Transform(const Matrix3 * m, const Vector2 * v) __GPU
 	return Vector3(x, y, z);
 }
 
-void Matrix3::Transform(const Matrix3 * m, const Vector2 * src, Vector3 * dest, const size_t length)
+void Matrix3::Transform(const Matrix3 * m, const Vector2 * src, Vector3 * dest, const size_t length) __CPU_ONLY
 {
 	array_view<const vect2, 1> arr_src(length, src);
 	array_view<vect3, 1> arr_dest(length, dest);

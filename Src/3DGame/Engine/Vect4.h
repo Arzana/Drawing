@@ -11,7 +11,11 @@
 #define VECT4_ZERO		vect4()
 #define VECT4_NEGATIVE	vect4(-1)
 
-#define __GPU			restrict(cpu, amp)
+#ifndef _CXXAMP
+#define __GPU				restrict(cpu, amp)
+#define __GPU_ONLY			restrict(amp)
+#define __CPU_ONLY
+#endif
 
 typedef struct Vector4
 {
@@ -43,8 +47,8 @@ typedef struct Vector4
 	void Abs(void) __GPU;
 	static Vector4 Add(const Vector4 *v1, const Vector4 *v2) __GPU;
 	float Area(void) const __GPU;
-	static Vector4 Barycentric(const Vector4 *v1, const Vector4 *v2, const Vector4 *v4, float b2, float b4);
-	static Vector4 CatmullRom(const Vector4 *v1, const Vector4 *v2, const Vector4 *v3, const Vector4 *v4, float a);
+	static Vector4 Barycentric(const Vector4 *v1, const Vector4 *v2, const Vector4 *v4, float b2, float b4) __GPU;
+	static Vector4 CatmullRom(const Vector4 *v1, const Vector4 *v2, const Vector4 *v3, const Vector4 *v4, float a) __GPU;
 	static Vector4 Clamp(const Vector4 *min, const Vector4 *max, const Vector4 *v) __GPU;
 	void Clamp(const Vector4 *min, const Vector4 *max) __GPU;
 	inline bool Clip(void) const __GPU
@@ -54,14 +58,16 @@ typedef struct Vector4
 
 		return X < nW || Y < nW || Z < nW || X > pW || Y > pW || Z > pW;
 	}
-	static float Distance(const Vector4 *v1, const Vector4 *v2);
+	static float Distance(const Vector4 *v1, const Vector4 *v2) __CPU_ONLY;
+	static float Distance(const Vector4 *v1, const Vector4 *v2) __GPU_ONLY;
 	static float DistanceSquared(const Vector4 *v1, const Vector4 *v2) __GPU;
 	static Vector4 Divide(const Vector4 *v1, float v2) __GPU;
 	static Vector4 Divide(const Vector4 *v1, const Vector4 *v2) __GPU;
 	static float Dot(const Vector4 *v1, const Vector4 *v2) __GPU;
 	static bool Equals(const Vector4 *v1, const Vector4 *v2) __GPU;
 	static Vector4 Hermite(const Vector4 *v1, const Vector4 *t1, const Vector4 *v2, const Vector4 *t2, float a) __GPU;
-	float Length(void) const;
+	float Length(void) const __CPU_ONLY;
+	float Length(void) const __GPU_ONLY;
 	float LengthSquared(void) const __GPU;
 	static Vector4 Lerp(const Vector4 *min, const Vector4 *max, float a) __GPU;
 	static Vector4 Lerp(const Vector4 *min, const Vector4 *max, const Vector4 *a) __GPU;
@@ -72,8 +78,8 @@ typedef struct Vector4
 	static Vector4 Multiply(const Vector4 *v1, float v2) __GPU;
 	static Vector4 Multiply(const Vector4 *v1, const Vector4 *v2) __GPU;
 	static Vector4 Negate(const Vector4 *v) __GPU;
-	void Normalize(void);
-	static Vector4 Normalize(const Vector4 *v);
+	void Normalize(void) __GPU;
+	static Vector4 Normalize(const Vector4 *v) __GPU;
 	static Vector4 Reflect(const Vector4 *v, const Vector4 *n) __GPU;
 	static Vector4 SmoothStep(const Vector4 *v1, const Vector4 *v2, float a) __GPU;
 	static Vector4 Subtract(const Vector4 *v1, const Vector4 *v2) __GPU;
@@ -81,5 +87,3 @@ typedef struct Vector4
 	float Volume(void) const __GPU;
 	float Volume4D(void) const __GPU;
 } vect4;
-
-#undef __GPU

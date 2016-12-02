@@ -1,7 +1,8 @@
+#include <amp_math.h>
 #include "Vect3.h"
 #include "MathEx.h"
 
-#define __GPU	restrict(cpu, amp)
+using namespace concurrency;
 
 Vector3 Vector3::Abs(const Vector3 * v) __GPU
 {
@@ -25,7 +26,7 @@ float Vector3::Area(void) const __GPU
 	return X * Z;
 }
 
-Vector3 Vector3::Barycentric(const Vector3 * v1, const Vector3 * v2, const Vector3 * v3, float b2, float b3)
+Vector3 Vector3::Barycentric(const Vector3 * v1, const Vector3 * v2, const Vector3 * v3, float b2, float b3) __GPU
 {
 	float x = barycentric(v1->X, v2->X, v3->X, b2, b3);
 	float y = barycentric(v1->Y, v2->Y, v3->Y, b2, b3);
@@ -34,7 +35,7 @@ Vector3 Vector3::Barycentric(const Vector3 * v1, const Vector3 * v2, const Vecto
 	return Vector3(x, y, z);
 }
 
-Vector3 Vector3::CatmullRom(const Vector3 * v1, const Vector3 * v2, const Vector3 * v3, const Vector3 * v4, float a)
+Vector3 Vector3::CatmullRom(const Vector3 * v1, const Vector3 * v2, const Vector3 * v3, const Vector3 * v4, float a) __GPU
 {
 	float x = catmullRom(v1->X, v2->X, v3->X, v4->X, a);
 	float y = catmullRom(v1->Y, v2->Y, v3->Y, v4->Y, a);
@@ -67,9 +68,14 @@ Vector3 Vector3::Cross(const Vector3 * v1, const Vector3 * v2) __GPU
 	return Vector3(x, y, z);
 }
 
-float Vector3::Distance(const Vector3 * v1, const Vector3 * v2)
+float Vector3::Distance(const Vector3 * v1, const Vector3 * v2) __CPU_ONLY
 {
 	return sqrtf(DistanceSquared(v1, v2));
+}
+
+float Vector3::Distance(const Vector3 * v1, const Vector3 * v2) __GPU_ONLY
+{
+	return fast_math::sqrtf(DistanceSquared(v1, v2));
 }
 
 float Vector3::DistanceSquared(const Vector3 * v1, const Vector3 * v2) __GPU
@@ -117,9 +123,14 @@ Vector3 Vector3::Hermite(const Vector3 * v1, const Vector3 * t1, const Vector3 *
 	return Vector3(x, y, z);
 }
 
-float Vector3::Length(void) const
+float Vector3::Length(void) const __CPU_ONLY
 {
 	return sqrtf(LengthSquared());
+}
+
+float Vector3::Length(void) const __GPU_ONLY
+{
+	return fast_math::sqrtf(LengthSquared());
 }
 
 float Vector3::LengthSquared(void) const __GPU
@@ -188,13 +199,13 @@ Vector3 Vector3::Negate(const Vector3 * v) __GPU
 	return Vector3(-v->X, -v->Y, -v->Z);
 }
 
-void Vector3::Normalize(void)
+void Vector3::Normalize(void) __GPU
 {
 	float l = Length();
 	operator/=(l);
 }
 
-Vector3 Vector3::Normalize(const Vector3 * v)
+Vector3 Vector3::Normalize(const Vector3 * v) __GPU
 {
 	float l = v->Length();
 	return Divide(v, l);

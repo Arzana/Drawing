@@ -23,11 +23,14 @@
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="Game_WIN.h" />
     <ClInclude Include="GF_WIN_Window.h" />
+    <ClInclude Include="Line.h" />
     <ClInclude Include="MathEx.h" />
     <ClInclude Include="Mtrx3.h" />
     <ClInclude Include="Mtrx4.h" />
-    <ClInclude Include="ParallelMath.h" />
     <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="Triangle.h" />
+    <ClInclude Include="Vertex.h" />
     <ClInclude Include="WindowsWindow.h" />
     <ClInclude Include="Shapes.h" />
     <ClInclude Include="Utils.h" />
@@ -44,6 +47,7 @@
     <ClCompile Include="Mtrx3.cpp" />
     <ClCompile Include="Mtrx4.cpp" />
     <ClCompile Include="Quaternion.cpp" />
+    <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="WindowsWindow.cpp" />
     <ClCompile Include="Shapes.cpp" />
     <ClCompile Include="Vect2.cpp" />

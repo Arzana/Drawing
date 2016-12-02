@@ -11,7 +11,7 @@ using namespace concurrency;
 
 GF_WIN_Window::GF_WIN_Window(const char * title, const uint width, const uint height)
 	: WindowsWindow(title, width, height), flags(new Flags()), scrArea(width * height)
-	, vp(new vPort(0, 0, width - 1, height - 1, FLT_MAX, 0)), cp(new vect4((width - 1) * 0.5f, (height - 1) * 0.5f, 0, 0))
+	, vp(new vPort(width - 1, height - 1, FLT_MAX, 0)), cp(new vect4((width - 1) * 0.5f, (height - 1) * 0.5f, 0, 0))
 	, buffLen(new size_t(0)), buffI(new size_t(0))
 	, vBuff(NULL), cBuff(NULL), hBuff(NULL), zBuff(malloc_s(float, scrArea))
 	, model(MTRX4_IDENTITY), view(MTRX4_IDENTITY), proj(MTRX4_IDENTITY)
@@ -199,11 +199,24 @@ void GF_WIN_Window::GF_Points(void)
 	{
 		vect4 c = arr_h[i];
 		if (c.Clip()) return;
-		vect3 scr = GF_WIN_Window::ToScreen(c, port, proj);
-		index<1> pI(xy2i(ipart(scr.X), ipart(scr.Y), w));
+		vect3 coord = GF_WIN_Window::ToScreen(c, port, proj);
+		index<1> pI(xy2i(ipart(coord.X), ipart(coord.Y), w));
 
-		if (arr_z[pI] > scr.Z) return;
-		arr_z[pI] = scr.Z;
+		if (arr_z[pI] > coord.Z) return;
+		arr_z[pI] = coord.Z;
 		arr_pix[pI] = arr_c[i];
 	});
+}
+#include <ppl.h>
+
+void GF_WIN_Window::GF_Lines(void)
+{
+	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
+	array_view<float, 1> arr_z(scrArea, zBuff);
+	array_view<vect4, 1> arr_h(*buffLen, hBuff);
+	array_view<clr, 1> arr_c(*buffLen, cBuff);
+
+	const bool proj = flags->proj, clip = flags->clip;
+	const vect4 port = *cp;
+	const size_t w = width;
 }

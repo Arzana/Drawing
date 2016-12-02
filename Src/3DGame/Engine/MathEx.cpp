@@ -1,11 +1,11 @@
 #include "MathEx.h"
 
-float barycentric(float v1, float v2, float v3, float b2, float b3)
+float barycentric(float v1, float v2, float v3, float b2, float b3) restrict(cpu, amp)
 {
 	return ((1 - b2 - b3) * v1) + (b2 * v2) + (b3 * v3);
 }
 
-float catmullRom(float v1, float v2, float v3, float v4, float a)
+float catmullRom(float v1, float v2, float v3, float v4, float a) restrict(cpu, amp)
 {
 	float a2 = square(a);
 	float a3 = cube(a);

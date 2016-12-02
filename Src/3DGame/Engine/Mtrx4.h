@@ -3,7 +3,12 @@
 #include "Quaternion.h"
 
 #define MTRX4_IDENTITY		mtrx4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+
+#ifndef _CXXAMP
 #define __GPU				restrict(cpu, amp)
+#define __GPU_ONLY			restrict(amp)
+#define __CPU_ONLY
+#endif
 
 typedef struct Matrix4
 {
@@ -104,21 +109,25 @@ typedef struct Matrix4
 	inline Vector3 Translation(void) const __GPU { return Vector3(M14, M24, M34); }
 
 	static bool Equals(const Matrix4 *m1, const Matrix4 *m2) __GPU;
-	static Matrix4 CreateYawPitchRoll(float yaw, float pitch, float roll);
-	static Matrix4 CreateFrustrum(float fovY, float aspr, float front, float back);
+	static Matrix4 CreateYawPitchRoll(float yaw, float pitch, float roll) __CPU_ONLY;
+	static Matrix4 CreateYawPitchRoll(float yaw, float pitch, float roll) __GPU_ONLY;
+	static Matrix4 CreateFrustrum(float fovY, float aspr, float front, float back) __CPU_ONLY;
+	static Matrix4 CreateFrustrum(float fovY, float aspr, float front, float back) __GPU_ONLY;
 	static Matrix4 CreateOrthographic(float width, float height, float front, float back) __GPU;
-	static Matrix4 CreateRotation(const Vector3 *axis, float rads);
-	static Matrix4 CreateRotationX(float rads);
-	static Matrix4 CreateRotationY(float rads);
-	static Matrix4 CreateRotationZ(float rads);
+	static Matrix4 CreateRotation(const Vector3 *axis, float rads) __CPU_ONLY;
+	static Matrix4 CreateRotation(const Vector3 *axis, float rads) __GPU_ONLY;
+	static Matrix4 CreateRotationX(float rads) __CPU_ONLY;
+	static Matrix4 CreateRotationX(float rads) __GPU_ONLY;
+	static Matrix4 CreateRotationY(float rads) __CPU_ONLY;
+	static Matrix4 CreateRotationY(float rads) __GPU_ONLY;
+	static Matrix4 CreateRotationZ(float rads) __CPU_ONLY;
+	static Matrix4 CreateRotationZ(float rads) __GPU_ONLY;
 	static Matrix4 CreateRotationQ(const Quaternion *q) __GPU;
 	static Matrix4 CreateScale(float scale) __GPU;
 	static Matrix4 CreateScale(const Vector3 *scale) __GPU;
 	static Matrix4 CreateTranslation(const Vector3 *pos) __GPU;
 	static Matrix4 Multiply(const Matrix4 *m1, const Matrix4 *m2) __GPU;
 	static Vector4 Transform(const Matrix4 *m, const Vector3 *v) __GPU;
-	static void Transform(const Matrix4 *m, const Vector3 *src, Vector4 *dest, const size_t length);
+	static void Transform(const Matrix4 *m, const Vector3 *src, Vector4 *dest, const size_t length) __CPU_ONLY;
 	static Matrix4 Transpose(const Matrix4 *m) __GPU;
 } mtrx4;
-
-#undef __GPU

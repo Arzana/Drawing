@@ -3,7 +3,12 @@
 #include "Vect3.h"
 
 #define MTRX3_IDENTITY		Mtrx3(1, 0, 0, 0, 1, 0, 0, 0, 1)
+
+#ifndef _CXXAMP
 #define __GPU				restrict(cpu, amp)
+#define __GPU_ONLY			restrict(amp)
+#define __CPU_ONLY
+#endif
 
 typedef struct Matrix3
 {
@@ -74,15 +79,14 @@ typedef struct Matrix3
 	}
 
 	static bool Equals(const Matrix3 *m1, const Matrix3 *m2) __GPU;
-	static Matrix3 CreateRotation(float rads);
+	static Matrix3 CreateRotation(float rads) __CPU_ONLY;
+	static Matrix3 CreateRotation(float rads) __GPU_ONLY;
 	static Matrix3 CreateScale(float scale) __GPU;
 	static Matrix3 CreateScale(const Vector2 *scale) __GPU;
 	static Matrix3 CreateTranslation(const Vector2 *pos) __GPU;
 	static Matrix3 Multiply(const Matrix3 *m1, const Matrix3 *m2) __GPU;
 	static Vector3 Transform(const Matrix3 *m, const Vector2 *v) __GPU;
-	static void Transform(const Matrix3 *m, const Vector2 *src, Vector3 *dest, const size_t length);
+	static void Transform(const Matrix3 *m, const Vector2 *src, Vector3 *dest, const size_t length) __CPU_ONLY;
 	Vector2 Translation(void) const __GPU;
 	static Matrix3 Transpose(const Matrix3 *m) __GPU;
 } mtrx3;
-
-#undef __GPU

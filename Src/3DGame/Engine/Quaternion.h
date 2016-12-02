@@ -3,7 +3,12 @@
 #include "Vect4.h"
 
 #define QUAT_IDENTITY	quat(0, 0, 0, 1)
+
+#ifndef _CXXAMP
 #define __GPU			restrict(cpu, amp)
+#define __GPU_ONLY		restrict(amp)
+#define __CPU_ONLY
+#endif
 
 typedef struct Quaternion
 {
@@ -22,14 +27,17 @@ typedef struct Quaternion
 
 	static Quaternion Add(const Quaternion *q1, const Quaternion *q2) __GPU;
 	static Quaternion Concat(const Quaternion *q1, const Quaternion *q2) __GPU;
-	static Quaternion CreateRotation(const vect3 *axis, float rads);
-	static Quaternion CreateYawPitchRoll(float yaw, float pitch, float roll);
+	static Quaternion CreateRotation(const vect3 *axis, float rads) __CPU_ONLY;
+	static Quaternion CreateRotation(const vect3 *axis, float rads) __GPU_ONLY;
+	static Quaternion CreateYawPitchRoll(float yaw, float pitch, float roll) __CPU_ONLY;
+	static Quaternion CreateYawPitchRoll(float yaw, float pitch, float roll) __GPU_ONLY;
 	static bool Equals(const Quaternion *q1, const Quaternion *q2) __GPU;
-	float Length(void) const;
+	float Length(void) const __CPU_ONLY;
+	float Length(void) const __GPU_ONLY;
 	float LengthSquared(void) const __GPU;
-	static Quaternion Lerp(const Quaternion *min, const Quaternion *max, float a);
-	static Quaternion SLerp(const Quaternion *min, const Quaternion *max, float a);
+	static Quaternion Lerp(const Quaternion *min, const Quaternion *max, float a) __CPU_ONLY;
+	static Quaternion Lerp(const Quaternion *min, const Quaternion *max, float a) __GPU_ONLY;
+	static Quaternion SLerp(const Quaternion *min, const Quaternion *max, float a) __CPU_ONLY;
+	static Quaternion SLerp(const Quaternion *min, const Quaternion *max, float a) __GPU_ONLY;
 	static Quaternion Subtract(const Quaternion *q1, const Quaternion *q2) __GPU;
 } quat;
-
-#undef __GPU

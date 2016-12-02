@@ -32,7 +32,7 @@ void Camera::SetYawRads(float rads)
 
 void Camera::SetYawDegr(float degr)
 {
-	SetYawRads(degr * deg2rad);
+	SetYawRads(degr * M_DEG2RAD);
 }
 
 void Camera::SetPitchRads(float rads)
@@ -42,7 +42,7 @@ void Camera::SetPitchRads(float rads)
 
 void Camera::SetPitchDegr(float degr)
 {
-	SetPitchRads(degr * deg2rad);
+	SetPitchRads(degr * M_DEG2RAD);
 }
 
 void Camera::SetRollRads(float rads)
@@ -52,7 +52,7 @@ void Camera::SetRollRads(float rads)
 
 void Camera::SetRollDegr(float degr)
 {
-	SetRollRads(degr * deg2rad);
+	SetRollRads(degr * M_DEG2RAD);
 }
 
 void Camera::SetRotationRads(vect3 rads)
@@ -64,7 +64,7 @@ void Camera::SetRotationRads(vect3 rads)
 
 void Camera::SetRotationDegr(vect3 degr)
 {
-	SetRotationRads(degr * deg2rad);
+	SetRotationRads(degr * M_DEG2RAD);
 }
 
 void Camera::AppendYawRads(float rads)
@@ -74,7 +74,7 @@ void Camera::AppendYawRads(float rads)
 
 void Camera::AppendYawDegr(float degr)
 {
-	AppendYawRads(degr * deg2rad);
+	AppendYawRads(degr * M_DEG2RAD);
 }
 
 void Camera::AppendPitchRads(float rads)
@@ -84,7 +84,7 @@ void Camera::AppendPitchRads(float rads)
 
 void Camera::AppendPitchDegr(float degr)
 {
-	AppendPitchRads(degr * deg2rad);
+	AppendPitchRads(degr * M_DEG2RAD);
 }
 
 void Camera::AppendRollRads(float rads)
@@ -94,7 +94,7 @@ void Camera::AppendRollRads(float rads)
 
 void Camera::AppendRollDegr(float degr)
 {
-	AppendRollDegr(degr * deg2rad);
+	AppendRollDegr(degr * M_DEG2RAD);
 }
 
 void Camera::AppendRotationRads(vect3 rads)
@@ -104,7 +104,7 @@ void Camera::AppendRotationRads(vect3 rads)
 
 void Camera::AppendRotationDegr(vect3 degr)
 {
-	AppendRotationRads(degr * deg2rad);
+	AppendRotationRads(degr * M_DEG2RAD);
 }
 
 float Camera::GetYaw(void) const

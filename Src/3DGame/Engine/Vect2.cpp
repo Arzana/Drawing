@@ -1,7 +1,8 @@
+#include <amp_math.h>
 #include "vect2.h"
 #include "MathEx.h"
 
-#define __GPU	restrict(cpu, amp)
+using namespace concurrency;
 
 Vector2 Vector2::Abs(const Vector2 * v) __GPU
 {
@@ -24,19 +25,24 @@ Vector2 Vector2::Add(const Vector2 * v1, const Vector2 * v2) __GPU
 	return vect2(v1->X + v2->X, v1->Y + v2->Y);
 }
 
-float Vector2::Angle(const Vector2 * v1, const Vector2 * v2)
+float Vector2::Angle(const Vector2 * v1, const Vector2 * v2) __CPU_ONLY
 {
 	return atan2f(v2->Y - v1->Y, v2->X - v1->X);
 }
 
-Vector2 Vector2::Barycentric(const Vector2 * v1, const Vector2 * v2, const Vector2 * v3, float b2, float b3)
+float Vector2::Angle(const Vector2 * v1, const Vector2 * v2) __GPU_ONLY
+{
+	return fast_math::atan2f(v2->Y - v1->Y, v2->X - v1->X);
+}
+
+Vector2 Vector2::Barycentric(const Vector2 * v1, const Vector2 * v2, const Vector2 * v3, float b2, float b3) __GPU
 {
 	float x = barycentric(v1->X, v2->X, v3->X, b2, b3);
 	float y = barycentric(v1->Y, v2->Y, v3->Y, b2, b3);
 	return vect2(x, y);
 }
 
-Vector2 Vector2::CatmullRom(const Vector2 * v1, const Vector2 * v2, const Vector2 * v3, const Vector2 * v4, float a)
+Vector2 Vector2::CatmullRom(const Vector2 * v1, const Vector2 * v2, const Vector2 * v3, const Vector2 * v4, float a) __GPU
 {
 	float x = catmullRom(v1->X, v2->X, v3->X, v4->X, a);
 	float y = catmullRom(v1->Y, v2->Y, v3->Y, v4->Y, a);
@@ -54,9 +60,14 @@ void Vector2::Clamp(const Vector2 * mi, const Vector2 * ma) __GPU
 	Y = clamp(mi->Y, ma->Y, Y);
 }
 
-float Vector2::Distance(const Vector2 * v1, const Vector2 * v2)
+float Vector2::Distance(const Vector2 * v1, const Vector2 * v2) __CPU_ONLY
 {
 	return sqrtf(DistanceSquared(v1, v2));
+}
+
+float Vector2::Distance(const Vector2 * v1, const Vector2 * v2) __GPU_ONLY
+{
+	return fast_math::sqrtf(DistanceSquared(v1, v2));
 }
 
 float Vector2::DistanceSquared(const Vector2 * v1, const Vector2 * v2) __GPU
@@ -99,9 +110,14 @@ Vector2 Vector2::Hermite(const Vector2 * v1, const Vector2 * t1, const Vector2 *
 	return vect2(x, y);
 }
 
-float Vector2::Length(void) const
+float Vector2::Length(void) const __CPU_ONLY
 {
 	return sqrtf(LengthSquared());
+}
+
+float Vector2::Length(void) const __GPU_ONLY
+{
+	return fast_math::sqrtf(LengthSquared());
 }
 
 float Vector2::LengthSquared(void) const __GPU
@@ -156,13 +172,13 @@ Vector2 Vector2::Negate(const Vector2 * v) __GPU
 	return vect2(-v->X, -v->Y);
 }
 
-void Vector2::Normalize(void)
+void Vector2::Normalize(void) __GPU
 {
 	float l = Length();
 	operator/=(l);
 }
 
-Vector2 Vector2::Normalize(const Vector2 * v)
+Vector2 Vector2::Normalize(const Vector2 * v) __GPU
 {
 	float l = v->Length();
 	return Divide(v, l);

@@ -1,8 +1,7 @@
 #include <amp.h>
+#include <amp_math.h>
 #include "Mtrx4.h"
 #include "MathEx.h"
-
-#define __GPU	restrict(cpu, amp)
 
 using namespace concurrency;
 
@@ -14,16 +13,45 @@ bool Matrix4::Equals(const Matrix4 * m1, const Matrix4 * m2) __GPU
 		&& m1->M41 == m2->M41 && m1->M42 == m2->M42 && m1->M43 == m2->M43 && m1->M44 == m2->M44;
 }
 
-Matrix4 Matrix4::CreateYawPitchRoll(float yaw, float pitch, float roll)
+Matrix4 Matrix4::CreateYawPitchRoll(float yaw, float pitch, float roll) __CPU_ONLY
 {
 	mtrx4 result = mtrx4::CreateRotation(&VECT3_FORWARD, roll);
 	result *= mtrx4::CreateRotation(&VECT3_UP, yaw);
 	return result * mtrx4::CreateRotation(&VECT3_RIGHT, pitch);
 }
 
-Matrix4 Matrix4::CreateFrustrum(float fovY, float aspr, float n, float f)
+Matrix4 Matrix4::CreateYawPitchRoll(float yaw, float pitch, float roll) __GPU_ONLY
 {
-	float tangent = tanf(fovY / 2 * deg2rad);
+	mtrx4 result = mtrx4::CreateRotation(&VECT3_FORWARD, roll);
+	result *= mtrx4::CreateRotation(&VECT3_UP, yaw);
+	 return result * mtrx4::CreateRotation(&VECT3_RIGHT, pitch);
+}
+
+Matrix4 Matrix4::CreateFrustrum(float fovY, float aspr, float n, float f) __CPU_ONLY
+{
+	float tangent = tanf(fovY / 2 * M_DEG2RAD);
+	float t = n * tangent;
+	float r = t * aspr;
+	float b = -t;
+	float l = -r;
+
+	float m11 = 2 * n / (r - l);
+	float m13 = (r + l) / (r - l);
+	float m22 = 2 * n / (t - b);
+	float m23 = (t + b) / (t - b);
+	float m33 = -(f + n) / (f - n);
+	float m34 = -(2 * f * n) / (f - n);
+
+	return Matrix4(
+		m11, 0, m13, 0,
+		0, m22, m23, 0,
+		0, 0, m33, m34,
+		0, 0, -1, 0);
+}
+
+Matrix4 Matrix4::CreateFrustrum(float fovY, float aspr, float n, float f) __GPU_ONLY
+{
+	float tangent = fast_math::tanf(fovY / 2 * M_DEG2RAD);
 	float t = n * tangent;
 	float r = t * aspr;
 	float b = -t;
@@ -64,7 +92,7 @@ Matrix4 Matrix4::CreateOrthographic(float width, float height, float n, float f)
 		0 ,0, 0, 1);
 }
 
-Matrix4 Matrix4::CreateRotation(const Vector3 * axis, float rads)
+Matrix4 Matrix4::CreateRotation(const Vector3 * axis, float rads) __CPU_ONLY
 {
 	float c = cosf(rads);
 	float s = sinf(rads);
@@ -93,7 +121,36 @@ Matrix4 Matrix4::CreateRotation(const Vector3 * axis, float rads)
 		0, 0, 0, 1);
 }
 
-Matrix4 Matrix4::CreateRotationX(float rads)
+Matrix4 Matrix4::CreateRotation(const Vector3 * axis, float rads) __GPU_ONLY
+{
+	float c = fast_math::cosf(rads);
+	float s = fast_math::sinf(rads);
+	float xx = square(axis->X);
+	float xy = axis->X * axis->Y;
+	float xz = axis->X * axis->Z;
+	float yy = fast_math::sqrt(axis->Y);
+	float yz = axis->Y * axis->Z;
+	float zz = square(axis->Z);
+	float omc = 1 - c;
+
+	float m11 = xx * omc + c;
+	float m12 = xy * omc - axis->Z * s;
+	float m13 = xz * omc + axis->Y * s;
+	float m21 = xy * omc + axis->Z * s;
+	float m22 = yy * omc + c;
+	float m23 = yz * omc - axis->X * s;
+	float m31 = xz * omc - axis->Y * s;
+	float m32 = yz * omc + axis->X * s;
+	float m33 = zz * omc + c;
+
+	return Matrix4(
+		m11, m12, m13, 0,
+		m21, m22, m23, 0,
+		m31, m32, m33, 0,
+		0, 0, 0, 1);
+}
+
+Matrix4 Matrix4::CreateRotationX(float rads) __CPU_ONLY
 {
 	float cos = cosf(rads);
 	float sin = sinf(rads);
@@ -105,7 +162,19 @@ Matrix4 Matrix4::CreateRotationX(float rads)
 		0, 0, 0, 1);
 }
 
-Matrix4 Matrix4::CreateRotationY(float rads)
+Matrix4 Matrix4::CreateRotationX(float rads) __GPU_ONLY
+{
+	float cos = fast_math::cosf(rads);
+	float sin = fast_math::sinf(rads);
+
+	return Matrix4(
+		1, 0, 0, 0,
+		0, cos, -sin, 0,
+		0, sin, cos, 0,
+		0, 0, 0, 1);
+}
+
+Matrix4 Matrix4::CreateRotationY(float rads) __CPU_ONLY
 {
 	float cos = cosf(rads);
 	float sin = sinf(rads);
@@ -117,10 +186,34 @@ Matrix4 Matrix4::CreateRotationY(float rads)
 		0, 0, 0, 1);
 }
 
-Matrix4 Matrix4::CreateRotationZ(float rads)
+Matrix4 Matrix4::CreateRotationY(float rads) __GPU_ONLY
+{
+	float cos = fast_math::cosf(rads);
+	float sin = fast_math::sinf(rads);
+
+	return Matrix4(
+		cos, 0, sin, 0,
+		0, 1, 0, 0,
+		-sin, 0, cos, 0,
+		0, 0, 0, 1);
+}
+
+Matrix4 Matrix4::CreateRotationZ(float rads) __CPU_ONLY
 {
 	float cos = cosf(rads);
 	float sin = cosf(rads);
+
+	return Matrix4(
+		cos, -sin, 0, 0,
+		sin, cos, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1);
+}
+
+Matrix4 Matrix4::CreateRotationZ(float rads) __GPU_ONLY
+{
+	float cos = fast_math::cosf(rads);
+	float sin = fast_math::cosf(rads);
 
 	return Matrix4(
 		cos, -sin, 0, 0,
@@ -212,7 +305,7 @@ Vector4 Matrix4::Transform(const Matrix4 * m, const Vector3 * v) __GPU
 	return Vector4(x, y, z, w);
 }
 
-void Matrix4::Transform(const Matrix4 * m, const Vector3 * src, Vector4 * dest, const size_t length)
+void Matrix4::Transform(const Matrix4 * m, const Vector3 * src, Vector4 * dest, const size_t length) __CPU_ONLY
 {
 	array_view<const vect3, 1> arr_src(length, src);
 	array_view<vect4, 1> arr_dest(length, dest);

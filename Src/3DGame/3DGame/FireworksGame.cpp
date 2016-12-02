@@ -5,7 +5,7 @@
 #include <Utils.h>
 
 #define FOV_Y		45.0f
-#define Z_DIST(r)	((r) / sinf(FOV_Y / 2 * deg2rad))
+#define Z_DIST(r)	((r) / sinf(FOV_Y / 2 * M_DEG2RAD))
 
 using namespace concurrency;
 

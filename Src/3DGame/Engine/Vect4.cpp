@@ -1,7 +1,8 @@
+#include <amp_math.h>
 #include "Vect4.h"
 #include "MathEx.h"
 
-#define __GPU	restrict(cpu, amp)
+using namespace concurrency;
 
 Vector4 Vector4::Abs(const Vector4 * v) __GPU
 {
@@ -26,7 +27,7 @@ float Vector4::Area(void) const __GPU
 	return X * Z;
 }
 
-Vector4 Vector4::Barycentric(const Vector4 * v1, const Vector4 * v2, const Vector4 * v3, float b2, float b3)
+Vector4 Vector4::Barycentric(const Vector4 * v1, const Vector4 * v2, const Vector4 * v3, float b2, float b3) __GPU
 {
 	float x = barycentric(v1->X, v2->X, v3->X, b2, b3);
 	float y = barycentric(v1->Y, v2->Y, v3->Y, b2, b3);
@@ -36,7 +37,7 @@ Vector4 Vector4::Barycentric(const Vector4 * v1, const Vector4 * v2, const Vecto
 	return Vector4(x, y, z, w);
 }
 
-Vector4 Vector4::CatmullRom(const Vector4 * v1, const Vector4 * v2, const Vector4 * v3, const Vector4 * v4, float a)
+Vector4 Vector4::CatmullRom(const Vector4 * v1, const Vector4 * v2, const Vector4 * v3, const Vector4 * v4, float a) __GPU
 {
 	float x = catmullRom(v1->X, v2->X, v3->X, v4->X, a);
 	float y = catmullRom(v1->Y, v2->Y, v3->Y, v4->Y, a);
@@ -63,9 +64,14 @@ void Vector4::Clamp(const Vector4 * mi, const Vector4 * ma) __GPU
 	W = clamp(mi->W, ma->W, W);
 }
 
-float Vector4::Distance(const Vector4 * v1, const Vector4 * v2)
+float Vector4::Distance(const Vector4 * v1, const Vector4 * v2) __CPU_ONLY
 {
 	return sqrtf(DistanceSquared(v1, v2));
+}
+
+float Vector4::Distance(const Vector4 * v1, const Vector4 * v2) __GPU_ONLY
+{
+	return fast_math::sqrtf(DistanceSquared(v1, v2));
 }
 
 float Vector4::DistanceSquared(const Vector4 * v1, const Vector4 * v2) __GPU
@@ -115,9 +121,14 @@ Vector4 Vector4::Hermite(const Vector4 * v1, const Vector4 * t1, const Vector4 *
 	return Vector4(x, y, z, w);
 }
 
-float Vector4::Length(void) const
+float Vector4::Length(void) const __CPU_ONLY
 {
 	return sqrtf(LengthSquared());
+}
+
+float Vector4::Length(void) const __GPU_ONLY
+{
+	return fast_math::sqrtf(LengthSquared());
 }
 
 float Vector4::LengthSquared(void) const __GPU
@@ -190,13 +201,13 @@ Vector4 Vector4::Negate(const Vector4 * v) __GPU
 	return Vector4(-v->X, -v->Y, -v->Z, -v->W);
 }
 
-void Vector4::Normalize(void)
+void Vector4::Normalize(void) __GPU
 {
 	float l = Length();
 	operator/=(l);
 }
 
-Vector4 Vector4::Normalize(const Vector4 * v)
+Vector4 Vector4::Normalize(const Vector4 * v) __GPU
 {
 	float l = v->Length();
 	return Divide(v, l);

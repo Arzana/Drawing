@@ -1,59 +1,7 @@
 #pragma once
 
-#include "Vect2.h"
-#include "Color.h"
-
-#undef far
-#undef near
-
-typedef struct Vertex
-{
-	vect3 v;
-	Color c;
-
-	Vertex(void);
-	Vertex(vect3 v, Color c);
-	Vertex(float x, float y, float z);
-	Vertex(float x, float y, float z, Color c);
-
-	inline bool operator ==(const Vertex &r) const { return v == r.v && c == r.c; }
-	inline bool operator !=(const Vertex &r) const { return v != r.v || c != r.c; }
-} vrtx;
-
-typedef struct Line 
-{
-	vrtx v0, v1;
-
-	Line(vrtx v0, vrtx v1);
-	Line(const vrtx *v0, const vrtx *v1);
-} line;
-
-typedef struct Triangle
-{
-	vrtx v0, v1, v2;
-
-	Triangle(vrtx v0, vrtx v1, vrtx v2);
-	Triangle(const vrtx *v0, const vrtx *v1, const vrtx *v2);
-	line GetLine(int l) const;
-	bool IsInside(vrtx *v);
-} trgl;
-
-typedef struct Rectangle
-{
-	int x, y, w, h;
-
-	Rectangle(void);
-	Rectangle(int x, int y, int w, int h);
-} rect;
-
-typedef struct ViewPort
-{
-	rect screen;
-	float far, near;
-
-	ViewPort(rect screen, float back, float front);
-	ViewPort(int x, int y, int w, int h, float f, float n);
-} vPort;
+#include "Triangle.h"
+#include "Rectangle.h"
 
 #ifdef _USE_CLIPPING
 #define INSIDE		0b000000
