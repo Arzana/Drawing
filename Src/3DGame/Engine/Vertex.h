@@ -1,6 +1,19 @@
 #pragma once
 
 #include "Color.h"
+#include "Rectangle.h"
+
+#define INSIDE		0b000000
+#define LEFT		0b000001
+#define RIGHT		0b000010
+#define HORIZONTAL	0b000011
+#define BOTTOM		0b000100
+#define TOP			0b001000
+#define VERTICAL	0b001100
+#define NEAR		0b010000
+#define FAR			0b100000
+#define DEPTH		0b110000
+#define OUTSIDE		0b111111
 
 typedef struct Vertex
 {
@@ -14,4 +27,18 @@ typedef struct Vertex
 
 	inline bool operator ==(const Vertex& r) __GPU { return r.v == v && r.c == c; }
 	inline bool operator !=(const Vertex& r) __GPU { return r.v != v || r.c != c; }
+
+	int ComputeMask(const ViewPort vp) const __GPU
+	{
+		int code = INSIDE;
+
+		if (v.X < vp.screen.x) code |= LEFT;
+		else if (v.X > vp.screen.w) code |= RIGHT;
+		if (v.Y < vp.screen.y) code |= BOTTOM;
+		else if (v.Y > vp.screen.h) code |= TOP;
+		if (v.Z < vp.near) code |= NEAR;
+		else if (v.Z > vp.far) code |= FAR;
+
+		return code;
+	}
 } vrtx;

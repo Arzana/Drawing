@@ -31,7 +31,7 @@ public:
 	inline void SetModel(const mtrx4 *mtrx) { model = *mtrx; }
 	void SetBufferLength(const size_t length);
 	void Start(const octet primitiveType);
-	void End(void);
+	bool End(void);
 	void AddVertex(const vect3 v, const clr c);
 	void Clear(const clr c);
 protected:
@@ -69,6 +69,9 @@ private:
 
 	void GF_Points(void);
 	void GF_Lines(void);
+	void GF_LineStrip(void);
+	void GF_LineLoop(void);
+	void GF_LineFan(void);
 } gfWinWnd;
 
 #undef __GPU

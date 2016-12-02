@@ -11,7 +11,7 @@ public:
 	~FireworksGame(void);
 private:
 	const float scalar = 0.1f;
-	const size_t ppAxis = 50;
+	const size_t ppAxis = 30;
 	const size_t pSize = cube(ppAxis);
 
 	size_t updCount = 0;

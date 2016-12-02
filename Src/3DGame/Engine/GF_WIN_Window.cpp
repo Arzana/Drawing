@@ -72,13 +72,13 @@ void GF_WIN_Window::Start(const octet primitiveType)
 	flags->prim = primitiveType;
 }
 
-void GF_WIN_Window::End(void)
+bool GF_WIN_Window::End(void)
 {
 	if (!flags->start || *buffI < *buffLen)
 	{
 		if (!flags->start) Raise("GF_WIN_Window::Start must be called before calling GF_WIN_Window::End!");
 		if (*buffI < *buffLen) Raise("Not all vertices in the buffer have been set!");
-		return;
+		return false;
 	}
 
 	mtrx4 mvp = proj * (model * view);
@@ -88,6 +88,18 @@ void GF_WIN_Window::End(void)
 	{
 	case GF_POINTS:
 		GF_Points();
+		break;
+	case GF_LINES:
+		GF_Lines();
+		break;
+	case GF_LINE_STRIP:
+		GF_LineStrip();
+		break;
+	case GF_LINE_LOOP:
+		GF_LineLoop();
+		break;
+	case GF_LINE_FAN:
+		GF_LineFan();
 		break;
 	default:
 		Raise("Unknown primitive type requested!");
@@ -105,6 +117,7 @@ void GF_WIN_Window::End(void)
 	}
 
 	flags->start = false;
+	return true;
 }
 
 void GF_WIN_Window::AddVertex(const vect3 v, const clr c)
@@ -199,7 +212,7 @@ void GF_WIN_Window::GF_Points(void)
 	{
 		vect4 c = arr_h[i];
 		if (c.Clip()) return;
-		vect3 coord = GF_WIN_Window::ToScreen(c, port, proj);
+		vect3 coord = gfWinWnd::ToScreen(c, port, proj);
 		index<1> pI(xy2i(ipart(coord.X), ipart(coord.Y), w));
 
 		if (arr_z[pI] > coord.Z) return;
@@ -218,5 +231,204 @@ void GF_WIN_Window::GF_Lines(void)
 
 	const bool proj = flags->proj, clip = flags->clip;
 	const vect4 port = *cp;
+	const vPort vport = *vp;
 	const size_t w = width;
+
+	parallel_for(size_t(0), *buffLen, size_t(2),
+		[=](size_t i) __GPU
+	{
+		vect4 c0 = arr_h[i], c1 = arr_h[i + 1];
+		if (c0.Clip() || c1.Clip())
+		{
+			if (!clip) return;
+			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
+			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
+			Line l = Line(Vertex(coord0, arr_c[i]), Vertex(coord1, arr_c[i + 1]));
+			if (l.Clip(vport))
+			{
+				l.Render(
+					[=](uint x, uint y, float z, clr c)
+				{
+					index<1> pI(xy2i(ipart(x), ipart(y), w));
+
+					if (arr_z[pI] > z) return;
+					arr_z[pI] = z;
+					arr_pix[pI] = c;
+				});
+			}
+		}
+		else
+		{
+			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
+			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
+			Line(Vertex(coord0, arr_c[i]), Vertex(coord1, arr_c[i + 1])).Render(
+				[=](uint x, uint y, float z, clr c)
+			{
+				index<1> pI(xy2i(ipart(x), ipart(y), w));
+
+				if (arr_z[pI] > z) return;
+				arr_z[pI] = z;
+				arr_pix[pI] = c;
+			});
+		}
+	});
+}
+
+void GF_WIN_Window::GF_LineStrip(void)
+{
+	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
+	array_view<float, 1> arr_z(scrArea, zBuff);
+	array_view<vect4, 1> arr_h(*buffLen, hBuff);
+	array_view<clr, 1> arr_c(*buffLen, cBuff);
+
+	const bool proj = flags->proj, clip = flags->clip;
+	const vect4 port = *cp;
+	const vPort vport = *vp;
+	const size_t w = width;
+
+	parallel_for(size_t(0), *buffLen - 1, size_t(1),
+		[=](size_t i) __GPU
+	{
+		vect4 c0 = arr_h[i], c1 = arr_h[i + 1];
+		if (c0.Clip() || c1.Clip())
+		{
+			if (!clip) return;
+			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
+			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
+			Line l = Line(Vertex(coord0, arr_c[i]), Vertex(coord1, arr_c[i + 1]));
+			if (l.Clip(vport))
+			{
+				l.Render(
+					[=](uint x, uint y, float z, clr c)
+				{
+					index<1> pI(xy2i(ipart(x), ipart(y), w));
+
+					if (arr_z[pI] > z) return;
+					arr_z[pI] = z;
+					arr_pix[pI] = c;
+				});
+			}
+		}
+		else
+		{
+			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
+			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
+			Line(Vertex(coord0, arr_c[i]), Vertex(coord1, arr_c[i + 1])).Render(
+				[=](uint x, uint y, float z, clr c)
+			{
+				index<1> pI(xy2i(ipart(x), ipart(y), w));
+
+				if (arr_z[pI] > z) return;
+				arr_z[pI] = z;
+				arr_pix[pI] = c;
+			});
+		}
+	});
+}
+
+void GF_WIN_Window::GF_LineLoop(void)
+{
+	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
+	array_view<float, 1> arr_z(scrArea, zBuff);
+	array_view<vect4, 1> arr_h(*buffLen, hBuff);
+	array_view<clr, 1> arr_c(*buffLen, cBuff);
+
+	const bool proj = flags->proj, clip = flags->clip;
+	const vect4 port = *cp;
+	const vPort vport = *vp;
+	const size_t w = width;
+	const size_t end = *buffLen;
+
+	parallel_for(size_t(0), end - 1, size_t(1),
+		[=](size_t i) __GPU
+	{
+		size_t j = i + 1 < end ? i + 1 : 0;
+		vect4 c0 = arr_h[i], c1 = arr_h[j];
+		if (c0.Clip() || c1.Clip())
+		{
+			if (!clip) return;
+			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
+			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
+			Line l = Line(Vertex(coord0, arr_c[i]), Vertex(coord1, arr_c[j]));
+			if (l.Clip(vport))
+			{
+				l.Render(
+					[=](uint x, uint y, float z, clr c)
+				{
+					index<1> pI(xy2i(ipart(x), ipart(y), w));
+
+					if (arr_z[pI] > z) return;
+					arr_z[pI] = z;
+					arr_pix[pI] = c;
+				});
+			}
+		}
+		else
+		{
+			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
+			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
+			Line(Vertex(coord0, arr_c[i]), Vertex(coord1, arr_c[j])).Render(
+				[=](uint x, uint y, float z, clr c)
+			{
+				index<1> pI(xy2i(ipart(x), ipart(y), w));
+
+				if (arr_z[pI] > z) return;
+				arr_z[pI] = z;
+				arr_pix[pI] = c;
+			});
+		}
+	});
+}
+
+void GF_WIN_Window::GF_LineFan(void)
+{
+	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
+	array_view<float, 1> arr_z(scrArea, zBuff);
+	array_view<vect4, 1> arr_h(*buffLen, hBuff);
+	array_view<clr, 1> arr_c(*buffLen, cBuff);
+
+	const bool proj = flags->proj, clip = flags->clip;
+	const vect4 port = *cp;
+	const vPort vport = *vp;
+	const size_t w = width;
+
+	parallel_for_each(
+		arr_h.extent,
+		[=](index<1> i) __GPU_ONLY
+	{
+		vect4 c0 = arr_h[0], c1 = arr_h[i];
+		if (c0.Clip() || c1.Clip())
+		{
+			if (!clip) return;
+			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
+			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
+			Line l = Line(Vertex(coord0, arr_c[0]), Vertex(coord1, arr_c[i]));
+			if (l.Clip(vport))
+			{
+				l.Render(
+					[=](uint x, uint y, float z, clr c) __GPU_ONLY
+				{
+					index<1> pI(xy2i(ipart(x), ipart(y), w));
+
+					if (arr_z[pI] > z) return;
+					arr_z[pI] = z;
+					arr_pix[pI] = c;
+				});
+			}
+		}
+		else
+		{
+			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
+			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
+			Line(Vertex(coord0, arr_c[0]), Vertex(coord1, arr_c[i])).Render(
+				[=](uint x, uint y, float z, clr c) __GPU_ONLY
+			{
+				index<1> pI(xy2i(ipart(x), ipart(y), w));
+
+				if (arr_z[pI] > z) return;
+				arr_z[pI] = z;
+				arr_pix[pI] = c;
+			});
+		}
+	});
 }

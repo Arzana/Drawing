@@ -27,10 +27,11 @@ FireworksGame::~FireworksGame(void)
 void FireworksGame::OnInitialize(void)
 {
 	printf("Starting particle creation.\n");
-	SetBufferLength(pSize);
+	SetBufferLength(pSize + 1);
 	vel = malloc_s(vect3, pSize);
-	vertices = GetVertexBuffer();
+	vertices = GetVertexBuffer() + 1;
 
+	AddVertex(VECT3_ZERO, CLR_BLACK);
 	for (size_t yaw = 0; yaw < ppAxis; yaw++)
 	{
 		float yawf = lerp(0, M_TAU, invLerp(0, ppAxis, yaw));
@@ -90,8 +91,8 @@ void FireworksGame::OnRender(void)
 	Clear(CLR_BLACK);
 	SetView(cam->GetView());
 
-	Start(GF_POINTS);
-	End();
+	Start(GF_LINE_FAN);
+	if (!End()) Terminate();
 
 #pragma region FPS VIEW
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
