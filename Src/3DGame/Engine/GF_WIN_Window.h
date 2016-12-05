@@ -68,10 +68,8 @@ private:
 	static vect3 ToScreen(const vect4 v, const vect4 cp, const bool proj) __GPU;
 
 	void GF_Points(void);
-	void GF_Lines(void);
-	void GF_LineStrip(void);
-	void GF_LineLoop(void);
 	void GF_LineFan(void);
+	void GF_Triangles(void);
 } gfWinWnd;
 
 #undef __GPU

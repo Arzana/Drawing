@@ -89,15 +89,6 @@ bool GF_WIN_Window::End(void)
 	case GF_POINTS:
 		GF_Points();
 		break;
-	case GF_LINES:
-		GF_Lines();
-		break;
-	case GF_LINE_STRIP:
-		GF_LineStrip();
-		break;
-	case GF_LINE_LOOP:
-		GF_LineLoop();
-		break;
 	case GF_LINE_FAN:
 		GF_LineFan();
 		break;
@@ -210,9 +201,9 @@ void GF_WIN_Window::GF_Points(void)
 		arr_h.extent,
 		[=](index<1> i) __GPU_ONLY
 	{
-		vect4 c = arr_h[i];
-		if (c.Clip()) return;
-		vect3 coord = gfWinWnd::ToScreen(c, port, proj);
+		vect4 h = arr_h[i];
+		if (h.Clip()) return;
+		vect3 coord = gfWinWnd::ToScreen(h, port, proj);
 		index<1> pI(xy2i(ipart(coord.X), ipart(coord.Y), w));
 
 		if (arr_z[pI] > coord.Z) return;
@@ -220,171 +211,12 @@ void GF_WIN_Window::GF_Points(void)
 		arr_pix[pI] = arr_c[i];
 	});
 }
-#include <ppl.h>
-
-void GF_WIN_Window::GF_Lines(void)
-{
-	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
-	array_view<float, 1> arr_z(scrArea, zBuff);
-	array_view<vect4, 1> arr_h(*buffLen, hBuff);
-	array_view<clr, 1> arr_c(*buffLen, cBuff);
-
-	const bool proj = flags->proj, clip = flags->clip;
-	const vect4 port = *cp;
-	const vPort vport = *vp;
-	const size_t w = width;
-
-	parallel_for(size_t(0), *buffLen, size_t(2),
-		[=](size_t i) __GPU
-	{
-		vect4 c0 = arr_h[i], c1 = arr_h[i + 1];
-		if (c0.Clip() || c1.Clip())
-		{
-			if (!clip) return;
-			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
-			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
-			Line l = Line(Vertex(coord0, arr_c[i]), Vertex(coord1, arr_c[i + 1]));
-			if (l.Clip(vport))
-			{
-				l.Render(
-					[=](uint x, uint y, float z, clr c)
-				{
-					index<1> pI(xy2i(ipart(x), ipart(y), w));
-
-					if (arr_z[pI] > z) return;
-					arr_z[pI] = z;
-					arr_pix[pI] = c;
-				});
-			}
-		}
-		else
-		{
-			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
-			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
-			Line(Vertex(coord0, arr_c[i]), Vertex(coord1, arr_c[i + 1])).Render(
-				[=](uint x, uint y, float z, clr c)
-			{
-				index<1> pI(xy2i(ipart(x), ipart(y), w));
-
-				if (arr_z[pI] > z) return;
-				arr_z[pI] = z;
-				arr_pix[pI] = c;
-			});
-		}
-	});
-}
-
-void GF_WIN_Window::GF_LineStrip(void)
-{
-	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
-	array_view<float, 1> arr_z(scrArea, zBuff);
-	array_view<vect4, 1> arr_h(*buffLen, hBuff);
-	array_view<clr, 1> arr_c(*buffLen, cBuff);
-
-	const bool proj = flags->proj, clip = flags->clip;
-	const vect4 port = *cp;
-	const vPort vport = *vp;
-	const size_t w = width;
-
-	parallel_for(size_t(0), *buffLen - 1, size_t(1),
-		[=](size_t i) __GPU
-	{
-		vect4 c0 = arr_h[i], c1 = arr_h[i + 1];
-		if (c0.Clip() || c1.Clip())
-		{
-			if (!clip) return;
-			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
-			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
-			Line l = Line(Vertex(coord0, arr_c[i]), Vertex(coord1, arr_c[i + 1]));
-			if (l.Clip(vport))
-			{
-				l.Render(
-					[=](uint x, uint y, float z, clr c)
-				{
-					index<1> pI(xy2i(ipart(x), ipart(y), w));
-
-					if (arr_z[pI] > z) return;
-					arr_z[pI] = z;
-					arr_pix[pI] = c;
-				});
-			}
-		}
-		else
-		{
-			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
-			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
-			Line(Vertex(coord0, arr_c[i]), Vertex(coord1, arr_c[i + 1])).Render(
-				[=](uint x, uint y, float z, clr c)
-			{
-				index<1> pI(xy2i(ipart(x), ipart(y), w));
-
-				if (arr_z[pI] > z) return;
-				arr_z[pI] = z;
-				arr_pix[pI] = c;
-			});
-		}
-	});
-}
-
-void GF_WIN_Window::GF_LineLoop(void)
-{
-	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
-	array_view<float, 1> arr_z(scrArea, zBuff);
-	array_view<vect4, 1> arr_h(*buffLen, hBuff);
-	array_view<clr, 1> arr_c(*buffLen, cBuff);
-
-	const bool proj = flags->proj, clip = flags->clip;
-	const vect4 port = *cp;
-	const vPort vport = *vp;
-	const size_t w = width;
-	const size_t end = *buffLen;
-
-	parallel_for(size_t(0), end - 1, size_t(1),
-		[=](size_t i) __GPU
-	{
-		size_t j = i + 1 < end ? i + 1 : 0;
-		vect4 c0 = arr_h[i], c1 = arr_h[j];
-		if (c0.Clip() || c1.Clip())
-		{
-			if (!clip) return;
-			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
-			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
-			Line l = Line(Vertex(coord0, arr_c[i]), Vertex(coord1, arr_c[j]));
-			if (l.Clip(vport))
-			{
-				l.Render(
-					[=](uint x, uint y, float z, clr c)
-				{
-					index<1> pI(xy2i(ipart(x), ipart(y), w));
-
-					if (arr_z[pI] > z) return;
-					arr_z[pI] = z;
-					arr_pix[pI] = c;
-				});
-			}
-		}
-		else
-		{
-			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
-			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
-			Line(Vertex(coord0, arr_c[i]), Vertex(coord1, arr_c[j])).Render(
-				[=](uint x, uint y, float z, clr c)
-			{
-				index<1> pI(xy2i(ipart(x), ipart(y), w));
-
-				if (arr_z[pI] > z) return;
-				arr_z[pI] = z;
-				arr_pix[pI] = c;
-			});
-		}
-	});
-}
 
 void GF_WIN_Window::GF_LineFan(void)
 {
 	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
 	array_view<float, 1> arr_z(scrArea, zBuff);
-	array_view<vect4, 1> arr_h(*buffLen, hBuff);
+	array_view<vect4, 1> arr_h((*buffLen) - 1, hBuff + 1);
 	array_view<clr, 1> arr_c(*buffLen, cBuff);
 
 	const bool proj = flags->proj, clip = flags->clip;
@@ -392,16 +224,18 @@ void GF_WIN_Window::GF_LineFan(void)
 	const vPort vport = *vp;
 	const size_t w = width;
 
+	const vect4 h0 = hBuff[0];
+
 	parallel_for_each(
 		arr_h.extent,
 		[=](index<1> i) __GPU_ONLY
 	{
-		vect4 c0 = arr_h[0], c1 = arr_h[i];
-		if (c0.Clip() || c1.Clip())
+		vect4 h1 = arr_h[i];
+		if (h0.Clip() || h1.Clip())
 		{
 			if (!clip) return;
-			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
-			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
+			vect3 coord0 = gfWinWnd::ToScreen(h0, port, proj);
+			vect3 coord1 = gfWinWnd::ToScreen(h1, port, proj);
 			Line l = Line(Vertex(coord0, arr_c[0]), Vertex(coord1, arr_c[i]));
 			if (l.Clip(vport))
 			{
@@ -418,8 +252,8 @@ void GF_WIN_Window::GF_LineFan(void)
 		}
 		else
 		{
-			vect3 coord0 = gfWinWnd::ToScreen(c0, port, proj);
-			vect3 coord1 = gfWinWnd::ToScreen(c1, port, proj);
+			vect3 coord0 = gfWinWnd::ToScreen(h0, port, proj);
+			vect3 coord1 = gfWinWnd::ToScreen(h1, port, proj);
 			Line(Vertex(coord0, arr_c[0]), Vertex(coord1, arr_c[i])).Render(
 				[=](uint x, uint y, float z, clr c) __GPU_ONLY
 			{
@@ -431,4 +265,44 @@ void GF_WIN_Window::GF_LineFan(void)
 			});
 		}
 	});
+}
+
+void GF_WIN_Window::GF_Triangles(void)
+{
+	const size_t tLen = *buffLen / 3;
+
+	trgl *trgls = malloc_s(trgl, tLen);
+	array_view<trgl, 1> arr_trgls(tLen, trgls);
+	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
+	array_view<float, 1> arr_z(scrArea, zBuff);
+	array_view<vect4, 1> arr_h((*buffLen) - 1, hBuff + 1);
+	array_view<clr, 1> arr_c(*buffLen, cBuff);
+
+	const bool proj = flags->proj, clip = flags->clip;
+	const vect4 port = *cp;
+	const vPort vport = *vp;
+
+	parallel_for_each(
+		arr_trgls.extent,
+		[=](index<1> i) __GPU_ONLY
+	{
+		index<1> j = i * 3;
+		vect3 coord0 = gfWinWnd::ToScreen(arr_h[j], port, proj);
+		vect3 coord1 = gfWinWnd::ToScreen(arr_h[j + 1], port, proj);
+		vect3 coord2 = gfWinWnd::ToScreen(arr_h[j + 2], port, proj);
+		arr_trgls[i] = trgl(Vertex(coord0, arr_c[j]), Vertex(coord1, arr_c[j + 1]), Vertex(coord2, arr_c[j + 2]));
+	});
+
+	for (size_t i = 0; i < tLen; i++)
+	{
+		trgl cur = trgls[i];
+		int maxX = max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X);
+		int minX = min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X);
+		int maxY = max3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y);
+		int minY = min3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y);
+		array_view<clr, 1> arr_box((maxX - minX) * (maxY - minY), (clr*)(pixels) + xy2i(minX, minY, width));
+
+		vect2 vs0 = vect2(cur.v1.v.X - cur.v0.v.X, cur.v1.v.Y - cur.v0.v.Y);
+		vect2 vs1 = vect2(cur.v2.v.X - cur.v0.v.X, cur.v2.v.Y - cur.v0.v.Y);
+	}
 }
