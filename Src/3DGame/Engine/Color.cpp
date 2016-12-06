@@ -15,11 +15,6 @@ bool Color::Equals(const Color * c1, const Color * c2) __GPU
 	return c1->packed == c2->packed;
 }
 
-Color Color::FromNonPremultiplied(int r, int g, int b, int a) __GPU
-{
-	return Color(ipart(r * a / 255), ipart(g * a / 255), ipart(b * a / 255), ipart(a * 255));
-}
-
 void Color::FromNonPremultiplied(Color * c, float a) __GPU
 {
 	*c = FromNonPremultiplied(c->GetR(), c->GetG(), c->GetB(), ipart(a * 255));

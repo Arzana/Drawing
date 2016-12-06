@@ -184,11 +184,6 @@ Vector2 Vector2::Normalize(const Vector2 * v) __GPU
 	return Divide(v, l);
 }
 
-float Vector2::PrepDot(const Vector2 * v1, const Vector2 * v2) __GPU
-{
-	return v1->X * v2->Y - v1->Y * v2->X;
-}
-
 Vector2 Vector2::Reflect(const Vector2 * v, const Vector2 * n) __GPU
 {
 	return *v - vect2(2) * (*v * *n) * *n;

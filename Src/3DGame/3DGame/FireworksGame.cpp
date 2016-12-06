@@ -31,7 +31,7 @@ void FireworksGame::OnInitialize(void)
 	vel = malloc_s(vect3, pSize);
 	vertices = GetVertexBuffer() + 1;
 
-	AddVertex(VECT3_ZERO, CLR_BLACK);
+	AddVertex(VECT3_ZERO, clr((uint)0));
 	for (size_t yaw = 0; yaw < ppAxis; yaw++)
 	{
 		float yawf = lerp(0, M_TAU, invLerp(0, ppAxis, yaw));

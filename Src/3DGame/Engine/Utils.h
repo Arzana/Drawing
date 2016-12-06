@@ -20,6 +20,8 @@
 
 #define xy2i(x, y, w)			((y) * (w) + (x))
 #define xyz2i(x, y, z, w, h)	((z) * (w) * (h) + xy2i(x, y, w))
+#define i2x(i, w)				((i) % (w))
+#define i2y(i, w)				((i) / (w))
 
 #ifdef _VECT_CONV
 #include "Vect2.h"

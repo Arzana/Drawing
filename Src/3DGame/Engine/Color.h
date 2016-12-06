@@ -58,15 +58,19 @@ typedef struct Color
 
 	inline Color operator +(const Color& r) const __GPU { return Color(GetR() + r.GetR(), GetG() + r.GetG(), GetB() + r.GetB(), GetA() + r.GetA()); }
 	inline Color operator -(const Color& r) const __GPU { return Color(GetR() - r.GetR(), GetG() - r.GetG(), GetB() - r.GetB(), GetA() - r.GetA()); }
-	inline Color operator *(float r) const __GPU { return Color(GetR() * r, GetG() * r, GetB() * r, GetA() * r); }
-	inline Color operator /(float r) const __GPU { return Color(GetR() / r, GetG() / r, GetB() / r, GetA() / r); }
+	inline Color operator *(float r) const __GPU { return Color(ipart(GetR() * r), ipart(GetG() * r), ipart(GetB() * r), ipart(GetA() * r)); }
+	inline Color operator /(float r) const __GPU { return Color(ipart(GetR() / r), ipart(GetG() / r), ipart(GetB() / r), ipart(GetA() / r)); }
 	inline bool operator ==(const Color &r) const __GPU { return r.packed == packed; }
 	inline bool operator !=(const Color &r) const __GPU { return r.packed != packed; }
 
 	static Color Add(const Color *c0, const Color *c1) __GPU;
 	static Color Divide(const Color *c, float divider) __GPU;
 	static bool Equals(const Color *c1, const Color *c2) __GPU;
-	static Color FromNonPremultiplied(int r, int g, int b, int a) __GPU;
+	static Color FromNonPremultiplied(int r, int g, int b, int a) __GPU
+	{
+		float f_a = a / 255.0f;
+		return Color(ipart(r * f_a), ipart(g * f_a), ipart(b * f_a), a);
+	}
 	static void FromNonPremultiplied(Color *c, float a) __GPU;
 	inline int GetA(void) const __GPU { return (packed & 0xFF000000) >> 24; }
 	inline int GetR(void) const __GPU { return (packed & 0x00FF0000) >> 16; }
@@ -75,11 +79,11 @@ typedef struct Color
 	static Color Lerp(const Color min, const Color max, float a) __GPU
 	{
 		a = clamp(0.0f, 1.0f, a);
-		float r = lerp(min.GetR(), max.GetR(), a);
-		float g = lerp(min.GetG(), max.GetG(), a);
-		float b = lerp(min.GetB(), max.GetB(), a);
-		float alpha = lerp(min.GetA(), max.GetA(), a);
-		return Color(ipart(r), ipart(g), ipart(b), ipart(alpha));
+		float f_a = lerp(min.GetA(), max.GetA(), a) / 255.0f;
+		float r = lerp(min.GetR(), max.GetR(), a) * f_a;
+		float g = lerp(min.GetG(), max.GetG(), a) * f_a;
+		float b = lerp(min.GetB(), max.GetB(), a) * f_a;
+		return Color(ipart(r), ipart(g), ipart(b), ipart(f_a * 255));
 	}
 	static Color Multiply(const Color *c, float multiplier) __GPU;
 	static Color Subtract(const Color *c0, const Color *c1) __GPU;

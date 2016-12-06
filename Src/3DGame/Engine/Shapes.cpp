@@ -102,7 +102,7 @@ vrtx* TriangleClip(trgl * p, int * len, const ViewPort vp)
 
 	for (size_t i = 0; i < 3; i++)
 	{
-		Line *l = &p->GetLine(i);
+		Line *l = NULL;
 		if (LineClip(l, vp))
 		{
 			if (!Contains(temp, &l->v0)) temp.push_back(l->v0);

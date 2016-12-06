@@ -70,7 +70,7 @@ typedef struct Vector2
 	static Vector2 Negate(const Vector2 *v) __GPU;
 	void Normalize(void) __GPU;
 	static Vector2 Normalize(const Vector2 *v) __GPU;
-	static float PrepDot(const Vector2 *v1, const Vector2 *v2) __GPU;
+	static float PrepDot(const Vector2 *v1, const Vector2 *v2) __GPU { return v1->X * v2->Y - v1->Y * v2->X; }
 	static Vector2 Reflect(const Vector2 *v, const Vector2 *n) __GPU;
 	static Vector2 SmoothStep(const Vector2 *v1, const Vector2 *v2, float a) __GPU;
 	static Vector2 Subtract(const Vector2 *v1, const Vector2 *v2) __GPU;
