@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include "FireworksGame.h"
+#include "Room.h"
 
 //#define _USE_FULL_HD
 

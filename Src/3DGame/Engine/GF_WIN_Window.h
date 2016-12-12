@@ -33,6 +33,8 @@ public:
 	void Start(const octet primitiveType);
 	bool End(void);
 	void AddVertex(const vect3 v, const clr c);
+	inline void AddVertex(const float x, const float y, const float z, const clr c) { AddVertex(vect3(x, y, z), c); }
+	inline void AddVertex(const vrtx vtx) { AddVertex(vtx.v, vtx.c); }
 	void Clear(const clr c);
 protected:
 	inline void SetFlag_ZBuffering(const bool value) { flags->zBuff = value; }

@@ -297,6 +297,7 @@ void GF_WIN_Window::GF_Triangles(void)
 	for (size_t i = 0; i < tLen; i++)
 	{
 		trgl cur = trgls[i];
+
 		int maxX = max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X);
 		int minX = min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X);
 		int maxY = max3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y);

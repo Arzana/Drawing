@@ -3,6 +3,7 @@
 #include "WindowsWindow.h"
 #include "Utils.h"
 #include "Color.h"
+#include "WinLogger.h"
 
 using namespace std;
 
@@ -73,7 +74,7 @@ LRESULT CALLBACK WindowsWindow::WndProc(uint msg, WPARAM wParam, LPARAM lParam)
 
 int WindowsWindow::WndInit(const char g_szClassName[], const char title[])
 {
-	printf("Starting windows window creation.\n");
+	LogMsg_Eng("Starting windows window creation.");
 
 	WNDCLASSEX wndc =
 	{
@@ -92,11 +93,11 @@ int WindowsWindow::WndInit(const char g_szClassName[], const char title[])
 
 	if (!RegisterClassEx(&wndc))
 	{
-		printf("Window registration failed(%d)!\n", GetLastError());
+		LogMsg_Eng("Window registration failed(%d)!", GetLastError());
 		return 1;
 	}
 	
-	printf("Window registration successfull.\n");
+	LogMsg_Eng("Window registration successfull.");
 	hwnd = CreateWindowEx(
 		WS_EX_CLIENTEDGE,
 		g_szClassName,
@@ -107,18 +108,18 @@ int WindowsWindow::WndInit(const char g_szClassName[], const char title[])
 
 	if (!hwnd)
 	{
-		printf("Window creation failed(%d)!\n", GetLastError());
+		LogMsg_Eng("Window creation failed(%d)!", GetLastError());
 		return 1;
 	}
 
-	printf("Window creation successfull.\n");
+	LogMsg_Eng("Window creation successfull.");
 	return 0;
 }
 
 int WindowsWindow::BmpInit(void)
 {
 	const uint depth = 3;
-	printf("Starting bitmap creation.\n");
+	LogMsg_Eng("Starting bitmap creation.");
 
 	hbmp = NULL;
 	bits = malloc_s(octet, width * height * depth);
@@ -149,12 +150,12 @@ int WindowsWindow::BmpInit(void)
 	hbmp = CreateDIBSection(hdc, &bmpinf, DIB_RGB_COLORS, &pixels, NULL, 0);
 	if (!hbmp)
 	{
-		printf("Bitmap creation failed!\n");
+		LogMsg_Eng("Bitmap creation failed(%d)!", GetLastError());
 		PostQuitMessage(0);
 		return 1;
 	}
 
-	printf("Bitmap creation successfull.\n");
+	LogMsg_Eng("Bitmap creation successfull.");
 	memcpy(pixels, bits, sizeof(pixels));
 	ReleaseDC(hwnd, hdc);
 	return 0;
@@ -174,7 +175,7 @@ LRESULT CALLBACK f_WndProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
 
 	if (!wnd)
 	{
-		printf("WndProc(%d) called from unknown window!\n", msg);
+		LogMsg_Eng("WndProc(%d) called from unknown window!", msg);
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
 	else return wnd->WndProc(msg, wParam, lParam);

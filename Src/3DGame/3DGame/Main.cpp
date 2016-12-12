@@ -1,11 +1,13 @@
 #include "Main.h"
+#include <WinLogger.h>
 
 int main(int argc, char *argv[])
 {
-	fireworks *game = new fireworks(WIDTH, HEIGHT);
+	room *game = new room(WIDTH, HEIGHT);
 	game->Run();
 	delete game;
 
-	printf("Press any key to continue...");
-	getchar();
+	char c;
+	printf("Press the ENTER key to continue...");
+	scanf("%c", &c);
 }

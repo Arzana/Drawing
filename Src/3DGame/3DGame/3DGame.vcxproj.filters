@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Games">
+      <UniqueIdentifier>{3477853d-b02f-4107-94d1-4827ae0317ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Games">
+      <UniqueIdentifier>{dce278c3-9587-443e-abbe-55b43755f8f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -22,7 +28,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FireworksGame.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="Room.cpp">
+      <Filter>Source Files\Games</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -33,7 +42,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FireworksGame.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="Room.h">
+      <Filter>Header Files\Games</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

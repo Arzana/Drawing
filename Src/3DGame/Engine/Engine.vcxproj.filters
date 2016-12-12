@@ -37,6 +37,12 @@
     <Filter Include="Source Files\Window">
       <UniqueIdentifier>{ea315658-c7b1-4be3-ad15-388dbb2ec383}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Logging">
+      <UniqueIdentifier>{9c34520b-92a3-4765-b4df-cf72ad6e6b95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logging">
+      <UniqueIdentifier>{2f23f890-24cc-4b90-91f9-f258173c56ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vect2.h">
@@ -93,6 +99,9 @@
     <ClInclude Include="Rectangle.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="WinLogger.h">
+      <Filter>Header Files\Logging</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vect2.cpp">
@@ -133,6 +142,9 @@
     </ClCompile>
     <ClCompile Include="Game_WIN.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WinLogger.cpp">
+      <Filter>Source Files\Logging</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

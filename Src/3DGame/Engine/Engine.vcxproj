@@ -37,6 +37,7 @@
     <ClInclude Include="Vect2.h" />
     <ClInclude Include="Vect3.h" />
     <ClInclude Include="Vect4.h" />
+    <ClInclude Include="WinLogger.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Color.cpp" />
@@ -52,6 +53,7 @@
     <ClCompile Include="Vect2.cpp" />
     <ClCompile Include="Vect3.cpp" />
     <ClCompile Include="Vect4.cpp" />
+    <ClCompile Include="WinLogger.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{05FF6B09-EFD4-4C3C-B09F-F970558CF2C8}</ProjectGuid>
