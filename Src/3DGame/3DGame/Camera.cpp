@@ -189,7 +189,7 @@ vect3 Camera::GetPosition(void) const
 
 void Camera::Move(vect3 direction)
 {
-	mtrx4 movement = mtrx4::CreateYawPitchRoll(rotation->X, rotation->Y, rotation->Z);
+	mtrx4 movement = mtrx4::CreateRotationQ(rotation->X, rotation->Y, rotation->Z);
 	vect4 vH = movement * direction;
 
 	AppendX(vH.X);
@@ -201,7 +201,7 @@ void Camera::Update(void)
 {
 	*rot = quat::CreateYawPitchRoll(rotation->X, -rotation->Y, rotation->Z);
 	*view = mtrx4::CreateRotationQ(rot);
-	*view *= mtrx4::CreateTranslation(&vect3::Negate(position));
+	*view *= mtrx4::CreateTranslation(&vect3(-position->X, position->Y, position->Z));
 }
 
 const mtrx4 * Camera::GetView(void) const

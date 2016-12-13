@@ -298,11 +298,11 @@ void GF_WIN_Window::GF_Triangles(void)
 	{
 		trgl cur = trgls[i];
 
-		int maxX = max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X);
-		int minX = min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X);
-		int maxY = max3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y);
-		int minY = min3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y);
-		array_view<clr, 1> arr_box((maxX - minX) * (maxY - minY), (clr*)pixels);
+		int maxX = abs(max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
+		int minX = abs(min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
+		int maxY = abs(max3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
+		int minY = abs(min3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
+		array_view<clr, 1> arr_box(max(1, maxX - minX) * max(1, maxY - minY), (clr*)pixels);
 
 		parallel_for_each(
 			arr_box.extent,

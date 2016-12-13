@@ -27,7 +27,7 @@ typedef struct Matrix4
 		, M21(m21), M22(m22), M23(m23), M24(m24)
 		, M31(m31), M32(m32), M33(m33), M34(m34)
 		, M41(m41), M42(m42), M43(m43), M44(m44) { }
-
+	
 	inline Matrix4 operator *(const Matrix4 &r) const __GPU
 	{
 		float m11 = M11 * r.M11 + M12 * r.M21 + M13 * r.M31 + M14 * r.M41;
@@ -123,6 +123,7 @@ typedef struct Matrix4
 	static Matrix4 CreateRotationZ(float rads) __CPU_ONLY;
 	static Matrix4 CreateRotationZ(float rads) __GPU_ONLY;
 	static Matrix4 CreateRotationQ(const Quaternion *q) __GPU;
+	inline static Matrix4 CreateRotationQ(float yaw, float pitch, float roll) __GPU { return CreateRotationQ(&Quaternion::CreateYawPitchRoll(yaw, pitch, roll)); }
 	static Matrix4 CreateScale(float scale) __GPU;
 	static Matrix4 CreateScale(const Vector3 *scale) __GPU;
 	static Matrix4 CreateTranslation(const Vector3 *pos) __GPU;
