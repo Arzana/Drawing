@@ -5,7 +5,7 @@ RoomGame::RoomGame(const uint w, const uint h)
 	: winGame("RoomTest", w, h)
 	, cam(new Camera(vect3(0, 0, -10)))
 {
-	SetProjection_Frustrum(45.0f, w / h, 0.1f, 100.0f);
+	SetProjection_Frustrum(45.0f, (float)w / h, 0.1f, 100.0f);
 }
 
 RoomGame::~RoomGame(void)

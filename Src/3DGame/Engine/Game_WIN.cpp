@@ -1,7 +1,9 @@
 #include "Game_WIN.h"
+#include "WinLogger.h"
 
 #define GET_X_LPARAM(lp)	((int)(short)LOWORD(lp))
 #define GET_Y_LPARAM(lp)	((int)(short)HIWORD(lp))
+#define BOOL_STR(b)			((b) ? "true" : "false")
 
 Game_WIN::Game_WIN(const char * title, const uint width, const uint height)
 	: gfWinWnd(title, width, height)
@@ -15,6 +17,13 @@ Game_WIN::~Game_WIN(void)
 {
 	delete IsFixedTimeStep;
 	delete frameBuffer;
+}
+
+void Game_WIN::OnInitialize(void)
+{
+	LogMsg_Game("Initializing windows game.");
+	LogMsg_Game("\tFlags { ZBuffering: %s, Clipping: %s, VertexBuffering: %s }",
+		BOOL_STR(flags->zBuff), BOOL_STR(flags->clip), BOOL_STR(flags->vBuff));
 }
 
 void Game_WIN::Run(void)

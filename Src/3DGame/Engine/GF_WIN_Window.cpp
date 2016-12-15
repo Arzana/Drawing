@@ -4,6 +4,7 @@
 #include <cstdio>
 #include "GF_WIN_Window.h"
 #include "Utils.h"
+#include "WinLogger.h"
 
 #define __GPU		restrict(cpu, amp)
 
@@ -33,6 +34,7 @@ GF_WIN_Window::~GF_WIN_Window(void)
 
 void GF_WIN_Window::SetProjection_Frustrum(const float fovY, const float aspr, const float front, const float back)
 {
+	LogMsg_GF("Projection set as frustrum.");
 	flags->proj = true;
 	proj = mtrx4::CreateFrustrum(fovY, aspr, front, back);
 	SetDepth(front, back);
@@ -40,6 +42,7 @@ void GF_WIN_Window::SetProjection_Frustrum(const float fovY, const float aspr, c
 
 void GF_WIN_Window::SetProjection_Orthographic(const float width, const float height, const float front, const float back)
 {
+	LogMsg_GF("Projection set as orthographic.");
 	flags->proj = false;
 	proj = mtrx4::CreateOrthographic(width, height, front, back);
 	SetDepth(front, back);
@@ -142,6 +145,9 @@ void GF_WIN_Window::Clear(const clr c)
 
 void GF_WIN_Window::SetFlag_VertexBuffering(const bool value)
 {
+	if (value == flags->vBuff) return;
+	LogMsg_GF("Flag vertex buffering turned %s.", value ? "on" : "off");
+
 	if (flags->vBuff && !value)
 	{
 		*buffI = 0;
@@ -164,7 +170,7 @@ void GF_WIN_Window::SetDepth(float front, float back)
 
 void GF_WIN_Window::Raise(const char * msg)
 {
-	printf("%s\n", msg);
+	LogErr_GF(msg);
 	*isRunning = false;
 }
 
@@ -271,52 +277,62 @@ void GF_WIN_Window::GF_LineFan(void)
 
 void GF_WIN_Window::GF_Triangles(void)
 {
-	const size_t tLen = *buffLen / 3;
-
+	size_t tLen = *buffLen / 3;
 	trgl *trgls = malloc_s(trgl, tLen);
-	array_view<trgl, 1> arr_trgls(tLen, trgls);
+
+	for (size_t i = 0, j, k, m = 0; i < *buffLen; i += 3)
+	{
+		j = i + 1, k = i + 2;
+		if (hBuff[i].Clip() || hBuff[j].Clip() || hBuff[k].Clip())
+		{
+			--tLen;
+		}
+		else
+		{
+			vect3 coord0 = gfWinWnd::ToScreen(hBuff[i], *cp, flags->proj);
+			vect3 coord1 = gfWinWnd::ToScreen(hBuff[j], *cp, flags->proj);
+			vect3 coord2 = gfWinWnd::ToScreen(hBuff[k], *cp, flags->proj);
+			trgls[m++] = trgl(vrtx(coord0, cBuff[i]), vrtx(coord1, cBuff[j]), vrtx(coord2, cBuff[k]));
+		}
+	}
+
+	if (!tLen)
+	{
+		free_s(trgls);
+		return;
+	}
+
 	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
 	array_view<float, 1> arr_z(scrArea, zBuff);
-	array_view<vect4, 1> arr_h(*buffLen, hBuff);
-	array_view<clr, 1> arr_c(*buffLen, cBuff);
-
-	const bool proj = flags->proj, clip = flags->clip;
-	const vect4 port = *cp;
-	const vPort vport = *vp;
-	const uint w = width, h = height;
-
-	for (size_t i = 0, j; i < tLen; i++)
-	{
-		j = i * 3;
-		vect3 coord0 = gfWinWnd::ToScreen(arr_h[j], port, proj);
-		vect3 coord1 = gfWinWnd::ToScreen(arr_h[j + 1], port, proj);
-		vect3 coord2 = gfWinWnd::ToScreen(arr_h[j + 2], port, proj);
-		arr_trgls[i] = trgl(vrtx(coord0, arr_c[j]), vrtx(coord1, arr_c[j + 1]), vrtx(coord2, arr_c[j + 2]));
-	}
+	const rect port = vp->screen;
+	const uint w = width;
 
 	for (size_t i = 0; i < tLen; i++)
 	{
 		trgl cur = trgls[i];
+		int maxX = max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X);
+		int minX = min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X);
+		int maxY = max3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y);
+		int minY = min3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y);
 
-		int maxX = abs(max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
-		int minX = abs(min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
-		int maxY = abs(max3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
-		int minY = abs(min3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
-		array_view<clr, 1> arr_box(max(1, maxX - minX) * max(1, maxY - minY), (clr*)pixels);
+		int bW = max(1, maxX - minX);
+		array_view<clr, 1> arr_box(bW * max(1, maxY - minY), (clr*)pixels);
 
 		parallel_for_each(
 			arr_box.extent,
-			[=](index<1> i) __GPU_ONLY
+			[=](index<1> idx) __GPU_ONLY
 		{
-			vrtx v = vrtx(minX + i2x(i[0], maxX - minX), minY + i2y(i[0], maxX - minX), 0, CLR_BLACK);
+			vrtx v = vrtx(minX + i2x(idx[0], bW), minY + i2y(idx[0], bW), 0, CLR_BLACK);
 			if (cur.IsInside(&v))
 			{
 				index<1> pI(xy2i(ipart(v.v.X), ipart(v.v.Y), w));
-				if (v.v.X < 0 || v.v.Y < 0 || v.v.X > w - 1 || v.v.Y > h - 1) return;
+				if (v.v.X < port.x || v.v.Y < port.y || v.v.X > port.w || v.v.Y > port.h) return;
 				if (arr_z[pI] > v.v.Z) return;
 				arr_z[pI] = v.v.Z;
 				arr_pix[pI] = v.c;
 			}
 		});
 	}
+
+	free_s(trgls);
 }

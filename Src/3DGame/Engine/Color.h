@@ -12,6 +12,7 @@
 #define CLR_CYAN		((clr)0xFF00FFFF)
 #define CLR_MAGENTA		((clr)0xFFFF00FF)
 #define CLR_YELLOW		((clr)0xFFFFFF00)
+#define CLR_DARKGRAY	((clr)0xFFA9A9A9)
 
 typedef struct Color
 {

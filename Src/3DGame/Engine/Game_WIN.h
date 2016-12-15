@@ -15,7 +15,7 @@ public:
 	Game_WIN(const char *title, const uint width, const uint height);
 	~Game_WIN(void);
 
-	virtual void OnInitialize(void) { }
+	virtual void OnInitialize(void);
 	virtual void OnUpdate(GameTime time) { }
 	virtual void OnRender(void) { }
 	virtual void OnKeyDown(int sym) { }

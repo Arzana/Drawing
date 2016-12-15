@@ -15,7 +15,7 @@ FireworksGame::FireworksGame(const uint width, const uint height)
 	, vertices(NULL), vel(NULL)
 {
 	SetFlag_VertexBuffering(true);
-	SetProjection_Frustrum(FOV_Y, width / height, 0.1f, 100.0f);
+	SetProjection_Frustrum(FOV_Y, (float)width / height, 0.1f, 100.0f);
 }
 
 FireworksGame::~FireworksGame(void)

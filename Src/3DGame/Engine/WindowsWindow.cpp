@@ -74,7 +74,7 @@ LRESULT CALLBACK WindowsWindow::WndProc(uint msg, WPARAM wParam, LPARAM lParam)
 
 int WindowsWindow::WndInit(const char g_szClassName[], const char title[])
 {
-	LogMsg_Eng("Starting windows window creation.");
+	LogMsg_Eng("Starting windows window registration.");
 
 	WNDCLASSEX wndc =
 	{
@@ -93,11 +93,12 @@ int WindowsWindow::WndInit(const char g_szClassName[], const char title[])
 
 	if (!RegisterClassEx(&wndc))
 	{
-		LogMsg_Eng("Window registration failed(%d)!", GetLastError());
+		LogErr_Eng("Window registration failed(%d)!", GetLastError());
 		return 1;
 	}
 	
-	LogMsg_Eng("Window registration successfull.");
+	LogVer_Eng("Window registration successfull.");
+	LogMsg_Eng("Starting window creation.");
 	hwnd = CreateWindowEx(
 		WS_EX_CLIENTEDGE,
 		g_szClassName,
@@ -108,11 +109,11 @@ int WindowsWindow::WndInit(const char g_szClassName[], const char title[])
 
 	if (!hwnd)
 	{
-		LogMsg_Eng("Window creation failed(%d)!", GetLastError());
+		LogErr_Eng("Window creation failed(%d)!", GetLastError());
 		return 1;
 	}
 
-	LogMsg_Eng("Window creation successfull.");
+	LogVer_Eng("Window creation successfull.");
 	return 0;
 }
 
@@ -150,12 +151,12 @@ int WindowsWindow::BmpInit(void)
 	hbmp = CreateDIBSection(hdc, &bmpinf, DIB_RGB_COLORS, &pixels, NULL, 0);
 	if (!hbmp)
 	{
-		LogMsg_Eng("Bitmap creation failed(%d)!", GetLastError());
+		LogErr_Eng("Bitmap creation failed(%d)!", GetLastError());
 		PostQuitMessage(0);
 		return 1;
 	}
 
-	LogMsg_Eng("Bitmap creation successfull.");
+	LogVer_Eng("Bitmap creation successfull.");
 	memcpy(pixels, bits, sizeof(pixels));
 	ReleaseDC(hwnd, hdc);
 	return 0;
@@ -175,7 +176,7 @@ LRESULT CALLBACK f_WndProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
 
 	if (!wnd)
 	{
-		LogMsg_Eng("WndProc(%d) called from unknown window!", msg);
+		LogWar_Eng("WndProc(%d) called from unknown window!", msg);
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
 	else return wnd->WndProc(msg, wParam, lParam);

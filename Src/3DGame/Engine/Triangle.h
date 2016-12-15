@@ -23,10 +23,10 @@ typedef struct Triangle
 		float r = vect2::PrepDot(vs1, vs2);
 		float s = vect2::PrepDot(vs3, vs2) / r;
 		float t = vect2::PrepDot(vs1, vs3) / r;
-		float u = 1.0f - s - t;
 
-		if (s >= 0 && t >= 0 && u >= 0)
+		if (s >= 0 && t >= 0 && s + t <= 1)
 		{
+			float u = 1.0f - s - t;
 			v->v.Z = v0.v.Z * u + v1.v.Z * s + v2.v.Z * t;
 			v->c = v0.c * u + v1.c * s + v2.c * t;
 			return true;

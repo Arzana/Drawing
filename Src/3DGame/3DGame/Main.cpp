@@ -1,5 +1,4 @@
 #include "Main.h"
-#include <WinLogger.h>
 
 int main(int argc, char *argv[])
 {
