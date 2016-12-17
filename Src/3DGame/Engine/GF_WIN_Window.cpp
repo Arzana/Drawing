@@ -275,6 +275,8 @@ void GF_WIN_Window::GF_LineFan(void)
 	});
 }
 
+#include <ppl.h>
+
 void GF_WIN_Window::GF_Triangles(void)
 {
 	size_t tLen = *buffLen / 3;
@@ -306,17 +308,16 @@ void GF_WIN_Window::GF_Triangles(void)
 	array_view<float, 1> arr_z(scrArea, zBuff);
 	const rect port = vp->screen;
 	const uint w = width;
+	arr_z.discard_data();
 
-	for (size_t i = 0; i < tLen; i++)
+	parallel_for(size_t(0), tLen, size_t(1),
+		[=](size_t i) __CPU_ONLY
 	{
 		trgl cur = trgls[i];
-		int maxX = max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X);
 		int minX = min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X);
-		int maxY = max3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y);
 		int minY = min3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y);
-
-		int bW = max(1, maxX - minX);
-		array_view<clr, 1> arr_box(bW * max(1, maxY - minY), (clr*)pixels);
+		int bW = max(1, max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X) - minX);
+		array_view<clr, 1> arr_box(bW * max(1, max3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y) - minY), (clr*)pixels);
 
 		parallel_for_each(
 			arr_box.extent,
@@ -326,13 +327,12 @@ void GF_WIN_Window::GF_Triangles(void)
 			if (cur.IsInside(&v))
 			{
 				index<1> pI(xy2i(ipart(v.v.X), ipart(v.v.Y), w));
-				if (v.v.X < port.x || v.v.Y < port.y || v.v.X > port.w || v.v.Y > port.h) return;
 				if (arr_z[pI] > v.v.Z) return;
 				arr_z[pI] = v.v.Z;
 				arr_pix[pI] = v.c;
 			}
 		});
-	}
+	});
 
 	free_s(trgls);
 }

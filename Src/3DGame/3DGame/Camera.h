@@ -45,7 +45,7 @@ public:
 
 	void Move(vect3 direction);
 
-	void Update(void);
+	const mtrx4* Update(void);
 	const mtrx4* GetView(void) const;
 
 private:

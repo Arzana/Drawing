@@ -42,14 +42,12 @@
   <ItemGroup>
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Game_WIN.cpp" />
-    <ClCompile Include="GF.cpp" />
     <ClCompile Include="GF_WIN_Window.cpp" />
     <ClCompile Include="MathEx.cpp" />
     <ClCompile Include="Mtrx3.cpp" />
     <ClCompile Include="Mtrx4.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="WindowsWindow.cpp" />
-    <ClCompile Include="Shapes.cpp" />
     <ClCompile Include="Vect2.cpp" />
     <ClCompile Include="Vect3.cpp" />
     <ClCompile Include="Vect4.cpp" />

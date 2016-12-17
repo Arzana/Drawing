@@ -1,7 +1,6 @@
 #include <amp.h>
 #include <amp_math.h>
 #include "Mtrx4.h"
-#include "MathEx.h"
 
 using namespace concurrency;
 
@@ -264,6 +263,11 @@ Matrix4 Matrix4::CreateScale(const Vector3 * scale) __GPU
 Matrix4 Matrix4::CreateTranslation(const Vector3 * pos) __GPU
 {
 	return Matrix4(1, 0, 0, pos->X, 0, 1, 0, pos->Y, 0, 0, 1, pos->Z, 0, 0, 0, 1);
+}
+
+Matrix4 Matrix4::CreateView(const Vector3 * camPos, const Vector3 * camRot) __GPU
+{
+	return CreateRotationQ(camRot->X, -camRot->Y, camRot->Z) * mtrx4::CreateTranslation(-camPos->X, camPos->Y, camPos->Z);
 }
 
 Matrix4 Matrix4::Multiply(const Matrix4 * m1, const Matrix4 * m2) __GPU

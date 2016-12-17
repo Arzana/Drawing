@@ -24,6 +24,12 @@ typedef struct Rectangle
 
 	inline bool operator ==(const Rectangle& r) __GPU { return r.x == x && r.y == y && r.w == w && r.h == h; }
 	inline bool operator !=(const Rectangle& r) __GPU { return r.x != x || r.y != y || r.w != w || r.h != h; }
+
+	inline bool Left(void) const __GPU { return w > 0 ? x : x + w; }
+	inline bool Right(void) const __GPU { return w > 0 ? x + w : x; }
+	inline bool Top(void) const __GPU { return h > 0 ? y : y + h; }
+	inline bool Bottom(void) const __GPU { return h > 0 ? y + h : y; }
+	bool Contains(int x, int y) const __GPU { return x >= Left() && x <= Right() && y >= Top() && y <= Bottom(); }
 } rect;
 
 typedef struct ViewPort

@@ -127,6 +127,8 @@ typedef struct Matrix4
 	static Matrix4 CreateScale(float scale) __GPU;
 	static Matrix4 CreateScale(const Vector3 *scale) __GPU;
 	static Matrix4 CreateTranslation(const Vector3 *pos) __GPU;
+	inline static Matrix4 CreateTranslation(float x, float y, float z) __GPU { return CreateTranslation(&vect3(x, y, z)); }
+	static Matrix4 CreateView(const Vector3 *camPos, const Vector3 *camRot) __GPU;
 	static Matrix4 Multiply(const Matrix4 *m1, const Matrix4 *m2) __GPU;
 	static Vector4 Transform(const Matrix4 *m, const Vector3 *v) __GPU;
 	static void Transform(const Matrix4 *m, const Vector3 *src, Vector4 *dest, const size_t length) __CPU_ONLY;

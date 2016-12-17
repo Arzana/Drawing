@@ -13,14 +13,9 @@ RoomGame::~RoomGame(void)
 	delete_s(cam);
 }
 
-void RoomGame::OnUpdate(GameTime time)
-{
-	cam->Update();
-}
-
 void RoomGame::OnRender(void)
 {
-	SetView(cam->GetView());
+	SetView(cam->Update());
 	Clear(CLR_BLACK);
 
 	Start(GF_TRIANGLES);

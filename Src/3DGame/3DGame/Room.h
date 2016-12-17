@@ -114,7 +114,6 @@ private:
 		{ 21, 22, 2 },	//1U
 	};
 
-	void OnUpdate(GameTime time) override;
 	void OnRender(void) override;
 	void OnMouseMove(int x, int y, int dX, int dY) override;
 	void OnKeyDown(int sym) override;

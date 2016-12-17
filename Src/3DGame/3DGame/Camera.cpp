@@ -189,17 +189,14 @@ vect3 Camera::GetPosition(void) const
 
 void Camera::Move(vect3 direction)
 {
-	vect4 vH = mtrx4::CreateRotationQ(rot) * direction;
-	AppendX(vH.X);
-	AppendY(vH.Y);
-	AppendZ(vH.Z);
+	if (direction == VECT3_ZERO) return;
+	AppendPosition((mtrx4::CreateRotationQ(rot) * direction).ToNDC());
 }
 
-void Camera::Update(void)
+const mtrx4 * Camera::Update(void)
 {
-	*rot = quat::CreateYawPitchRoll(rotation->X, -rotation->Y, rotation->Z);
-	*view = mtrx4::CreateRotationQ(rot);
-	*view *= mtrx4::CreateTranslation(&vect3(position->X, position->Y, position->Z));
+	*rot = quat::CreateYawPitchRoll(rotation->X, rotation->Y, rotation->Z);
+	return &(*view = mtrx4::CreateView(position, rotation));
 }
 
 const mtrx4 * Camera::GetView(void) const

@@ -26,6 +26,8 @@ public:
 	inline void Terminate(void) { *isRunning = false; }
 	float GetFps(void) const;
 	float GetAvarageFPS(void) const;
+	inline void HideMouse(void) { while (ShowCursor(false) >= 0); }
+	inline void ShowMouse(void) { while (ShowCursor(true) >= 0); }
 private:
 	const clock_t mili2clocks = CLOCKS_PER_SEC / 1000;
 	const TimeSpan MAX_ELAPSED_TIME = 500 * mili2clocks;
