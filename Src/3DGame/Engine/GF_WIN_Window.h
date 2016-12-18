@@ -53,7 +53,7 @@ private:
 		Flags(void) : zBuff(true), clip(true), vBuff(false), proj(false), start(false), prim(GF_POINTS) { }
 	} *flags;
 
-	const float scrArea;
+	const uint scrArea;
 	vPort *vp;
 	vect4 *cp;
 	size_t *buffLen, *buffI;

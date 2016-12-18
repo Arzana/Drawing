@@ -58,7 +58,7 @@ private:
 		vrtx(10, -1, 10, CLR_DARKGRAY)	//39
 	};
 
-	static const size_t tLen = 48;
+	static const size_t tLen = 50;
 	const int trgls[tLen][3]
 	{
 		/* Floor */
@@ -112,6 +112,8 @@ private:
 		{ 20, 21, 1},	//0U
 		{ 1, 2, 21 },	//1L
 		{ 21, 22, 2 },	//1U
+		{ 2, 3, 22 },	//3L
+		{ 3, 22, 23 },	//3U
 	};
 
 	void OnRender(void) override;

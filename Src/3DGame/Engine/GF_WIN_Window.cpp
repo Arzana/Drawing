@@ -2,6 +2,7 @@
 
 #include <cfloat>
 #include <cstdio>
+#include <ppl.h>
 #include "GF_WIN_Window.h"
 #include "Utils.h"
 #include "WinLogger.h"
@@ -182,7 +183,7 @@ void GF_WIN_Window::ResetZBuff(void)
 		arr_z.extent,
 		[=](index<1> i) __GPU_ONLY
 	{
-		arr_z[i] = FLT_MIN;
+		arr_z[i] = FLT_MAX;
 	});
 }
 
@@ -215,7 +216,7 @@ void GF_WIN_Window::GF_Points(void)
 		vect3 coord = gfWinWnd::ToScreen(h, port, proj);
 		index<1> pI(xy2i(ipart(coord.X), ipart(coord.Y), w));
 
-		if (arr_z[pI] > coord.Z) return;
+		if (arr_z[pI] < coord.Z) return;
 		arr_z[pI] = coord.Z;
 		arr_pix[pI] = arr_c[i];
 	});
@@ -253,7 +254,7 @@ void GF_WIN_Window::GF_LineFan(void)
 				{
 					index<1> pI(xy2i(ipart(x), ipart(y), w));
 
-					if (arr_z[pI] > z) return;
+					if (arr_z[pI] < z) return;
 					arr_z[pI] = z;
 					arr_pix[pI] = c;
 				});
@@ -267,15 +268,13 @@ void GF_WIN_Window::GF_LineFan(void)
 			{
 				index<1> pI(xy2i(ipart(x), ipart(y), w));
 
-				if (arr_z[pI] > z) return;
+				if (arr_z[pI] < z) return;
 				arr_z[pI] = z;
 				arr_pix[pI] = c;
 			});
 		}
 	});
 }
-
-#include <ppl.h>
 
 void GF_WIN_Window::GF_Triangles(void)
 {
@@ -308,7 +307,6 @@ void GF_WIN_Window::GF_Triangles(void)
 	array_view<float, 1> arr_z(scrArea, zBuff);
 	const rect port = vp->screen;
 	const uint w = width;
-	arr_z.discard_data();
 
 	parallel_for(size_t(0), tLen, size_t(1),
 		[=](size_t i) __CPU_ONLY
@@ -327,7 +325,7 @@ void GF_WIN_Window::GF_Triangles(void)
 			if (cur.IsInside(&v))
 			{
 				index<1> pI(xy2i(ipart(v.v.X), ipart(v.v.Y), w));
-				if (arr_z[pI] > v.v.Z) return;
+				if (arr_z[pI] < v.v.Z) return;
 				arr_z[pI] = v.v.Z;
 				arr_pix[pI] = v.c;
 			}

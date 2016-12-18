@@ -147,8 +147,8 @@ LRESULT CALLBACK Game_WIN::WndProc(uint msg, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEMOVE:
 		x = GET_X_LPARAM(lParam);
 		y = GET_Y_LPARAM(lParam);
-		dX = oldMousePos.X - x;
-		dY = oldMousePos.Y - y;
+		dX = ceil(oldMousePos.X - x);
+		dY = ceil(oldMousePos.Y - y);
 
 		if (oldMousePos.Z) OnMouseMove(x, y, dX, dY);
 		oldMousePos = vect3(x, y, 1);
