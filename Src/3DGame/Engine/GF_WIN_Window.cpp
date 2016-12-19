@@ -207,8 +207,7 @@ void GF_WIN_Window::GF_Points(void)
 	const vect4 port = *cp;
 	const size_t w = width;
 
-	parallel_for_each(
-		arr_h.extent,
+	parallel_for_each(arr_h.extent,
 		[=](index<1> i) __GPU_ONLY
 	{
 		vect4 h = arr_h[i];
@@ -237,8 +236,7 @@ void GF_WIN_Window::GF_LineFan(void)
 	const vect4 h0 = hBuff[0];
 	const vrtx v0 = vrtx(gfWinWnd::ToScreen(h0, port, proj), cBuff[0]);
 
-	parallel_for_each(
-		arr_h.extent,
+	parallel_for_each(arr_h.extent,
 		[=](index<1> i) __GPU_ONLY
 	{
 		vect4 h1 = arr_h[i];
@@ -281,13 +279,9 @@ void GF_WIN_Window::GF_Triangles(void)
 	size_t tLen = *buffLen / 3;
 	trgl *trgls = malloc_s(trgl, tLen);
 
-	for (size_t i = 0, j, k, m = 0; i < *buffLen; i += 3)
+	for (size_t i = 0, j = 1, k = 2, m = 0; i < *buffLen; i += 3, j += 3, k += 3)
 	{
-		j = i + 1, k = i + 2;
-		if (hBuff[i].Clip() || hBuff[j].Clip() || hBuff[k].Clip())
-		{
-			--tLen;
-		}
+		if (hBuff[i].Clip() || hBuff[j].Clip() || hBuff[k].Clip()) --tLen;
 		else
 		{
 			vect3 coord0 = gfWinWnd::ToScreen(hBuff[i], *cp, flags->proj);
@@ -305,20 +299,21 @@ void GF_WIN_Window::GF_Triangles(void)
 
 	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
 	array_view<float, 1> arr_z(scrArea, zBuff);
-	const rect port = vp->screen;
 	const uint w = width;
 
 	parallel_for(size_t(0), tLen, size_t(1),
-		[=](size_t i) __CPU_ONLY
+		[&](size_t i) __CPU_ONLY
 	{
 		trgl cur = trgls[i];
-		int minX = min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X);
-		int minY = min3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y);
-		int bW = max(1, max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X) - minX);
-		array_view<clr, 1> arr_box(bW * max(1, max3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y) - minY), (clr*)pixels);
+		int minX = ceilf(min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
+		int minY = ceilf(min3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
+		int maxX = ceilf(max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
+		int maxY = ceilf(max3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
 
-		parallel_for_each(
-			arr_box.extent,
+		int bW = max(1, maxX - minX);
+		array_view<clr, 1> arr_box(bW * max(1, maxY - minY), (clr*)pixels);
+
+		parallel_for_each( arr_box.extent,
 			[=](index<1> idx) __GPU_ONLY
 		{
 			vrtx v = vrtx(minX + i2x(idx[0], bW), minY + i2y(idx[0], bW), 0, CLR_BLACK);

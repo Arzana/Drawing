@@ -18,8 +18,6 @@
 #define min3(x, y, z)		(min((x), min((y), (z))))
 #define max3(x, y, z)		(max((x), max((y), (z))))
 #define clamp(mi, ma, v)	(min(max((mi), (v)), (ma)))
-#define floor(x)			((x) < 0 ? ipart((x) - 0.5) : ipart(x))
-#define ceil(x)				(ipart((x) + 0.5f))
 #define fpart(x)			((x) < 0 ? 1 - ((x) - floor(x)) : (x) - floor(x))
 #define rfpart(x)			(float(1.0 - fpart(x))
 #define csc(x)				(1.0f / sinf(x))
