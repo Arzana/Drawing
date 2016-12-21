@@ -5,6 +5,9 @@
 #include <ppl.h>
 #include "GF_WIN_Window.h"
 #include "Utils.h"
+#include "Line.h"
+#include "Triangle.h"
+#include "Shapes.h"
 #include "WinLogger.h"
 
 #define __GPU		restrict(cpu, amp)
@@ -276,14 +279,20 @@ void GF_WIN_Window::GF_LineFan(void)
 
 void GF_WIN_Window::GF_Triangles(void)
 {
-	size_t tLen = *buffLen / 3;
+	size_t tLen = *buffLen / 3, pLen = 0;		// Initialize initial polygon buffers
 	trgl *trgls = malloc_s(trgl, tLen);
+	poly *polies = malloc_s(poly, tLen);
 
 	for (size_t i = 0, j = 1, k = 2, m = 0; i < *buffLen; i += 3, j += 3, k += 3)
 	{
-		if (hBuff[i].Clip() || hBuff[j].Clip() || hBuff[k].Clip()) --tLen;
+		if (hBuff[i].Clip() || hBuff[j].Clip() || hBuff[k].Clip())
+		{	// Clip triangle and add it to polygon buffer
+			--tLen;
+			polies[pLen] = { 3, { hBuff[i], hBuff[j], hBuff[k] } };
+			ClipPoly(&polies[pLen++]);
+		}
 		else
-		{
+		{	// Perform perspective division and add to triangle buffer
 			vect3 coord0 = gfWinWnd::ToScreen(hBuff[i], *cp, flags->proj);
 			vect3 coord1 = gfWinWnd::ToScreen(hBuff[j], *cp, flags->proj);
 			vect3 coord2 = gfWinWnd::ToScreen(hBuff[k], *cp, flags->proj);
@@ -291,34 +300,54 @@ void GF_WIN_Window::GF_Triangles(void)
 		}
 	}
 
-	if (!tLen)
-	{
+	if (!tLen && !pLen)
+	{	// If nothing needs to be drawn exit here
 		free_s(trgls);
+		free_s(polies);
 		return;
 	}
 
-	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
+	size_t cLen = tLen;	// Initialize final buffer
+	for (size_t i = 0; i < pLen; i++) cLen += polies[i].TrglLen();
+	trgl *ctrgls = malloc_s(trgl, cLen);
+	memcpy(ctrgls, trgls, sizeof(trgl) * tLen);
+
+	for (size_t i = 0, j = 0; i < pLen; i++)
+	{	// Concatinate polygons into final buffer
+		poly cur = polies[i];
+		if (cur.vrtxCount < 3) continue;
+		vrtx vrtx0(gfWinWnd::ToScreen(cur.vertices[0], *cp, flags->proj), CLR_WHITE);
+
+		for (size_t k = 2; k < cur.vrtxCount; k++)
+		{
+			vrtx vrtx1(gfWinWnd::ToScreen(cur.vertices[k - 1], *cp, flags->proj), CLR_WHITE);
+			vrtx vrtx2(gfWinWnd::ToScreen(cur.vertices[k], *cp, flags->proj), CLR_WHITE);
+			memcpy(ctrgls + tLen + j++, &trgl(vrtx0, vrtx1, vrtx2), sizeof(trgl));
+		}
+	}
+
+	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);	// Start moving rending buffers to the GPU
 	array_view<float, 1> arr_z(scrArea, zBuff);
 	const uint w = width;
 
-	parallel_for(size_t(0), tLen, size_t(1),
+	parallel_for(size_t(0), cLen, size_t(1),
 		[&](size_t i) __CPU_ONLY
-	{
-		trgl cur = trgls[i];
+	{	// Create bounding box for triangle
+		trgl cur = ctrgls[i];
 		int minX = ceilf(min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
 		int minY = ceilf(min3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
 		int maxX = ceilf(max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
 		int maxY = ceilf(max3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
 
-		int bW = max(1, maxX - minX);
+		int bW = max(1, maxX - minX);	// Create special buffer for rasterizing the traingle.
 		array_view<clr, 1> arr_box(bW * max(1, maxY - minY), (clr*)pixels);
 
-		parallel_for_each( arr_box.extent,
+		parallel_for_each(arr_box.extent,
 			[=](index<1> idx) __GPU_ONLY
-		{
+		{	// Get the current vertex
 			vrtx v = vrtx(minX + i2x(idx[0], bW), minY + i2y(idx[0], bW), 0, CLR_BLACK);
 			if (cur.IsInside(&v))
-			{
+			{	// If the vertex if inside the triangle check depth buffer and add to screen buffer
 				index<1> pI(xy2i(ipart(v.v.X), ipart(v.v.Y), w));
 				if (arr_z[pI] < v.v.Z) return;
 				arr_z[pI] = v.v.Z;
@@ -328,4 +357,6 @@ void GF_WIN_Window::GF_Triangles(void)
 	});
 
 	free_s(trgls);
+	free_s(polies);
+	free_s(ctrgls);
 }

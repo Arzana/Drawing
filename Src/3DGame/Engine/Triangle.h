@@ -3,7 +3,7 @@
 #define _VECT_CONV
 
 #include "Vect2.h"
-#include "Line.h"
+#include "Vertex.h"
 #include "Utils.h"
 
 typedef struct Triangle

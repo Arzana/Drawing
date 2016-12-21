@@ -40,6 +40,9 @@
     <Filter Include="Source Files\Logging">
       <UniqueIdentifier>{2f23f890-24cc-4b90-91f9-f258173c56ce}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{e0027407-76c7-4660-a2ed-99b344a4626c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vect2.h">
@@ -136,6 +139,9 @@
     </ClCompile>
     <ClCompile Include="WinLogger.cpp">
       <Filter>Source Files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Shapes.cpp">
+      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -3,7 +3,8 @@
 #include <amp.h>
 #include <vector>
 #include "WindowsWindow.h"
-#include "Shapes.h"
+#include "Vertex.h"
+#include "Rectangle.h"
 #include "Mtrx4.h"
 
 #define GF_POINTS			0

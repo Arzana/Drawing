@@ -42,6 +42,7 @@ typedef struct Vector4
 
 	inline bool operator ==(const Vector4 &r) const __GPU { return r.X == X && r.Y == Y && r.Z == Z && r.W == W; }
 	inline bool operator !=(const Vector4 &r) const __GPU { return r.X != X || r.Y != Y || r.Z != Z || r.W != W; }
+	inline float operator [](const int i) const __GPU { return ((float*)this)[i]; }
 
 	static Vector4 Abs(const Vector4 *v) __GPU;
 	void Abs(void) __GPU;
