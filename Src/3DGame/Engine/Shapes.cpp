@@ -1,30 +1,30 @@
 #include "Shapes.h"
 
-void CopyVertices(vect4 *from, poly *to, octet numVertices)
+void CopyVertices(poly::clrvect4 *from, poly *to, octet numVertices)
 {
 	to->vrtxCount = numVertices;
 	for (octet i = 0; i < numVertices; i++)
 	{
-		to->vertices[i] = vect4(from[i]);
+		to->vertexes[i] = poly::clrvect4(from[i]);
 	}
 }
 
 void ClipPolyOnWAxis(poly *face)
 {
 	octet vrtxCount = 0;
-	vect4 result[MAX_VRTX_PRE_POLY];
+	poly::clrvect4 result[MAX_VRTX_PRE_POLY];
 
-	vect4 *prevVrtx = &face->vertices[face->vrtxCount - 1];
-	vect4 *curVrtx = face->First();
-	float prevDot = prevVrtx->W < W_CLIPPING_PLANE ? -1 : 1;
+	poly::clrvect4 *prevVrtx = &face->vertexes[face->vrtxCount - 1];
+	poly::clrvect4 *curVrtx = face->First();
+	float prevDot = prevVrtx->v.W < W_CLIPPING_PLANE ? -1 : 1;
 
 	while (curVrtx != face->Last())
 	{
-		float curDot = curVrtx->W < W_CLIPPING_PLANE ? -1 : 1;
+		float curDot = curVrtx->v.W < W_CLIPPING_PLANE ? -1 : 1;
 		if (prevDot * curDot < 0)	// W clipping needed
 		{
-			float a = (W_CLIPPING_PLANE - prevVrtx->W) / (prevVrtx->W - curVrtx->W);
-			result[vrtxCount++] = vect4::Lerp(prevVrtx, curVrtx, a);
+			float a = (W_CLIPPING_PLANE - prevVrtx->v.W) / (prevVrtx->v.W - curVrtx->v.W);
+			result[vrtxCount++] = poly::clrvect4::Lerp(prevVrtx, curVrtx, a);
 		}
 
 		if (curDot > 0) result[vrtxCount++] = *curVrtx;
@@ -39,20 +39,20 @@ void ClipPolyOnWAxis(poly *face)
 void ClipPolyOnAxis(poly *face, int axis)
 {
 	octet vrtxCount = 0;
-	vect4 result[MAX_VRTX_PRE_POLY];
+	poly::clrvect4 result[MAX_VRTX_PRE_POLY];
 
 	// Clip against first plane
-	vect4 *prevVrtx = &face->vertices[face->vrtxCount - 1];
-	vect4 *curVrtx = face->First();
-	float prevDot = (*prevVrtx)[axis] <= prevVrtx->W ? 1 : -1;
+	poly::clrvect4 *prevVrtx = &face->vertexes[face->vrtxCount - 1];
+	poly::clrvect4 *curVrtx = face->First();
+	float prevDot = prevVrtx->v[axis] <= prevVrtx->v.W ? 1 : -1;
 
 	while (curVrtx != face->Last())
 	{
-		float curDot = (*curVrtx)[axis] <= curVrtx->W ? 1 : -1;
+		float curDot = curVrtx->v[axis] <= curVrtx->v.W ? 1 : -1;
 		if (prevDot * curDot < 0)	// Clip needed against plan W=0
 		{
-			float a = (prevVrtx->W - (*prevVrtx)[axis]) / ((prevVrtx->W - (*prevVrtx)[axis]) - (curVrtx->W - (*curVrtx)[axis]));
-			result[vrtxCount++] = vect4::Lerp(prevVrtx, curVrtx, a);
+			float a = (prevVrtx->v.W - prevVrtx->v[axis]) / ((prevVrtx->v.W - prevVrtx->v[axis]) - (curVrtx->v.W - curVrtx->v[axis]));
+			result[vrtxCount++] = poly::clrvect4::Lerp(prevVrtx, curVrtx, a);
 		}
 
 		if (curDot > 0) result[vrtxCount++] = *curVrtx;
@@ -65,16 +65,16 @@ void ClipPolyOnAxis(poly *face, int axis)
 	vrtxCount = 0;
 
 	// Clip against opposite plane
-	prevVrtx = &face->vertices[face->vrtxCount - 1];
-	prevDot = -(*prevVrtx)[axis] <= prevVrtx->W ? 1 : -1;
+	prevVrtx = &face->vertexes[face->vrtxCount - 1];
+	prevDot = -prevVrtx->v[axis] <= prevVrtx->v.W ? 1 : -1;
 	curVrtx = face->First();
 	while (curVrtx != face->Last())
 	{
-		float curDot = -(*curVrtx)[axis] <= curVrtx->W ? 1 : -1;
+		float curDot = -curVrtx->v[axis] <= curVrtx->v.W ? 1 : -1;
 		if (prevDot * curDot < 0)
 		{
-			float a = (prevVrtx->W + (*prevVrtx)[axis]) / ((prevVrtx->W + (*prevVrtx)[axis]) - (curVrtx->W + (*curVrtx)[axis]));
-			result[vrtxCount++] = vect4::Lerp(prevVrtx, curVrtx, a);
+			float a = (prevVrtx->v.W + prevVrtx->v[axis]) / ((prevVrtx->v.W + prevVrtx->v[axis]) - (curVrtx->v.W + curVrtx->v[axis]));
+			result[vrtxCount++] = poly::clrvect4::Lerp(prevVrtx, curVrtx, a);
 		}
 
 		if (curDot > 0) result[vrtxCount++] = *curVrtx;

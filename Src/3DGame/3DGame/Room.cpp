@@ -29,6 +29,7 @@ void RoomGame::OnRender(void)
 	}
 
 	if (!End()) Terminate();
+	//printf("FPS: %7.3f|%7.3f\n", GetAvarageFPS(), GetFps());
 }
 
 void RoomGame::OnMouseMove(int x, int y, int dX, int dY)

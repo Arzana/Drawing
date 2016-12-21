@@ -279,50 +279,37 @@ void GF_WIN_Window::GF_LineFan(void)
 
 void GF_WIN_Window::GF_Triangles(void)
 {
-	size_t tLen = *buffLen / 3, pLen = 0;		// Initialize initial polygon buffers
-	trgl *trgls = malloc_s(trgl, tLen);
-	poly *polies = malloc_s(poly, tLen);
+	size_t pLen = 0;		// Initialize initial polygon buffer
+	poly *polies = malloc_s(poly, *buffLen / 3);
 
 	for (size_t i = 0, j = 1, k = 2, m = 0; i < *buffLen; i += 3, j += 3, k += 3)
 	{
-		if (hBuff[i].Clip() || hBuff[j].Clip() || hBuff[k].Clip())
-		{	// Clip triangle and add it to polygon buffer
-			--tLen;
-			polies[pLen] = { 3, { hBuff[i], hBuff[j], hBuff[k] } };
-			ClipPoly(&polies[pLen++]);
-		}
-		else
-		{	// Perform perspective division and add to triangle buffer
-			vect3 coord0 = gfWinWnd::ToScreen(hBuff[i], *cp, flags->proj);
-			vect3 coord1 = gfWinWnd::ToScreen(hBuff[j], *cp, flags->proj);
-			vect3 coord2 = gfWinWnd::ToScreen(hBuff[k], *cp, flags->proj);
-			trgls[m++] = trgl(vrtx(coord0, cBuff[i]), vrtx(coord1, cBuff[j]), vrtx(coord2, cBuff[k]));
-		}
+		polies[pLen] = { 3, { { hBuff[i], cBuff[i] }, { hBuff[j], cBuff[j] }, { hBuff[k], cBuff[k] } } };
+		if (hBuff[i].Clip() || hBuff[j].Clip() || hBuff[k].Clip()) ClipPoly(&polies[pLen]);
+		pLen++;
 	}
 
-	if (!tLen && !pLen)
+	if (!pLen)
 	{	// If nothing needs to be drawn exit here
-		free_s(trgls);
 		free_s(polies);
 		return;
 	}
 
-	size_t cLen = tLen;	// Initialize final buffer
-	for (size_t i = 0; i < pLen; i++) cLen += polies[i].TrglLen();
-	trgl *ctrgls = malloc_s(trgl, cLen);
-	memcpy(ctrgls, trgls, sizeof(trgl) * tLen);
+	size_t tLen = 0;	// Initialize final buffer
+	for (size_t i = 0; i < pLen; i++) tLen += polies[i].TrglLen();
+	trgl *trgls = malloc_s(trgl, tLen);
 
 	for (size_t i = 0, j = 0; i < pLen; i++)
 	{	// Concatinate polygons into final buffer
 		poly cur = polies[i];
 		if (cur.vrtxCount < 3) continue;
-		vrtx vrtx0(gfWinWnd::ToScreen(cur.vertices[0], *cp, flags->proj), CLR_WHITE);
 
+		vrtx vrtx0(gfWinWnd::ToScreen(cur.vertexes[0].v, *cp, flags->proj), cur.vertexes[0].c);
 		for (size_t k = 2; k < cur.vrtxCount; k++)
 		{
-			vrtx vrtx1(gfWinWnd::ToScreen(cur.vertices[k - 1], *cp, flags->proj), CLR_WHITE);
-			vrtx vrtx2(gfWinWnd::ToScreen(cur.vertices[k], *cp, flags->proj), CLR_WHITE);
-			memcpy(ctrgls + tLen + j++, &trgl(vrtx0, vrtx1, vrtx2), sizeof(trgl));
+			vrtx vrtx1(gfWinWnd::ToScreen(cur.vertexes[k - 1].v, *cp, flags->proj), cur.vertexes[k - 1].c);
+			vrtx vrtx2(gfWinWnd::ToScreen(cur.vertexes[k].v, *cp, flags->proj), cur.vertexes[k].c);
+			trgls[j++] = trgl(vrtx0, vrtx1, vrtx2);
 		}
 	}
 
@@ -330,10 +317,10 @@ void GF_WIN_Window::GF_Triangles(void)
 	array_view<float, 1> arr_z(scrArea, zBuff);
 	const uint w = width;
 
-	parallel_for(size_t(0), cLen, size_t(1),
+	parallel_for(size_t(0), tLen, size_t(1),
 		[&](size_t i) __CPU_ONLY
 	{	// Create bounding box for triangle
-		trgl cur = ctrgls[i];
+		trgl cur = trgls[i];
 		int minX = ceilf(min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
 		int minY = ceilf(min3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
 		int maxX = ceilf(max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
@@ -356,7 +343,6 @@ void GF_WIN_Window::GF_Triangles(void)
 		});
 	});
 
-	free_s(trgls);
 	free_s(polies);
-	free_s(ctrgls);
+	free_s(trgls);
 }

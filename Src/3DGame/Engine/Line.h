@@ -2,6 +2,12 @@
 
 #include "Vertex.h"
 
+#ifndef _CXXAMP
+#define __GPU				restrict(cpu, amp)
+#define __GPU_ONLY			restrict(amp)
+#define __CPU_ONLY
+#endif
+
 typedef struct Line
 {
 	vrtx v0, v1;
