@@ -16,11 +16,11 @@ void ClipPolyOnWAxis(poly *face)
 
 	poly::clrvect4 *prevVrtx = face->Last();
 	poly::clrvect4 *curVrtx = face->First();
-	float prevDot = prevVrtx->v.W < W_CLIPPING_PLANE ? -1 : 1;
+	char prevDot = prevVrtx->v.W < W_CLIPPING_PLANE ? -1 : 1;
 
 	while (curVrtx != face->End())
 	{
-		float curDot = curVrtx->v.W < W_CLIPPING_PLANE ? -1 : 1;
+		char curDot = curVrtx->v.W < W_CLIPPING_PLANE ? -1 : 1;
 		if (prevDot * curDot < 0)	// W clipping needed
 		{
 			float a = (W_CLIPPING_PLANE - prevVrtx->v.W) / (prevVrtx->v.W - curVrtx->v.W);
@@ -44,11 +44,11 @@ void ClipPolyOnAxis(poly *face, int axis)
 	// Clip against first plane
 	poly::clrvect4 *prevVrtx = face->Last();
 	poly::clrvect4 *curVrtx = face->First();
-	float prevDot = prevVrtx->v[axis] <= prevVrtx->v.W ? 1 : -1;
+	char prevDot = prevVrtx->v[axis] <= prevVrtx->v.W ? 1 : -1;
 
 	while (curVrtx != face->End())
 	{
-		float curDot = curVrtx->v[axis] <= curVrtx->v.W ? 1 : -1;
+		char curDot = curVrtx->v[axis] <= curVrtx->v.W ? 1 : -1;
 		if (prevDot * curDot < 0)	// Clip needed against plan W=0
 		{
 			float a = (prevVrtx->v.W - prevVrtx->v[axis]) / ((prevVrtx->v.W - prevVrtx->v[axis]) - (curVrtx->v.W - curVrtx->v[axis]));
@@ -70,7 +70,7 @@ void ClipPolyOnAxis(poly *face, int axis)
 	curVrtx = face->First();
 	while (curVrtx != face->End())
 	{
-		float curDot = -curVrtx->v[axis] <= curVrtx->v.W ? 1 : -1;
+		char curDot = -curVrtx->v[axis] <= curVrtx->v.W ? 1 : -1;
 		if (prevDot * curDot < 0)
 		{
 			float a = (prevVrtx->v.W + prevVrtx->v[axis]) / ((prevVrtx->v.W + prevVrtx->v[axis]) - (curVrtx->v.W + curVrtx->v[axis]));
