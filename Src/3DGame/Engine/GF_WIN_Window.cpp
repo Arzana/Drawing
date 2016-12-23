@@ -279,14 +279,13 @@ void GF_WIN_Window::GF_LineFan(void)
 
 void GF_WIN_Window::GF_Triangles(void)
 {
-	size_t pLen = 0;		// Initialize initial polygon buffer
-	poly *polies = malloc_s(poly, *buffLen / 3);
+	size_t pLen = *buffLen / 3;		// Initialize initial polygon buffer
+	poly *polies = malloc_s(poly, pLen);
 
-	for (size_t i = 0, j = 1, k = 2, m = 0; i < *buffLen; i += 3, j += 3, k += 3)
+	for (size_t i(0), j(1), k(2), m(0); i < *buffLen; i += 3, j += 3, k += 3, m++)
 	{
-		polies[pLen] = { 3, { { hBuff[i], cBuff[i] }, { hBuff[j], cBuff[j] }, { hBuff[k], cBuff[k] } } };
-		if (hBuff[i].Clip() || hBuff[j].Clip() || hBuff[k].Clip()) ClipPoly(&polies[pLen]);
-		pLen++;
+		polies[m] = { 3,{ { hBuff[i], cBuff[i] },{ hBuff[j], cBuff[j] },{ hBuff[k], cBuff[k] } } };
+		if (hBuff[i].Clip() || hBuff[j].Clip() || hBuff[k].Clip()) ClipPoly(&polies[m]);
 	}
 
 	if (!pLen)
