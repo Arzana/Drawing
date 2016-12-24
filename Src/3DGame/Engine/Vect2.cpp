@@ -127,13 +127,11 @@ float Vector2::LengthSquared(void) const __GPU
 
 Vector2 Vector2::Lerp(const Vector2 * mi, const Vector2 * ma, float a) __GPU
 {
-	a = clamp(0.0f, 1.0f, a);
 	return vect2(lerp(mi->X, ma->X, a), lerp(mi->Y, ma->Y, a));
 }
 
 Vector2 Vector2::Lerp(const Vector2 * mi, const Vector2 * ma, const Vector2 * a) __GPU
 {
-	a = &vect2::Clamp(&VECT2_ZERO, &VECT2_ONE, a);
 	return vect2(lerp(mi->X, ma->X, a->X), lerp(mi->Y, ma->Y, a->Y));
 }
 
@@ -191,7 +189,6 @@ Vector2 Vector2::Reflect(const Vector2 * v, const Vector2 * n) __GPU
 
 Vector2 Vector2::SmoothStep(const Vector2 * v1, const Vector2 * v2, float a) __GPU
 {
-	a = clamp(0.0f, 1.0f, a);
 	a = square(a) * (3.0f - (2.0f * a));
 
 	float x = v1->X + ((v2->X - v1->X) * a);

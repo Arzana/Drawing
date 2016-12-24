@@ -218,7 +218,6 @@ Vector3 Vector3::Reflect(const Vector3 * v, const Vector3 * n) __GPU
 
 Vector3 Vector3::SmoothStep(const Vector3 * v1, const Vector3 * v2, float a) __GPU
 {
-	a = clamp(0.0f, 1.0f, a);
 	a = square(a) * (3.0f - (2.0f * a));
 
 	float x = v1->X + ((v2->X - v1->X) * a);

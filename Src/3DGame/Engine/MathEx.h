@@ -23,6 +23,7 @@
 #define csc(x)				(1.0f / sinf(x))
 #define sec(x)				(1.0f / cosf(x))
 #define cot(x)				(1.0f / tanf(x))
+#define lerpclamp(x)		clamp(0.0f, 1.0f, abs(x))
 
 typedef unsigned char octet;
 typedef unsigned int uint;

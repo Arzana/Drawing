@@ -2,7 +2,7 @@
 #include "Color.h"
 #include "Vect4.h"
 
-#define MAX_VRTX_PRE_POLY	10
+#define MAX_VRTX_POLY		10
 #define W_CLIPPING_PLANE	0.00001f
 
 typedef struct polygon
@@ -17,7 +17,7 @@ typedef struct polygon
 		{
 			return{ vect4::Lerp(&min->v, &max->v, a), clr::Lerp(min->c, max->c, a) };
 		}
-	} vertexes[MAX_VRTX_PRE_POLY];
+	} vertexes[MAX_VRTX_POLY];
 
 	inline clrvect4* First(void) { return &vertexes[0]; }
 	inline clrvect4* End(void) { return &vertexes[vrtxCount]; }
