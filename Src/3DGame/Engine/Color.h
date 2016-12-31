@@ -2,7 +2,6 @@
 #pragma warning(disable: 4244)
 
 #include "MathEx.h"
-#include "Vect3.h"
 #include "Vect4.h"
 
 #define CLR_BLACK		((clr)0xFF000000)

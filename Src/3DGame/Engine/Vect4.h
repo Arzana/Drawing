@@ -11,12 +11,6 @@
 #define VECT4_ZERO		vect4()
 #define VECT4_NEGATIVE	vect4(-1)
 
-#ifndef _CXXAMP
-#define __GPU				restrict(cpu, amp)
-#define __GPU_ONLY			restrict(amp)
-#define __CPU_ONLY
-#endif
-
 typedef struct Vector4
 {
 	float X, Y, Z, W;

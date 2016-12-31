@@ -3,6 +3,14 @@
 #include "Color.h"
 #include "Rectangle.h"
 
+#ifdef FAR
+#undef FAR
+#endif
+
+#ifdef NEAR
+#undef NEAR
+#endif
+
 #define INSIDE		0b000000
 #define LEFT		0b000001
 #define RIGHT		0b000010

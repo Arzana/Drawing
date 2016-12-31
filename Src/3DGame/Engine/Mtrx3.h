@@ -4,12 +4,6 @@
 
 #define MTRX3_IDENTITY		Mtrx3(1, 0, 0, 0, 1, 0, 0, 0, 1)
 
-#ifndef _CXXAMP
-#define __GPU				restrict(cpu, amp)
-#define __GPU_ONLY			restrict(amp)
-#define __CPU_ONLY
-#endif
-
 typedef struct Matrix3
 {
 	float M11, M12, M13;

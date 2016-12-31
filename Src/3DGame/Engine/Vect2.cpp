@@ -1,5 +1,5 @@
 #include <amp_math.h>
-#include "vect2.h"
+#include "Vect2.h"
 #include "MathEx.h"
 
 using namespace concurrency;

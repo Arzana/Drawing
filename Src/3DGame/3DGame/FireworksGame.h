@@ -20,8 +20,7 @@ private:
 
 	void OnInitialize(void) override;
 	void OnTerminate(void) override;
-	void OnUpdate(GameTime time) override;
+	void OnUpdate(GameTime time, const KeyboardState kstate) override;
 	void OnRender(void) override;
 	void OnMouseMove(int x, int y, int dX, int dY) override;
-	void OnKeyDown(int sym) override;
 } fireworks;

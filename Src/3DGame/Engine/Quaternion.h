@@ -4,12 +4,6 @@
 
 #define QUAT_IDENTITY	quat(0, 0, 0, 1)
 
-#ifndef _CXXAMP
-#define __GPU			restrict(cpu, amp)
-#define __GPU_ONLY		restrict(amp)
-#define __CPU_ONLY
-#endif
-
 typedef struct Quaternion
 {
 	float X, Y, Z, W;

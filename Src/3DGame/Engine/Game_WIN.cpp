@@ -8,7 +8,8 @@
 Game_WIN::Game_WIN(const char * title, const uint width, const uint height)
 	: gfWinWnd(title, width, height)
 	, inactiveSleepTime(0), accumelatedElapsedTime(0), previousTicks(0), timer(0), gameTime(GameTime()), updateFrameLag(0)
-	, IsFixedTimeStep(new bool(true)), oldMousePos(VECT3_ZERO), frameBuffer(new std::queue<float>())
+	, IsFixedTimeStep(new bool(true))
+	, oldMousePos(VECT3_ZERO), keyState(new kstate()), frameBuffer(new std::queue<float>())
 {
 	ResetZBuff();
 }
@@ -121,7 +122,7 @@ void Game_WIN::DoUpdate(void)
 		DispatchMessage(&msg);
 	}
 
-	OnUpdate(gameTime);
+	OnUpdate(gameTime, *keyState);
 }
 
 void Game_WIN::DoDraw(void)
@@ -142,7 +143,10 @@ LRESULT CALLBACK Game_WIN::WndProc(uint msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_KEYDOWN:
-		OnKeyDown(wParam);
+		*keyState << (Keys)wParam;
+		break;
+	case WM_KEYUP:
+		*keyState >> (Keys)wParam;
 		break;
 	case WM_MOUSEMOVE:
 		x = GET_X_LPARAM(lParam);

@@ -43,6 +43,12 @@
     <Filter Include="Source Files\Graphics">
       <UniqueIdentifier>{e0027407-76c7-4660-a2ed-99b344a4626c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Core\Input">
+      <UniqueIdentifier>{07f96c4a-aa49-4579-a80c-e2d3c489c2c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Input">
+      <UniqueIdentifier>{2761dcca-7718-46cc-99e5-c39db130671d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vect2.h">
@@ -102,6 +108,12 @@
     <ClInclude Include="WinLogger.h">
       <Filter>Header Files\Logging</Filter>
     </ClInclude>
+    <ClInclude Include="KeyboardState.h">
+      <Filter>Header Files\Core\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Keys.h">
+      <Filter>Header Files\Core\Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vect2.cpp">
@@ -142,6 +154,9 @@
     </ClCompile>
     <ClCompile Include="Shapes.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyboardState.cpp">
+      <Filter>Source Files\Core\Input</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

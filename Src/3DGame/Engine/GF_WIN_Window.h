@@ -15,7 +15,6 @@
 #define GF_TRIANGLES		5
 #define GF_TRIANGLE_STRIP	6
 #define GF_TRIANGLE_FAN		7
-#define __GPU				restrict(cpu, amp)
 
 typedef struct GF_WIN_Window
 	: public winWnd

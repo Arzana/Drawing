@@ -4,13 +4,12 @@
 #include <cstdio>
 #include <ppl.h>
 #include "GF_WIN_Window.h"
-#include "Utils.h"
 #include "Line.h"
 #include "Triangle.h"
 #include "Shapes.h"
 #include "WinLogger.h"
 
-#define __GPU		restrict(cpu, amp)
+#define vrtxat(x)	vrtx(gfWinWnd::ToScreen(cur.vertexes[x].v, *cp, flags->proj), cur.vertexes[x].c)
 
 using namespace concurrency;
 
@@ -279,13 +278,14 @@ void GF_WIN_Window::GF_LineFan(void)
 
 void GF_WIN_Window::GF_Triangles(void)
 {
-	size_t pLen = *buffLen / 3;		// Initialize initial polygon buffer
+	size_t pLen = *buffLen / 3, tLen = 0;		// Initialize initial polygon buffer
 	poly *polies = malloc_s(poly, pLen);
 
 	for (size_t i(0), j(1), k(2), m(0); i < *buffLen; i += 3, j += 3, k += 3, m++)
 	{
-		polies[m] = { 3,{ { hBuff[i], cBuff[i] },{ hBuff[j], cBuff[j] },{ hBuff[k], cBuff[k] } } };
+		polies[m] = { 3,{ { hBuff[i], cBuff[i] }, { hBuff[j], cBuff[j] }, { hBuff[k], cBuff[k] } } };
 		if (hBuff[i].Clip() || hBuff[j].Clip() || hBuff[k].Clip()) ClipPoly(&polies[m]);
+		tLen += polies[m].TrglLen();
 	}
 
 	if (!pLen)
@@ -294,20 +294,18 @@ void GF_WIN_Window::GF_Triangles(void)
 		return;
 	}
 
-	size_t tLen = 0;	// Initialize final buffer
-	for (size_t i = 0; i < pLen; i++) tLen += polies[i].TrglLen();
+	// Initialize final buffer
 	trgl *trgls = malloc_s(trgl, tLen);
-
 	for (size_t i = 0, j = 0; i < pLen; i++)
 	{	// Concatinate polygons into final buffer
 		poly cur = polies[i];
 		if (cur.vrtxCount < 3) continue;
 
-		vrtx vrtx0(gfWinWnd::ToScreen(cur.vertexes[0].v, *cp, flags->proj), cur.vertexes[0].c);
+		vrtx vrtx0 = vrtxat(0);
 		for (size_t k = 2; k < cur.vrtxCount; k++)
 		{
-			vrtx vrtx1(gfWinWnd::ToScreen(cur.vertexes[k - 1].v, *cp, flags->proj), cur.vertexes[k - 1].c);
-			vrtx vrtx2(gfWinWnd::ToScreen(cur.vertexes[k].v, *cp, flags->proj), cur.vertexes[k].c);
+			vrtx vrtx1 = vrtxat(k - 1);
+			vrtx vrtx2 = vrtxat(k);
 			trgls[j++] = trgl(vrtx0, vrtx1, vrtx2);
 		}
 	}

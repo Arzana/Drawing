@@ -118,5 +118,5 @@ private:
 
 	void OnRender(void) override;
 	void OnMouseMove(int x, int y, int dX, int dY) override;
-	void OnKeyDown(int sym) override;
+	void OnUpdate(GameTime gameTime, const KeyboardState kstate) override;
 } room;

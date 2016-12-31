@@ -60,7 +60,7 @@ void FireworksGame::OnTerminate(void)
 	SetFlag_VertexBuffering(false);
 }
 
-void FireworksGame::OnUpdate(GameTime time)
+void FireworksGame::OnUpdate(GameTime time, const KeyboardState kstate)
 {
 	array_view<vect3, 1> a(pSize, vertices);
 	array_view<vect3, 1> b(pSize, vel);
@@ -108,32 +108,4 @@ void FireworksGame::OnMouseMove(int x, int y, int dX, int dY)
 {
 	cam->AppendYawDegr(dX * scalar);
 	cam->AppendPitchDegr(dY * scalar);
-}
-
-void FireworksGame::OnKeyDown(int sym)
-{
-	switch (sym)
-	{
-	case VK_ESCAPE: // ESC
-		Terminate();
-		break;
-	case 0x57: // W
-		cam->Move(VECT3_FORWARD * scalar);
-		break;
-	case 0x53: // S
-		cam->Move(VECT3_BACK * scalar);
-		break;
-	case 0x41: // A
-		cam->Move(VECT3_LEFT * scalar);
-		break;
-	case 0x44: // D
-		cam->Move(VECT3_RIGHT * scalar);
-		break;
-	case 0x45: // E
-		cam->Move(VECT3_UP * scalar);
-		break;
-	case 0x51: // Q
-		cam->Move(VECT3_DOWN * scalar);
-		break;
-	}
 }

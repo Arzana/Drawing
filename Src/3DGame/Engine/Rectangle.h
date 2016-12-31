@@ -1,8 +1,12 @@
 #pragma once
 
-#ifndef _CXXAMP
+#ifndef __GPU
 #define __GPU				restrict(cpu, amp)
+#endif
+#ifndef __GPU_ONLY
 #define __GPU_ONLY			restrict(amp)
+#endif
+#ifndef __CPU_ONLY
 #define __CPU_ONLY
 #endif
 

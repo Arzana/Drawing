@@ -29,7 +29,6 @@ void RoomGame::OnRender(void)
 	}
 
 	if (!End()) Terminate();
-	//printf("FPS: %7.3f|%7.3f\n", GetAvarageFPS(), GetFps());
 }
 
 void RoomGame::OnMouseMove(int x, int y, int dX, int dY)
@@ -38,30 +37,11 @@ void RoomGame::OnMouseMove(int x, int y, int dX, int dY)
 	cam->AppendPitchDegr(dY * scalar);
 }
 
-void RoomGame::OnKeyDown(int sym)
+void RoomGame::OnUpdate(GameTime gameTime, const KeyboardState kstate)
 {
-	switch (sym)
-	{
-	case VK_ESCAPE: // ESC
-		Terminate();
-		break;
-	case 0x57: // W
-		cam->Move(VECT3_FORWARD * scalar);
-		break;
-	case 0x53: // S
-		cam->Move(VECT3_BACK * scalar);
-		break;
-	case 0x41: // A
-		cam->Move(VECT3_LEFT * scalar);
-		break;
-	case 0x44: // D
-		cam->Move(VECT3_RIGHT * scalar);
-		break;
-	case 0x45: // E
-		cam->Move(VECT3_UP * scalar);
-		break;
-	case 0x51: // Q
-		cam->Move(VECT3_DOWN * scalar);
-		break;
-	}
+	if (kstate[Keys::Escape]) Terminate();
+	if (kstate[Keys::W]) cam->Move(VECT3_FORWARD * scalar);
+	if (kstate[Keys::S]) cam->Move(VECT3_BACK * scalar);
+	if (kstate[Keys::A]) cam->Move(VECT3_LEFT * scalar);
+	if (kstate[Keys::D]) cam->Move(VECT3_RIGHT * scalar);
 }

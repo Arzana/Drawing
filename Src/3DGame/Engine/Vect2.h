@@ -6,9 +6,13 @@
 #define VECT2_ZERO		vect2()
 #define VECT2_NEGATIVE	vect2(-1)
 
-#ifndef _CXXAMP
+#ifndef __GPU
 #define __GPU				restrict(cpu, amp)
+#endif
+#ifndef __GPU_ONLY
 #define __GPU_ONLY			restrict(amp)
+#endif
+#ifndef __CPU_ONLY
 #define __CPU_ONLY
 #endif
 
