@@ -3,8 +3,8 @@
 
 RoomGame::RoomGame(const uint w, const uint h)
 	: winGame("RoomTest", w, h)
-	, cam(new Camera(vect3(0, 0, -10)))
 {
+	cam = new Camera(vect3(0, eyeHeight, -10));
 	SetProjection_Frustrum(45.0f, (float)w / h, 0.1f, 100.0f);
 }
 
@@ -34,11 +34,11 @@ void RoomGame::OnRender(void)
 void RoomGame::OnUpdate(GameTime gameTime, const KeyboardState& kstate, const MouseState& mstate)
 {
 	if (kstate[Keys::Escape]) Terminate();
-	if (kstate[Keys::W]) cam->Move(VECT3_FORWARD * scalar);
-	if (kstate[Keys::S]) cam->Move(VECT3_BACK * scalar);
-	if (kstate[Keys::A]) cam->Move(VECT3_LEFT * scalar);
-	if (kstate[Keys::D]) cam->Move(VECT3_RIGHT * scalar);
+	if (kstate[Keys::W]) cam->Move(VECT3_FORWARD * moveScalar);
+	if (kstate[Keys::S]) cam->Move(VECT3_BACK * moveScalar);
+	if (kstate[Keys::A]) cam->Move(VECT3_LEFT * moveScalar);
+	if (kstate[Keys::D]) cam->Move(VECT3_RIGHT * moveScalar);
 
-	cam->AppendYawDegr(mstate.dx * scalar);
-	cam->AppendPitchDegr(mstate.dy * scalar);
+	cam->AppendYawDegr(mstate.dx * lookScalar);
+	cam->AppendPitchDegr(mstate.dy * lookScalar);
 }

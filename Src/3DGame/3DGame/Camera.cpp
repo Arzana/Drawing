@@ -5,7 +5,6 @@ Camera::Camera(void)
 {
 	position = new VECT3_ZERO;
 	rotation = new VECT3_ZERO;
-	rot = new QUAT_IDENTITY;
 	view = new MTRX4_IDENTITY;
 }
 
@@ -13,7 +12,6 @@ Camera::Camera(const vect3 pos)
 { 
 	position = new vect3(pos);
 	rotation = new VECT3_ZERO;
-	rot = new QUAT_IDENTITY;
 	view = new MTRX4_IDENTITY;
 }
 
@@ -21,187 +19,60 @@ Camera::~Camera(void)
 {
 	delete position;
 	delete rotation;
-	delete rot;
 	delete view;
 }
 
-void Camera::SetYawRads(float rads)
+void Camera::SetYaw(float rads)
 {
 	rotation->X = GetClampedRads(rads);
 }
 
-void Camera::SetYawDegr(float degr)
-{
-	SetYawRads(degr * M_DEG2RAD);
-}
-
-void Camera::SetPitchRads(float rads)
+void Camera::SetPitch(float rads)
 {
 	rotation->Y = GetClampedRads(rads);
 }
 
-void Camera::SetPitchDegr(float degr)
-{
-	SetPitchRads(degr * M_DEG2RAD);
-}
-
-void Camera::SetRollRads(float rads)
+void Camera::SetRoll(float rads)
 {
 	rotation->Z = GetClampedRads(rads);
 }
 
-void Camera::SetRollDegr(float degr)
+void Camera::SetRotation(vect3 rads)
 {
-	SetRollRads(degr * M_DEG2RAD);
+	SetYaw(rads.X);
+	SetPitch(rads.Y);
+	SetRoll(rads.Z);
 }
 
-void Camera::SetRotationRads(vect3 rads)
+void Camera::AppendYaw(float rads)
 {
-	rotation->X = GetClampedRads(rads.X);
-	rotation->Y = GetClampedRads(rads.Y);
-	rotation->Z = GetClampedRads(rads.Z);
+	SetYaw(rotation->X + rads);
 }
 
-void Camera::SetRotationDegr(vect3 degr)
+void Camera::AppendPitch(float rads)
 {
-	SetRotationRads(degr * M_DEG2RAD);
+	SetPitch(rotation->Y + rads);
 }
 
-void Camera::AppendYawRads(float rads)
+void Camera::AppendRoll(float rads)
 {
-	SetYawRads(rotation->X + rads);
+	SetRoll(rotation->Z + rads);
 }
 
-void Camera::AppendYawDegr(float degr)
+void Camera::AppendRotation(vect3 rads)
 {
-	AppendYawRads(degr * M_DEG2RAD);
-}
-
-void Camera::AppendPitchRads(float rads)
-{
-	SetPitchRads(rotation->Y + rads);
-}
-
-void Camera::AppendPitchDegr(float degr)
-{
-	AppendPitchRads(degr * M_DEG2RAD);
-}
-
-void Camera::AppendRollRads(float rads)
-{
-	SetRollRads(rotation->Z + rads);
-}
-
-void Camera::AppendRollDegr(float degr)
-{
-	AppendRollDegr(degr * M_DEG2RAD);
-}
-
-void Camera::AppendRotationRads(vect3 rads)
-{
-	SetRotationRads(*rotation + rads);
-}
-
-void Camera::AppendRotationDegr(vect3 degr)
-{
-	AppendRotationRads(degr * M_DEG2RAD);
-}
-
-float Camera::GetYaw(void) const
-{
-	return rotation->X;
-}
-
-float Camera::GetPitch(void) const
-{
-	return rotation->Y;
-}
-
-float Camera::GetRoll(void) const
-{
-	return rotation->Z;
-}
-
-vect3 Camera::GetRotation(void) const
-{
-	return *rotation;
-}
-
-void Camera::SetX(float x)
-{
-	position->X = x;
-}
-
-void Camera::SetY(float y)
-{
-	position->Y = y;
-}
-
-void Camera::SetZ(float z)
-{
-	position->Z = z;
-}
-
-void Camera::SetPosition(vect3 pos)
-{
-	*position = pos;
-}
-
-void Camera::AppendX(float x)
-{
-	position->X += x;
-}
-
-void Camera::AppendY(float y)
-{
-	position->Y += y;
-}
-
-void Camera::AppendZ(float z)
-{
-	position->Z += z;
-}
-
-void Camera::AppendPosition(vect3 pos)
-{
-	*position += pos;
-}
-
-float Camera::GetX(void) const
-{
-	return position->X;
-}
-
-float Camera::GetY(void) const
-{
-	return position->Y;
-}
-
-float Camera::GetZ(void) const
-{
-	return position->Z;
-}
-
-vect3 Camera::GetPosition(void) const
-{
-	return *position;
+	SetRotation(*rotation + rads);
 }
 
 void Camera::Move(vect3 direction)
 {
 	if (direction == VECT3_ZERO) return;
-	AppendPosition((mtrx4::CreateRotationQ(rot) * direction).ToNDC());
+	AppendPosition((mtrx4::CreateRotationQ(rotation->X, 0, rotation->Z) * direction).ToNDC());
 }
 
 const mtrx4 * Camera::Update(void)
 {
-	*rot = quat::CreateYawPitchRoll(rotation->X, rotation->Y, rotation->Z);
 	return &(*view = mtrx4::CreateView(position, rotation));
-}
-
-const mtrx4 * Camera::GetView(void) const
-{
-	return view;
 }
 
 float Camera::GetClampedRads(float rads)

@@ -10,8 +10,10 @@ public:
 	RoomGame(const uint w, const uint h);
 	~RoomGame(void);
 private:
-	const float scalar = 0.1f;
 	Camera *cam;
+	const float lookScalar = 0.1f,
+				moveScalar = 0.01f,
+				eyeHeight = 0.5f;
 
 	static const size_t vLen = 40;
 	const vrtx vertices[vLen] =
