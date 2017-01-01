@@ -60,7 +60,7 @@ void FireworksGame::OnTerminate(void)
 	SetFlag_VertexBuffering(false);
 }
 
-void FireworksGame::OnUpdate(GameTime time, const KeyboardState kstate)
+void FireworksGame::OnUpdate(GameTime time, const KeyboardState& kstate, const MouseState& mstate)
 {
 	array_view<vect3, 1> a(pSize, vertices);
 	array_view<vect3, 1> b(pSize, vel);
@@ -102,10 +102,4 @@ void FireworksGame::OnRender(void)
 	SetConsoleCursorPosition(chndl, cPos);
 	printf("FPS: %7.3f|%7.3f\n", GetAvarageFPS(), GetFps());
 #pragma endregion
-}
-
-void FireworksGame::OnMouseMove(int x, int y, int dX, int dY)
-{
-	cam->AppendYawDegr(dX * scalar);
-	cam->AppendPitchDegr(dY * scalar);
 }

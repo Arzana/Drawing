@@ -9,7 +9,7 @@ Game_WIN::Game_WIN(const char * title, const uint width, const uint height)
 	: gfWinWnd(title, width, height)
 	, inactiveSleepTime(0), accumelatedElapsedTime(0), previousTicks(0), timer(0), gameTime(GameTime()), updateFrameLag(0)
 	, IsFixedTimeStep(new bool(true))
-	, oldMousePos(VECT3_ZERO), keyState(new kstate()), frameBuffer(new std::queue<float>())
+	, keyState(new kstate()), mouseState(new mstate()), frameBuffer(new std::queue<float>())
 {
 	ResetZBuff();
 }
@@ -29,9 +29,9 @@ void Game_WIN::OnInitialize(void)
 
 void Game_WIN::Run(void)
 {
-	ShowWnd();
 	timer = clock();
 
+	ShowWnd();
 	OnInitialize();
 
 	while (*isRunning)
@@ -122,7 +122,8 @@ void Game_WIN::DoUpdate(void)
 		DispatchMessage(&msg);
 	}
 
-	OnUpdate(gameTime, *keyState);
+	OnUpdate(gameTime, *keyState, *mouseState);
+	mouseState->DeltaReset();
 }
 
 void Game_WIN::DoDraw(void)
@@ -138,8 +139,6 @@ void Game_WIN::DoDraw(void)
 
 LRESULT CALLBACK Game_WIN::WndProc(uint msg, WPARAM wParam, LPARAM lParam)
 {
-	int x, y, dX, dY;
-
 	switch (msg)
 	{
 	case WM_KEYDOWN:
@@ -149,13 +148,31 @@ LRESULT CALLBACK Game_WIN::WndProc(uint msg, WPARAM wParam, LPARAM lParam)
 		*keyState >> (Keys)wParam;
 		break;
 	case WM_MOUSEMOVE:
-		x = GET_X_LPARAM(lParam);
-		y = GET_Y_LPARAM(lParam);
-		dX = ceil(oldMousePos.X - x);
-		dY = ceil(oldMousePos.Y - y);
-
-		if (oldMousePos.Z) OnMouseMove(x, y, dX, dY);
-		oldMousePos = vect3(x, y, 1);
+		mouseState->Update(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		break;
+	case WM_NCMOUSEMOVE:
+		mouseState->inBounds = false;
+		break;
+	case WM_LBUTTONDOWN:
+		mouseState->leftDown = true;
+		break;
+	case WM_LBUTTONUP:
+		mouseState->leftDown = false;
+		break;
+	case WM_MBUTTONDOWN:
+		mouseState->middleDown = true;
+		break;
+	case WM_MBUTTONUP:
+		mouseState->middleDown = false;
+		break;
+	case WM_RBUTTONDOWN:
+		mouseState->rightDown = true;
+		break;
+	case WM_RBUTTONUP:
+		mouseState->rightDown = false;
+		break;
+	case WM_MOUSEWHEEL:
+		mouseState->scrollWheel += GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
 		break;
 	default:
 		return gfWinWnd::WndProc(msg, wParam, lParam);

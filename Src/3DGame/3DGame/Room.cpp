@@ -31,17 +31,14 @@ void RoomGame::OnRender(void)
 	if (!End()) Terminate();
 }
 
-void RoomGame::OnMouseMove(int x, int y, int dX, int dY)
-{
-	cam->AppendYawDegr(dX * scalar);
-	cam->AppendPitchDegr(dY * scalar);
-}
-
-void RoomGame::OnUpdate(GameTime gameTime, const KeyboardState kstate)
+void RoomGame::OnUpdate(GameTime gameTime, const KeyboardState& kstate, const MouseState& mstate)
 {
 	if (kstate[Keys::Escape]) Terminate();
 	if (kstate[Keys::W]) cam->Move(VECT3_FORWARD * scalar);
 	if (kstate[Keys::S]) cam->Move(VECT3_BACK * scalar);
 	if (kstate[Keys::A]) cam->Move(VECT3_LEFT * scalar);
 	if (kstate[Keys::D]) cam->Move(VECT3_RIGHT * scalar);
+
+	cam->AppendYawDegr(mstate.dx * scalar);
+	cam->AppendPitchDegr(mstate.dy * scalar);
 }

@@ -4,6 +4,7 @@
 #include "GameTime.h"
 #include "GF_WIN_Window.h"
 #include "KeyboardState.h"
+#include "MouseState.h"
 
 #define FPS_LOCK	60.0f
 
@@ -17,9 +18,8 @@ public:
 	~Game_WIN(void);
 
 	virtual void OnInitialize(void);
-	virtual void OnUpdate(GameTime time, const KeyboardState kstate) { }
+	virtual void OnUpdate(GameTime time, const KeyboardState& kstate, const MouseState& mstate) { }
 	virtual void OnRender(void) { }
-	virtual void OnMouseMove(int x, int y, int dX, int dY) { }
 	virtual void OnTerminate(void) { }
 
 	void Run(void);
@@ -41,8 +41,8 @@ private:
 	clock_t previousTicks;
 	int updateFrameLag;
 
-	vect3 oldMousePos;
 	kstate *keyState;
+	mstate *mouseState;
 	std::queue<float> *frameBuffer;
 
 	void Tick(void);

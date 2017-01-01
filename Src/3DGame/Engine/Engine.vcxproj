@@ -27,6 +27,7 @@
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="MathEx.h" />
+    <ClInclude Include="MouseState.h" />
     <ClInclude Include="Mtrx3.h" />
     <ClInclude Include="Mtrx4.h" />
     <ClInclude Include="Quaternion.h" />
@@ -47,6 +48,7 @@
     <ClCompile Include="GF_WIN_Window.cpp" />
     <ClCompile Include="KeyboardState.cpp" />
     <ClCompile Include="MathEx.cpp" />
+    <ClCompile Include="MouseState.cpp" />
     <ClCompile Include="Mtrx3.cpp" />
     <ClCompile Include="Mtrx4.cpp" />
     <ClCompile Include="Quaternion.cpp" />

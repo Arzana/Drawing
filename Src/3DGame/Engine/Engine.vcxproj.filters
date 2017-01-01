@@ -114,6 +114,9 @@
     <ClInclude Include="Keys.h">
       <Filter>Header Files\Core\Input</Filter>
     </ClInclude>
+    <ClInclude Include="MouseState.h">
+      <Filter>Header Files\Core\Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vect2.cpp">
@@ -156,6 +159,9 @@
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="KeyboardState.cpp">
+      <Filter>Source Files\Core\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="MouseState.cpp">
       <Filter>Source Files\Core\Input</Filter>
     </ClCompile>
   </ItemGroup>
