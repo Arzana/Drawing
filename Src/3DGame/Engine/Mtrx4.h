@@ -54,6 +54,14 @@ typedef struct Matrix4
 		float w = r.X * M41 + r.Y * M42 + r.Z * M43 + M44;
 		return Vector4(x, y, z, w);
 	}
+	inline void operator >>(Vector4 &r) const __GPU
+	{
+		r = vect4(
+			r.X * M11 + r.Y * M12 + r.Z * M13 + M14,
+			r.X * M21 + r.Y * M22 + r.Z * M23 + M24, 
+			r.X * M31 + r.Y * M32 + r.Z * M33 + M34, 
+			r.X * M41 + r.Y * M42 + r.Z * M43 + M44);
+	}
 	inline Matrix4 operator *=(const Matrix4 &r) __GPU
 	{
 		float m11 = M11 * r.M11 + M12 * r.M21 + M13 * r.M31 + M14 * r.M41;
@@ -125,6 +133,7 @@ typedef struct Matrix4
 	static Matrix4 CreateView(const Vector3 *camPos, const Vector3 *camRot) __GPU;
 	static Matrix4 Multiply(const Matrix4 *m1, const Matrix4 *m2) __GPU;
 	static Vector4 Transform(const Matrix4 *m, const Vector3 *v) __GPU;
-	static void Transform(const Matrix4 *m, const Vector3 *src, Vector4 *dest, const size_t length) __CPU_ONLY;
+	static void Transform(const Matrix4 *m, const Vector3 *src, Vector4 *dest, size_t length) __CPU_ONLY;
+	static void Transform(const Matrix4 *m, Vector4 *arr, size_t length) __CPU_ONLY;
 	static Matrix4 Transpose(const Matrix4 *m) __GPU;
 } mtrx4;

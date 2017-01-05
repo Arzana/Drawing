@@ -309,17 +309,28 @@ Vector4 Matrix4::Transform(const Matrix4 * m, const Vector3 * v) __GPU
 	return Vector4(x, y, z, w);
 }
 
-void Matrix4::Transform(const Matrix4 * m, const Vector3 * src, Vector4 * dest, const size_t length) __CPU_ONLY
+void Matrix4::Transform(const Matrix4 * m, const Vector3 * src, Vector4 * dest, size_t length) __CPU_ONLY
 {
 	array_view<const vect3, 1> arr_src(length, src);
 	array_view<vect4, 1> arr_dest(length, dest);
 	const mtrx4 mtrx = *m;
 
-	parallel_for_each(
-		arr_dest.extent,
-		[=](index<1> i) __GPU
+	parallel_for_each(arr_dest.extent,
+		[=](index<1> i) __GPU_ONLY
 	{
 		arr_dest[i] = mtrx * arr_src[i];
+	});
+}
+
+void Matrix4::Transform(const Matrix4 * m, Vector4 * arr, size_t length)
+{
+	array_view<vect4, 1> arr_vect(length, arr);
+	const mtrx4 mtrx = *m;
+
+	parallel_for_each(arr_vect.extent,
+		[=](index<1> i) __GPU_ONLY
+	{
+		mtrx >> arr_vect[i];
 	});
 }
 

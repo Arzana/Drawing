@@ -24,7 +24,7 @@ void Game_WIN::OnInitialize(void)
 {
 	LogMsg_Game("Initializing windows game.");
 	LogMsg_Game("\tFlags { ZBuffering: %s, Clipping: %s, VertexBuffering: %s }",
-		BOOL_STR(flags->zBuff), BOOL_STR(flags->clip), BOOL_STR(flags->vBuff));
+		BOOL_STR(flags->zBuff), BOOL_STR(flags->clip));
 }
 
 void Game_WIN::Run(void)

@@ -18,6 +18,7 @@ typedef struct Vector4
 	Vector4(void) __GPU : X(0), Y(0), Z(0), W(0) { }
 	Vector4(float v) __GPU : X(v), Y(v), Z(v), W(v) { }
 	Vector4(float x, float y, float z, float w) __GPU : X(x), Y(y), Z(z), W(w) { }
+	Vector4(Vector3 v) __GPU : X(v.X), Y(v.Y), Z(v.Z), W(1) { }
 
 	inline Vector4 operator -(void) const __GPU { return Vector4(-X, -Y, -Z, -W); }
 	inline Vector4 operator -(const Vector4 &r) const __GPU { return Vector4(X - r.X, Y - r.Y, Z - r.Z, W - r.W); }
@@ -77,7 +78,7 @@ typedef struct Vector4
 	static Vector4 Reflect(const Vector4 *v, const Vector4 *n) __GPU;
 	static Vector4 SmoothStep(const Vector4 *v1, const Vector4 *v2, float a) __GPU;
 	static Vector4 Subtract(const Vector4 *v1, const Vector4 *v2) __GPU;
-	inline Vector3 ToNDC(void) const __GPU { return vect3(X / W, Y / W, Z / W); }
+	inline void ToNDC(void) __GPU { X /= W; Y /= W; Z /= W; }
 	float Volume(void) const __GPU;
 	float Volume4D(void) const __GPU;
 } vect4;

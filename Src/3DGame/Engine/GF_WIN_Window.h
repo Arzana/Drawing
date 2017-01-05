@@ -39,18 +39,15 @@ public:
 protected:
 	inline void SetFlag_ZBuffering(bool value) { flags->zBuff = value; }
 	inline void SetFlag_Clipping(bool value) { flags->clip = value; }
-	void SetFlag_VertexBuffering(bool value);
-	inline vect3* GetVertexBuffer(void) { return vBuff; }
 private:
 	struct Flags
 	{
 		bool zBuff : 1;
 		bool clip : 1;
-		bool vBuff : 1;
 		bool proj : 1;
 		bool start : 1;
 		octet prim : 3;
-		Flags(void) : zBuff(true), clip(true), vBuff(false), proj(false), start(false), prim(GF_POINTS) { }
+		Flags(void) : zBuff(true), clip(true), proj(false), start(false), prim(GF_POINTS) { }
 	} *flags;
 
 	const uint scrArea;
@@ -58,7 +55,6 @@ private:
 	vect4 *cp;
 	size_t *buffLen, *buffI;
 
-	vect3 *vBuff;
 	clr *cBuff;
 	vect4 *hBuff;
 	float *zBuff;
@@ -67,7 +63,7 @@ private:
 	void SetDepth(float front, float back);
 	void Raise(const char *msg);
 	void ResetZBuff(void);
-	static vect3 ToScreen(vect4 v, vect4 cp, bool proj) __GPU;
+	static void ToScreen(vect4 *v, vect4 cp, bool proj) __GPU;
 
 	void GF_Points(void);
 	void GF_LineFan(void);

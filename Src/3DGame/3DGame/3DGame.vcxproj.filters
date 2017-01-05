@@ -27,9 +27,6 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FireworksGame.cpp">
-      <Filter>Source Files\Games</Filter>
-    </ClCompile>
     <ClCompile Include="Room.cpp">
       <Filter>Source Files\Games</Filter>
     </ClCompile>
@@ -40,9 +37,6 @@
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FireworksGame.h">
-      <Filter>Header Files\Games</Filter>
     </ClInclude>
     <ClInclude Include="Room.h">
       <Filter>Header Files\Games</Filter>

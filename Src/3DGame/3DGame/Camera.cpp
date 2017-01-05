@@ -1,5 +1,8 @@
+#define _VECT_CONV
+
 #include "Camera.h"
 #include <MathEx.h>
+#include <Utils.h>
 
 Camera::Camera(void)
 {
@@ -67,7 +70,9 @@ void Camera::AppendRotation(vect3 rads)
 void Camera::Move(vect3 direction)
 {
 	if (direction == VECT3_ZERO) return;
-	AppendPosition((mtrx4::CreateRotationQ(rotation->X, 0, rotation->Z) * direction).ToNDC());
+	vect4 camDir = mtrx4::CreateRotationQ(rotation->X, 0, rotation->Z) * direction;
+	camDir.ToNDC();
+	AppendPosition(V4ToV3(camDir));
 }
 
 const mtrx4 * Camera::Update(void)

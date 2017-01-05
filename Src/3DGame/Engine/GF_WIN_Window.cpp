@@ -9,7 +9,9 @@
 #include "Shapes.h"
 #include "WinLogger.h"
 
-#define vrtxat(x)	vrtx(gfWinWnd::ToScreen(p.vertexes[x].v, *cp, flags->proj), p.vertexes[x].c)
+#define vrtxat(x, name)	gfWinWnd::ToScreen(&p.vertexes[x].v, *cp, flags->proj); \
+						vrtx name(V4ToV3(p.vertexes[x].v), p.vertexes[x].c)
+
 
 using namespace concurrency;
 
@@ -17,7 +19,7 @@ GF_WIN_Window::GF_WIN_Window(const char * title, uint width, uint height)
 	: WindowsWindow(title, width, height), flags(new Flags()), scrArea(width * height)
 	, vp(new vPort(width - 1, height - 1, FLT_MAX, 0)), cp(new vect4((width - 1) * 0.5f, (height - 1) * 0.5f, 0, 0))
 	, buffLen(new size_t(0)), buffI(new size_t(0))
-	, vBuff(NULL), cBuff(NULL), hBuff(NULL), zBuff(malloc_s(float, scrArea))
+	, cBuff(NULL), hBuff(NULL), zBuff(malloc_s(float, scrArea))
 	, model(MTRX4_IDENTITY), view(MTRX4_IDENTITY), proj(MTRX4_IDENTITY)
 { }
 
@@ -30,7 +32,6 @@ GF_WIN_Window::~GF_WIN_Window(void)
 	delete_s(buffI);
 	free_s(zBuff);
 
-	if (vBuff) free_s(vBuff);
 	if (cBuff) free_s(cBuff);
 	if (hBuff) free_s(hBuff);
 }
@@ -61,7 +62,6 @@ void GF_WIN_Window::SetBufferLength(size_t length)
 	}
 
 	*buffLen = length;
-	vBuff = malloc_s(vect3, length);
 	cBuff = malloc_s(Color, length);
 	hBuff = malloc_s(vect4, length);
 }
@@ -88,7 +88,7 @@ bool GF_WIN_Window::End(void)
 	}
 
 	mtrx4 mvp = proj * (model * view);
-	mtrx4::Transform(&mvp, vBuff, hBuff, *buffLen);
+	mtrx4::Transform(&mvp, hBuff, *buffLen);
 
 	switch (flags->prim)
 	{
@@ -106,15 +106,11 @@ bool GF_WIN_Window::End(void)
 		break;
 	}
 
-	if (!flags->vBuff)
-	{
-		model = MTRX4_IDENTITY;
-		*buffI = 0;
-		*buffLen = 0;
-		free_s(vBuff);
-		free_s(cBuff);
-		free_s(hBuff);
-	}
+	model = MTRX4_IDENTITY;
+	*buffI = 0;
+	*buffLen = 0;
+	free_s(cBuff);
+	free_s(hBuff);
 
 	flags->start = false;
 	return true;
@@ -129,7 +125,7 @@ void GF_WIN_Window::AddVertex(vect3 v, clr c)
 		return;
 	}
 
-	vBuff[*buffI] = v;
+	hBuff[*buffI] = vect4(v);
 	cBuff[(*buffI)++] = c;
 }
 
@@ -144,23 +140,6 @@ void GF_WIN_Window::Clear(clr c)
 	{
 		arr_pix[i] = clearColor;
 	});
-}
-
-void GF_WIN_Window::SetFlag_VertexBuffering(bool value)
-{
-	if (value == flags->vBuff) return;
-	LogMsg_GF("Flag vertex buffering turned %s.", value ? "on" : "off");
-
-	if (flags->vBuff && !value)
-	{
-		*buffI = 0;
-		*buffLen = 0;
-		free_s(vBuff);
-		free_s(cBuff);
-		free_s(hBuff);
-	}
-
-	flags->vBuff = value;
 }
 
 void GF_WIN_Window::SetDepth(float front, float back)
@@ -189,13 +168,14 @@ void GF_WIN_Window::ResetZBuff(void)
 	});
 }
 
-vect3 GF_WIN_Window::ToScreen(vect4 v, vect4 cp, bool proj) __GPU
+void GF_WIN_Window::ToScreen(vect4 *v, vect4 cp, bool proj) __GPU
 {
-	vect3 result = proj ? v.ToNDC() : V4ToV3(v);
-	result.X = cp.X * result.X + cp.X;
-	result.Y = cp.Y * result.Y + cp.Y;
-	result.Z = cp.Z * result.Z + cp.W;
-	return result;
+	if (v->W == 0) return;
+	if (proj) v->ToNDC();
+	v->X = cp.X * v->X + cp.X;
+	v->Y = cp.Y * v->Y + cp.Y;
+	v->Z = cp.Z * v->Z + cp.W;
+	v->W = 0;
 }
 
 void GF_WIN_Window::GF_Points(void)
@@ -214,11 +194,11 @@ void GF_WIN_Window::GF_Points(void)
 	{
 		vect4 h = arr_h[i];
 		if (h.Clip()) return;
-		vect3 coord = gfWinWnd::ToScreen(h, port, proj);
-		index<1> pI(xy2i(ipart(coord.X), ipart(coord.Y), w));
+		gfWinWnd::ToScreen(&h, port, proj);
+		index<1> pI(xy2i(ipart(h.X), ipart(h.Y), w));
 
-		if (arr_z[pI] < coord.Z) return;
-		arr_z[pI] = coord.Z;
+		if (arr_z[pI] < h.Z) return;
+		arr_z[pI] = h.Z;
 		arr_pix[pI] = arr_c[i];
 	});
 }
@@ -235,8 +215,9 @@ void GF_WIN_Window::GF_LineFan(void)
 	const vPort vport = *vp;
 	const size_t w = width;
 
-	const vect4 h0 = hBuff[0];
-	const vrtx v0 = vrtx(gfWinWnd::ToScreen(h0, port, proj), cBuff[0]);
+	vect4 h0 = hBuff[0];
+	gfWinWnd::ToScreen(&h0, port, proj);
+	const vrtx v0 = vrtx(V4ToV3(h0), cBuff[0]);
 
 	parallel_for_each(arr_h.extent,
 		[=](index<1> i) __GPU_ONLY
@@ -245,8 +226,8 @@ void GF_WIN_Window::GF_LineFan(void)
 		if (h0.Clip() || h1.Clip())
 		{
 			if (!clip) return;
-			vect3 coord1 = gfWinWnd::ToScreen(h1, port, proj);
-			Line l = Line(v0, vrtx(coord1, arr_c[i]));
+			gfWinWnd::ToScreen(&h1, port, proj);
+			Line l = Line(v0, vrtx(V4ToV3(h1), arr_c[i]));
 			if (l.Clip(vport))
 			{
 				l.Render(
@@ -262,8 +243,8 @@ void GF_WIN_Window::GF_LineFan(void)
 		}
 		else
 		{
-			vect3 coord1 = gfWinWnd::ToScreen(h1, port, proj);
-			Line(v0, vrtx(coord1, arr_c[i])).Render(
+			gfWinWnd::ToScreen(&h1, port, proj);
+			Line(v0, vrtx(V4ToV3(h1), arr_c[i])).Render(
 				[=](uint x, uint y, float z, clr c) __GPU_ONLY
 			{
 				index<1> pI(xy2i(ipart(x), ipart(y), w));
@@ -290,12 +271,15 @@ void GF_WIN_Window::GF_Triangles(void)
 		if (hBuff[i].Clip() || hBuff[j].Clip() || hBuff[k].Clip()) ClipPoly(&p);
 
 		if (p.vrtxCount < 3) return;
-		vrtx vrtx0 = vrtxat(0);
+		vrtxat(0, vrtx0);
 
 		parallel_for(size_t(2), size_t(p.vrtxCount), size_t(1),
 			[&](size_t m) __CPU_ONLY
 		{
-			trgl cur(vrtx0, vrtxat(m - 1), vrtxat(m));
+			vrtxat(m - 1, vrtx1);
+			vrtxat(m, vrtx2);
+
+			trgl cur(vrtx0, vrtx1, vrtx2);
 			int minX = (int)ceilf(min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
 			int minY = (int)ceilf(min3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
 			int maxX = (int)ceilf(max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
