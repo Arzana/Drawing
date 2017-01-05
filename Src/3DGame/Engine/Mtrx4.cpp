@@ -28,7 +28,7 @@ Matrix4 Matrix4::CreateYawPitchRoll(float yaw, float pitch, float roll) __GPU_ON
 
 Matrix4 Matrix4::CreateFrustrum(float fovY, float aspr, float n, float f) __CPU_ONLY
 {
-	float tangent = tanf(fovY / 2 * M_DEG2RAD);
+	float tangent = tanf(fovY / 2.0f * M_DEG2RAD);
 	float t = n * tangent;
 	float r = t * aspr;
 	float b = -t;

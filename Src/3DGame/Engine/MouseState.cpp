@@ -1,6 +1,6 @@
 #include "MouseState.h"
 
-void MouseState::Update(const int newX, const int newY)
+void MouseState::Update(int newX, int newY)
 {
 	if (x != -1)
 	{

@@ -9,11 +9,11 @@
 #include "Shapes.h"
 #include "WinLogger.h"
 
-#define vrtxat(x)	vrtx(gfWinWnd::ToScreen(cur.vertexes[x].v, *cp, flags->proj), cur.vertexes[x].c)
+#define vrtxat(x)	vrtx(gfWinWnd::ToScreen(p.vertexes[x].v, *cp, flags->proj), p.vertexes[x].c)
 
 using namespace concurrency;
 
-GF_WIN_Window::GF_WIN_Window(const char * title, const uint width, const uint height)
+GF_WIN_Window::GF_WIN_Window(const char * title, uint width, uint height)
 	: WindowsWindow(title, width, height), flags(new Flags()), scrArea(width * height)
 	, vp(new vPort(width - 1, height - 1, FLT_MAX, 0)), cp(new vect4((width - 1) * 0.5f, (height - 1) * 0.5f, 0, 0))
 	, buffLen(new size_t(0)), buffI(new size_t(0))
@@ -35,7 +35,7 @@ GF_WIN_Window::~GF_WIN_Window(void)
 	if (hBuff) free_s(hBuff);
 }
 
-void GF_WIN_Window::SetProjection_Frustrum(const float fovY, const float aspr, const float front, const float back)
+void GF_WIN_Window::SetProjection_Frustrum(float fovY, float aspr, float front, float back)
 {
 	LogMsg_GF("Projection set as frustrum.");
 	flags->proj = true;
@@ -43,7 +43,7 @@ void GF_WIN_Window::SetProjection_Frustrum(const float fovY, const float aspr, c
 	SetDepth(front, back);
 }
 
-void GF_WIN_Window::SetProjection_Orthographic(const float width, const float height, const float front, const float back)
+void GF_WIN_Window::SetProjection_Orthographic(float width, float height, float front, float back)
 {
 	LogMsg_GF("Projection set as orthographic.");
 	flags->proj = false;
@@ -51,7 +51,7 @@ void GF_WIN_Window::SetProjection_Orthographic(const float width, const float he
 	SetDepth(front, back);
 }
 
-void GF_WIN_Window::SetBufferLength(const size_t length)
+void GF_WIN_Window::SetBufferLength(size_t length)
 {
 	if (length < 0 || *buffLen > 0)
 	{
@@ -66,7 +66,7 @@ void GF_WIN_Window::SetBufferLength(const size_t length)
 	hBuff = malloc_s(vect4, length);
 }
 
-void GF_WIN_Window::Start(const octet primitiveType)
+void GF_WIN_Window::Start(octet primitiveType)
 {
 	if (flags->start)
 	{
@@ -120,7 +120,7 @@ bool GF_WIN_Window::End(void)
 	return true;
 }
 
-void GF_WIN_Window::AddVertex(const vect3 v, const clr c)
+void GF_WIN_Window::AddVertex(vect3 v, clr c)
 {
 	if (*buffI >= *buffLen)
 	{
@@ -133,7 +133,7 @@ void GF_WIN_Window::AddVertex(const vect3 v, const clr c)
 	cBuff[(*buffI)++] = c;
 }
 
-void GF_WIN_Window::Clear(const clr c)
+void GF_WIN_Window::Clear(clr c)
 {
 	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
 	const clr clearColor = c;
@@ -146,7 +146,7 @@ void GF_WIN_Window::Clear(const clr c)
 	});
 }
 
-void GF_WIN_Window::SetFlag_VertexBuffering(const bool value)
+void GF_WIN_Window::SetFlag_VertexBuffering(bool value)
 {
 	if (value == flags->vBuff) return;
 	LogMsg_GF("Flag vertex buffering turned %s.", value ? "on" : "off");
@@ -167,8 +167,8 @@ void GF_WIN_Window::SetDepth(float front, float back)
 {
 	vp->far = back;
 	vp->near = front;
-	cp->Z = (back - front) * 0.5;
-	cp->W = (back + front) * 0.5;
+	cp->Z = (back - front) * 0.5f;
+	cp->W = (back + front) * 0.5f;
 }
 
 void GF_WIN_Window::Raise(const char * msg)
@@ -189,7 +189,7 @@ void GF_WIN_Window::ResetZBuff(void)
 	});
 }
 
-vect3 GF_WIN_Window::ToScreen(const vect4 v, const vect4 cp, const bool proj) __GPU
+vect3 GF_WIN_Window::ToScreen(vect4 v, vect4 cp, bool proj) __GPU
 {
 	vect3 result = proj ? v.ToNDC() : V4ToV3(v);
 	result.X = cp.X * result.X + cp.X;
@@ -278,68 +278,44 @@ void GF_WIN_Window::GF_LineFan(void)
 
 void GF_WIN_Window::GF_Triangles(void)
 {
-	size_t pLen = *buffLen / 3, tLen = 0;		// Initialize initial polygon buffer
-	poly *polies = malloc_s(poly, pLen);
-
-	for (size_t i(0), j(1), k(2), m(0); i < *buffLen; i += 3, j += 3, k += 3, m++)
-	{
-		polies[m] = { 3,{ { hBuff[i], cBuff[i] }, { hBuff[j], cBuff[j] }, { hBuff[k], cBuff[k] } } };
-		if (hBuff[i].Clip() || hBuff[j].Clip() || hBuff[k].Clip()) ClipPoly(&polies[m]);
-		tLen += polies[m].TrglLen();
-	}
-
-	if (!pLen)
-	{	// If nothing needs to be drawn exit here
-		free_s(polies);
-		return;
-	}
-
-	// Initialize final buffer
-	trgl *trgls = malloc_s(trgl, tLen);
-	for (size_t i = 0, j = 0; i < pLen; i++)
-	{	// Concatinate polygons into final buffer
-		poly cur = polies[i];
-		if (cur.vrtxCount < 3) continue;
-
-		vrtx vrtx0 = vrtxat(0);
-		for (size_t k = 2; k < cur.vrtxCount; k++)
-		{
-			vrtx vrtx1 = vrtxat(k - 1);
-			vrtx vrtx2 = vrtxat(k);
-			trgls[j++] = trgl(vrtx0, vrtx1, vrtx2);
-		}
-	}
-
-	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);	// Start moving rending buffers to the GPU
+	array_view<clr, 1> arr_pix(scrArea, (clr*)pixels);
 	array_view<float, 1> arr_z(scrArea, zBuff);
 	const uint w = width;
 
-	parallel_for(size_t(0), tLen, size_t(1),
+	parallel_for(size_t(0), *buffLen, size_t(3),
 		[&](size_t i) __CPU_ONLY
-	{	// Create bounding box for triangle
-		trgl cur = trgls[i];
-		int minX = ceilf(min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
-		int minY = ceilf(min3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
-		int maxX = ceilf(max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
-		int maxY = ceilf(max3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
+	{
+		size_t j = i + 1, k = i + 2;
+		poly p = { 3, { { hBuff[i], cBuff[i] }, { hBuff[j], cBuff[j] }, { hBuff[k], cBuff[k] } } };
+		if (hBuff[i].Clip() || hBuff[j].Clip() || hBuff[k].Clip()) ClipPoly(&p);
 
-		int bW = max(1, maxX - minX);	// Create special buffer for rasterizing the traingle.
-		array_view<clr, 1> arr_box(bW * max(1, maxY - minY), (clr*)pixels);
+		if (p.vrtxCount < 3) return;
+		vrtx vrtx0 = vrtxat(0);
 
-		parallel_for_each(arr_box.extent,
-			[=](index<1> idx) __GPU_ONLY
-		{	// Get the current vertex
-			vrtx v = vrtx(minX + i2x(idx[0], bW), minY + i2y(idx[0], bW), 0, CLR_BLACK);
-			if (cur.IsInside(&v))
-			{	// If the vertex if inside the triangle check depth buffer and add to screen buffer
-				index<1> pI(xy2i(ipart(v.v.X), ipart(v.v.Y), w));
-				if (arr_z[pI] < v.v.Z) return;
-				arr_z[pI] = v.v.Z;
-				arr_pix[pI] = v.c;
-			}
+		parallel_for(size_t(2), size_t(p.vrtxCount), size_t(1),
+			[&](size_t m) __CPU_ONLY
+		{
+			trgl cur(vrtx0, vrtxat(m - 1), vrtxat(m));
+			int minX = (int)ceilf(min3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
+			int minY = (int)ceilf(min3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
+			int maxX = (int)ceilf(max3(cur.v0.v.X, cur.v1.v.X, cur.v2.v.X));
+			int maxY = (int)ceilf(max3(cur.v0.v.Y, cur.v1.v.Y, cur.v2.v.Y));
+
+			int bW = max(1, maxX - minX);
+			array_view<clr, 1> arr_box(bW * max(1, maxY - minY), (clr*)pixels);
+
+			parallel_for_each(arr_box.extent,
+				[=](index<1> idx) __GPU_ONLY
+			{
+				vrtx v = vrtx(float(minX + i2x(idx[0], bW)), float(minY + i2y(idx[0], bW)), 0.0f, CLR_BLACK);
+				if (cur.IsInside(&v))
+				{
+					index<1> pI(xy2i(ipart(v.v.X), ipart(v.v.Y), w));
+					if (arr_z[pI] < v.v.Z) return;
+					arr_z[pI] = v.v.Z;
+					arr_pix[pI] = v.c;
+				}
+			});
 		});
 	});
-
-	free_s(polies);
-	free_s(trgls);
 }

@@ -14,7 +14,7 @@ typedef struct Game_WIN
 public:
 	bool *IsFixedTimeStep;
 
-	Game_WIN(const char *title, const uint width, const uint height);
+	Game_WIN(const char *title, uint width, uint height);
 	~Game_WIN(void);
 
 	virtual void OnInitialize(void);
@@ -31,7 +31,7 @@ public:
 private:
 	const clock_t mili2clocks = CLOCKS_PER_SEC / 1000;
 	const TimeSpan MAX_ELAPSED_TIME = 500 * mili2clocks;
-	const TimeSpan TARGET_ELAPSED_TIME = 1.0f / FPS_LOCK * CLOCKS_PER_SEC;
+	const TimeSpan TARGET_ELAPSED_TIME = TimeSpan(1.0f / FPS_LOCK * CLOCKS_PER_SEC);
 	const uint buffLen = 100;
 
 	TimeSpan inactiveSleepTime;

@@ -5,7 +5,7 @@
 #define GET_Y_LPARAM(lp)	((int)(short)HIWORD(lp))
 #define BOOL_STR(b)			((b) ? "true" : "false")
 
-Game_WIN::Game_WIN(const char * title, const uint width, const uint height)
+Game_WIN::Game_WIN(const char * title, uint width, uint height)
 	: gfWinWnd(title, width, height)
 	, inactiveSleepTime(0), accumelatedElapsedTime(0), previousTicks(0), timer(0), gameTime(GameTime()), updateFrameLag(0)
 	, IsFixedTimeStep(new bool(true))
@@ -71,7 +71,7 @@ RetryTick:
 
 	if (*IsFixedTimeStep && accumelatedElapsedTime < TARGET_ELAPSED_TIME)
 	{
-		clock_t sleepTime = (float)(TARGET_ELAPSED_TIME - accumelatedElapsedTime) / mili2clocks;
+		clock_t sleepTime = clock_t((TARGET_ELAPSED_TIME - accumelatedElapsedTime) / (float)mili2clocks);
 		Sleep(sleepTime);
 
 		goto RetryTick;

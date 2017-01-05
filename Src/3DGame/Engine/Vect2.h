@@ -41,7 +41,7 @@ typedef struct Vector2
 
 	inline bool operator ==(const Vector2 &r) const __GPU { return r.X == X && r.Y == Y; }
 	inline bool operator !=(const Vector2 &r) const __GPU { return r.X != X || r.Y != Y; }
-	inline float operator [](const int i) const __GPU { return ((float*)this)[i]; }
+	inline float operator [](int i) const __GPU { return ((const float*)this)[i]; }
 
 	static Vector2 Abs(const Vector2 *v) __GPU;
 	void Abs() __GPU;

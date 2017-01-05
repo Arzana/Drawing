@@ -28,19 +28,6 @@
 #include "Vect3.h"
 #include "Vect4.h"
 
-inline vect3 V4ToV3(const vect4 v) restrict(cpu, amp) { return vect3(v.X, v.Y, v.Z); }
-inline vect2 V3ToV2(const vect3 v) restrict(cpu, amp) { return vect2(v.X, v.Y); }
-#endif
-
-#ifdef _VECTOR_
-template <typename T>
-bool Contains(std::vector<T> vec, T *element)
-{
-	for (size_t i = 0; i < vec.size(); i++)
-	{
-		if (vec.at(i) == *element) return true;
-	}
-
-	return false;
-}
+inline vect3 V4ToV3(vect4 v) restrict(cpu, amp) { return vect3(v.X, v.Y, v.Z); }
+inline vect2 V3ToV2(vect3 v) restrict(cpu, amp) { return vect2(v.X, v.Y); }
 #endif

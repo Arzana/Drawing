@@ -6,7 +6,7 @@
 #include <Windows.h>
 #include "WinLogger.h"
 
-void LogAs(const char * as, const int clr, const char * format, ...)
+void LogAs(const char * as, int clr, const char * format, ...)
 {
 	HANDLE hndlConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(hndlConsole, clr);

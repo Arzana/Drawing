@@ -17,10 +17,9 @@ typedef struct Line
 	vrtx v0, v1;
 
 	Line(void) __GPU : v0(vrtx()), v1(vrtx()) { }
-	Line(const vrtx v0, const vrtx v1) __GPU : v0(v0), v1(v1) { }
-	Line(const vrtx *v0, const vrtx *v1) __GPU : v0(*v0), v1(*v1) { }
+	Line(vrtx v0, vrtx v1) __GPU : v0(v0), v1(v1) { }
 
-	bool Clip(const ViewPort vp) __GPU
+	bool Clip(ViewPort vp) __GPU
 	{
 		int m0 = v0.ComputeMask(vp);
 		int m1 = v1.ComputeMask(vp);
@@ -32,10 +31,10 @@ typedef struct Line
 			float x, y, z, a;
 			int mc = m0 ? m0 : m1;
 
-			if (mc & TOP) y = vp.screen.h;
-			else if (mc & BOTTOM) y = vp.screen.y;
-			else if (mc & RIGHT) x = vp.screen.w;
-			else if (mc & LEFT) x = vp.screen.x;
+			if (mc & TOP) y = float(vp.screen.h);
+			else if (mc & BOTTOM) y = float(vp.screen.y);
+			else if (mc & RIGHT) x = float(vp.screen.w);
+			else if (mc & LEFT) x = float(vp.screen.x);
 			else if (mc & NEAR) z = vp.near;
 			else if (mc & FAR) z = vp.far;
 
@@ -78,16 +77,16 @@ typedef struct Line
 	template <typename _Func>
 	void Render(const _Func plot) const __GPU
 	{
-		int w = v1.v.X - v0.v.X;
-		int h = v1.v.Y - v0.v.Y;
+		float w = v1.v.X - v0.v.X;
+		float h = v1.v.Y - v0.v.Y;
 
 		int dx0 = w < 0 ? -1 : (w > 0 ? 1 : 0);
 		int dy0 = h < 0 ? -1 : (h > 0 ? 1 : 0);
 		int dx1 = dx0;
 		int dy1 = 0;
 
-		uint lng = abs(w);
-		uint shrt = abs(h);
+		float lng = abs(w);
+		float shrt = abs(h);
 		if (lng <= shrt)
 		{
 			lng = shrt;
@@ -96,13 +95,13 @@ typedef struct Line
 			dx1 = 0;
 		}
 
-		uint num = lng >> 1;
-		uint x = v0.v.X;
-		uint y = v0.v.Y;
+		float num = lng / 2.0f;
+		int x = ipart(v0.v.X);
+		int y = ipart(v0.v.Y);
 
-		for (size_t i = 0; i < lng; i++)
+		for (float i = 0; i < lng; i++)
 		{
-			float a = invLerp(0, lng, i);
+			float a = invLerp(0.0f, lng, i);
 			plot(x, y, lerp(v0.v.Z, v1.v.Z, a), clr::Lerp(v0.c, v1.c, a));
 			num += shrt;
 			if (num >= lng)

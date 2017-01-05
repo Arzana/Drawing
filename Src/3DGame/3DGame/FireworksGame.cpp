@@ -34,7 +34,7 @@ void FireworksGame::OnInitialize(void)
 	AddVertex(VECT3_ZERO, clr((uint)0));
 	for (size_t yaw = 0; yaw < ppAxis; yaw++)
 	{
-		float yawf = lerp(0, M_TAU, invLerp(0, ppAxis, yaw));
+		float yawf = lerp(0.0f, M_TAU, invLerp(0.0f, ppAxis, yaw));
 		int red = lerp(0, 255, invLerp(0, ppAxis, yaw));
 		for (size_t pitch = 0; pitch < ppAxis; pitch++)
 		{

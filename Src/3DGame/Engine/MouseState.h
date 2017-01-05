@@ -12,6 +12,6 @@ typedef struct MouseState
 		, x(-1), y(0)
 		, scrollWheel(0), dx(0), dy(0) { }
 
-	void Update(const int newX, const int newY);
+	void Update(int newX, int newY);
 	void DeltaReset(void);
 } mstate;

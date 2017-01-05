@@ -22,24 +22,24 @@ typedef struct GF_WIN_Window
 	friend struct Game_WIN;
 
 public:
-	GF_WIN_Window(const char *title, const uint width, const uint height);
+	GF_WIN_Window(const char *title, uint width, uint height);
 	~GF_WIN_Window(void);
 
-	void SetProjection_Frustrum(const float fovY, const float aspr, const float front, const float back);
-	void SetProjection_Orthographic(const float width, const float height, const float front, const float back);
+	void SetProjection_Frustrum(float fovY, float aspr, float front, float back);
+	void SetProjection_Orthographic(float width, float height, float front, float back);
 	inline void SetView(const mtrx4 *mtrx) { view = *mtrx; }
 	inline void SetModel(const mtrx4 *mtrx) { model = *mtrx; }
-	void SetBufferLength(const size_t length);
-	void Start(const octet primitiveType);
+	void SetBufferLength(size_t length);
+	void Start(octet primitiveType);
 	bool End(void);
-	void AddVertex(const vect3 v, const clr c);
-	inline void AddVertex(const float x, const float y, const float z, const clr c) { AddVertex(vect3(x, y, z), c); }
-	inline void AddVertex(const vrtx vtx) { AddVertex(vtx.v, vtx.c); }
-	void Clear(const clr c);
+	void AddVertex(vect3 v, clr c);
+	inline void AddVertex(float x, float y, float z, clr c) { AddVertex(vect3(x, y, z), c); }
+	inline void AddVertex(vrtx vtx) { AddVertex(vtx.v, vtx.c); }
+	void Clear(clr c);
 protected:
-	inline void SetFlag_ZBuffering(const bool value) { flags->zBuff = value; }
-	inline void SetFlag_Clipping(const bool value) { flags->clip = value; }
-	void SetFlag_VertexBuffering(const bool value);
+	inline void SetFlag_ZBuffering(bool value) { flags->zBuff = value; }
+	inline void SetFlag_Clipping(bool value) { flags->clip = value; }
+	void SetFlag_VertexBuffering(bool value);
 	inline vect3* GetVertexBuffer(void) { return vBuff; }
 private:
 	struct Flags
@@ -67,7 +67,7 @@ private:
 	void SetDepth(float front, float back);
 	void Raise(const char *msg);
 	void ResetZBuff(void);
-	static vect3 ToScreen(const vect4 v, const vect4 cp, const bool proj) __GPU;
+	static vect3 ToScreen(vect4 v, vect4 cp, bool proj) __GPU;
 
 	void GF_Points(void);
 	void GF_LineFan(void);

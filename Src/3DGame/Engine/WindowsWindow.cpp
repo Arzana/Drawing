@@ -9,7 +9,7 @@ using namespace std;
 
 vector<winWnd*> wnds;
 
-WindowsWindow::WindowsWindow(const char * t, const uint w, const uint h)
+WindowsWindow::WindowsWindow(const char * t, uint w, uint h)
 	: width(w), height(h), title(t), isRunning(new bool(true))
 {
 	wnds.push_back(this);
@@ -129,12 +129,12 @@ int WindowsWindow::BmpInit(void)
 	BITMAPINFOHEADER bmih
 	{
 		sizeof(BITMAPINFOHEADER),
-		width, -(int)height,
+		(long)width, -(long)height,
 		1,
 		sizeof(clr) << 3,
 		BI_RGB,
 		0,
-		10, 10,
+		10L, 10L,
 		0, 0
 	};
 

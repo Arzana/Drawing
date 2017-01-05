@@ -29,16 +29,17 @@ void RoomGame::OnRender(void)
 	}
 
 	if (!End()) Terminate();
+	printf("FPS: %7.3f|%7.3f\n", GetAvarageFPS(), GetFps());
 }
 
 void RoomGame::OnUpdate(GameTime gameTime, const KeyboardState& kstate, const MouseState& mstate)
 {
+	/* Update player movement. */
 	if (kstate[Keys::Escape]) Terminate();
 	if (kstate[Keys::W]) cam->Move(VECT3_FORWARD * moveScalar);
 	if (kstate[Keys::S]) cam->Move(VECT3_BACK * moveScalar);
 	if (kstate[Keys::A]) cam->Move(VECT3_LEFT * moveScalar);
 	if (kstate[Keys::D]) cam->Move(VECT3_RIGHT * moveScalar);
-
 	cam->AppendYawDegr(mstate.dx * lookScalar);
 	cam->AppendPitchDegr(mstate.dy * lookScalar);
 }

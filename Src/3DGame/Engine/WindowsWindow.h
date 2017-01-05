@@ -8,7 +8,7 @@ typedef struct WindowsWindow
 public: 
 	const uint width, height;
 
-	WindowsWindow(const char *title, const uint width, const uint height);
+	WindowsWindow(const char *title, uint width, uint height);
 	~WindowsWindow(void);
 protected:
 	HWND hwnd;

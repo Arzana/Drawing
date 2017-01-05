@@ -40,4 +40,4 @@
 #define LogWar_Game(format, ...)	LogWarAs(DISPLNAME_GAME, format, __VA_ARGS__)
 #define LogErr_Game(format, ...)	LogErrAs(DISPLNAME_GAME, format, __VA_ARGS__)
 
-void LogAs(const char *as, const int clr, const char *format, ...);
+void LogAs(const char *as, int clr, const char *format, ...);

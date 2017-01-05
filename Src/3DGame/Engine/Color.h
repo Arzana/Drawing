@@ -1,5 +1,4 @@
 #pragma once
-#pragma warning(disable: 4244)
 
 #include "MathEx.h"
 #include "Vect4.h"
@@ -24,8 +23,8 @@ typedef struct Color
 	uint packed;
 
 	Color(void) __GPU : packed(0) { }
-	Color(const uint packed) __GPU : packed(packed) { }
-	Color(const int r, const int g, const int b) __GPU
+	Color(uint packed) __GPU : packed(packed) { }
+	Color(int r, int g, int b) __GPU
 	{
 		packed = 0xFF000000;	// Set A to 255
 
@@ -35,11 +34,11 @@ typedef struct Color
 			int clpG = clamp(0, 255, g);
 			int clpB = clamp(0, 255, b);
 
-			packed |= (clpR << 16) | (clpG << 8) | (clpB);
+			packed |= (clpR << 16) | (clpG << 8) | clpB;
 		}
-		else packed |= (r << 16) | (g << 8) | (b);
+		else packed |= (r << 16) | (g << 8) | b;
 	}
-	Color(const int r, const int g, const int b, const int a) __GPU
+	Color(int r, int g, int b, int a) __GPU
 	{
 		if (((r | g | b | a) & 0xFFFFFF00) != 0)
 		{
@@ -48,12 +47,12 @@ typedef struct Color
 			int clpB = clamp(0, 255, b);
 			int clpA = clamp(0, 255, a);
 
-			packed = (clpA << 24) | (clpR << 16) | (clpG << 8) | (clpB);
+			packed = (clpA << 24) | (clpR << 16) | (clpG << 8) | clpB;
 		}
-		else packed = (a << 24) | (r << 16) | (g << 8) | (b);
+		else packed = (a << 24) | (r << 16) | (g << 8) | b;
 	}
-	Color(const float r, const float g, const float b) __GPU : Color(ipart(r * 255), ipart(g * 255), ipart(b * 255)) { }
-	Color(const float r, const float g, const float b, const float a) __GPU : Color(ipart(r * 255), ipart(g * 255), ipart(b * 255), ipart(a * 255)) { }
+	Color(float r, float g, float b) __GPU : Color(ipart(r * 255), ipart(g * 255), ipart(b * 255)) { }
+	Color(float r, float g, float b, float a) __GPU : Color(ipart(r * 255), ipart(g * 255), ipart(b * 255), ipart(a * 255)) { }
 	Color(const vect3 *v) __GPU : Color(v->X, v->Y, v->Z) { }
 	Color(const vect4 *v) __GPU : Color(v->X, v->Y, v->Z, v->W) { }
 
@@ -77,14 +76,14 @@ typedef struct Color
 	inline int GetR(void) const __GPU { return (packed & 0x00FF0000) >> 16; }
 	inline int GetG(void) const __GPU { return (packed & 0x0000FF00) >> 8; }
 	inline int GetB(void) const __GPU { return packed & 0x000000FF; }
-	static Color Lerp(const Color min, const Color max, float a) __GPU
+	static Color Lerp(Color min, Color max, float a) __GPU
 	{
 		a = clamp(0.0f, 1.0f, a);
-		float f_a = lerp(min.GetA(), max.GetA(), a) / 255.0f;
-		float r = lerp(min.GetR(), max.GetR(), a) * f_a;
-		float g = lerp(min.GetG(), max.GetG(), a) * f_a;
-		float b = lerp(min.GetB(), max.GetB(), a) * f_a;
-		return Color(ipart(r), ipart(g), ipart(b), ipart(f_a * 255));
+		int f_a = (int)lerp((float)min.GetA(), (float)max.GetA(), a);
+		int r = (int)lerp((float)min.GetR(), (float)max.GetR(), a);
+		int g = (int)lerp((float)min.GetG(), (float)max.GetG(), a);
+		int b = (int)lerp((float)min.GetB(), (float)max.GetB(), a);
+		return FromNonPremultiplied(r, g, b, f_a);
 	}
 	static Color Multiply(const Color *c, float multiplier) __GPU;
 	static Color Subtract(const Color *c0, const Color *c1) __GPU;

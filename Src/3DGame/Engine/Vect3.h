@@ -45,7 +45,7 @@ typedef struct Vector3
 
 	inline bool operator ==(const Vector3 &r) const __GPU { return r.X == X && r.Y == Y && r.Z == Z; }
 	inline bool operator !=(const Vector3 &r) const __GPU { return r.X != X || r.Y != Y || r.Z != Z; }
-	inline float operator [](const int i) const __GPU { return ((float*)this)[i]; }
+	inline float operator [](int i) const __GPU { return ((const float*)this)[i]; }
 
 	static Vector3 Abs(const Vector3 *v) __GPU;
 	void Abs(void) __GPU;

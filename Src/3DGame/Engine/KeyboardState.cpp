@@ -34,12 +34,12 @@ bool KeyboardState::IsDown(Keys key) const
 		break;
 	}
 
-	return element & (1 << ((uint)key & 0x1f));
+	return (element & (1 << ((uint)key & 0x1F))) != 0;
 }
 
 void KeyboardState::SetDown(Keys key)
 {
-	uint mask = 1 << ((uint)key & 0x1f);
+	uint mask = 1 << ((uint)key & 0x1F);
 	switch ((uint)key >> 5)
 	{
 	case 0:
@@ -71,7 +71,7 @@ void KeyboardState::SetDown(Keys key)
 
 void KeyboardState::SetUp(Keys key)
 {
-	uint mask = ~(1 << ((uint)key & 0x1f));
+	uint mask = ~(1 << ((uint)key & 0x1F));
 	switch ((uint)key >> 5)
 	{
 	case 0:
