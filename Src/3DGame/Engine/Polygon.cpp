@@ -1,7 +1,5 @@
-#include "Shapes.h"
+#include "Polygon.h"
 #include <cstring>
-
-typedef poly::clrvect4 vrtx;
 
 void CopyVertices(vrtx *from, poly *to, octet numVertices)
 {

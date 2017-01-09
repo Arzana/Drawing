@@ -59,13 +59,13 @@ typedef struct Line
 
 			if (mc == m0)
 			{
-				v0.v = vect3(x, y, z);
+				v0.v = vect4(x, y, z, 1);
 				v0.c = Color::Lerp(v0.c, v1.c, a);
 				m0 = v0.ComputeMask(vp);
 			}
 			else
 			{
-				v1.v = vect3(x, y, z);
+				v1.v = vect4(x, y, z, 1);
 				v1.c = Color::Lerp(v0.c, v1.c, a);
 				m1 = v1.ComputeMask(vp);
 			}

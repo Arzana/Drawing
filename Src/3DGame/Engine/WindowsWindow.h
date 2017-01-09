@@ -5,7 +5,7 @@
 
 typedef struct WindowsWindow
 {
-public: 
+public:
 	const uint width, height;
 
 	WindowsWindow(const char *title, uint width, uint height);
@@ -15,8 +15,8 @@ protected:
 	void *pixels;
 	bool *isRunning;
 
-	inline void ShowWnd(void) { ShowWindow(hwnd, SW_SHOWDEFAULT); }
-	inline void HideWnd(void) { CloseWindow(hwnd); }
+	inline void ShowWnd(void) const { ShowWindow(hwnd, SW_SHOWMAXIMIZED); }
+	inline void HideWnd(void) const { CloseWindow(hwnd); }
 	inline void PostMsg(uint msg, WPARAM wParam, LPARAM lParam) { PostMessage(hwnd, msg, wParam, lParam); }
 	virtual LRESULT CALLBACK WndProc(uint msg, WPARAM wParam, LPARAM lParam);
 private:

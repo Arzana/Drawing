@@ -3,14 +3,16 @@
 #include <queue>
 #include "GameTime.h"
 #include "GF_WIN_Window.h"
-#include "KeyboardState.h"
-#include "MouseState.h"
+#include "GameComponent.h"
 
 #define FPS_LOCK	60.0f
 
 typedef struct Game_WIN
-	: public gfWinWnd
+	: private gfWinWnd
 {
+	friend struct TriangleRenderer;
+	friend struct Camera;
+
 public:
 	bool *IsFixedTimeStep;
 
@@ -26,8 +28,8 @@ public:
 	inline void Terminate(void) { *isRunning = false; }
 	float GetFps(void) const;
 	float GetAvarageFPS(void) const;
-	inline void HideMouse(void) { while (ShowCursor(false) >= 0); }
-	inline void ShowMouse(void) { while (ShowCursor(true) >= 0); }
+
+	void AddComponent(GameComponent *comp);
 private:
 	const clock_t mili2clocks = CLOCKS_PER_SEC / 1000;
 	const TimeSpan MAX_ELAPSED_TIME = 500 * mili2clocks;
@@ -44,6 +46,7 @@ private:
 	kstate *keyState;
 	mstate *mouseState;
 	std::queue<float> *frameBuffer;
+	std::vector<gameComp*> *components;
 
 	void Tick(void);
 	void DoUpdate(void);

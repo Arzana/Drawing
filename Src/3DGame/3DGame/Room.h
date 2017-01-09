@@ -1,7 +1,12 @@
 #pragma once
 
 #include <Game_WIN.h>
-#include "Camera.h"
+#include <Camera.h>
+#include <TriangleRenderer.h>
+
+const float lookScalar = 0.1f,
+			moveScalar = 0.01f,
+			eyeHeight = 0.5f;
 
 typedef struct RoomGame
 	: public winGame
@@ -11,9 +16,9 @@ public:
 	~RoomGame(void);
 private:
 	Camera *cam;
-	const float lookScalar = 0.1f,
-				moveScalar = 0.01f,
-				eyeHeight = 0.5f;
+	TriangleRenderer *renderer;
+
+	vect3 ppos, prot;
 
 	static const size_t vLen = 40;
 	const vrtx vertices[vLen] =
@@ -118,6 +123,7 @@ private:
 		{ 3, 22, 23 },	//3U
 	};
 
+	void OnInitialize(void) override;
 	void OnRender(void) override;
 	void OnUpdate(GameTime gameTime, const KeyboardState& kstate, const MouseState& mstate) override;
 } room;

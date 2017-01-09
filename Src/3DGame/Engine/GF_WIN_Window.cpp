@@ -6,11 +6,11 @@
 #include "GF_WIN_Window.h"
 #include "Line.h"
 #include "Triangle.h"
-#include "Shapes.h"
+#include "Polygon.h"
 #include "WinLogger.h"
 
 #define vrtxat(x, name)	gfWinWnd::ToScreen(&p.vertexes[x].v, *cp, flags->proj); \
-						vrtx name(V4ToV3(p.vertexes[x].v), p.vertexes[x].c)
+						vrtx name(p.vertexes[x].v, p.vertexes[x].c)
 
 
 using namespace concurrency;
@@ -116,7 +116,7 @@ bool GF_WIN_Window::End(void)
 	return true;
 }
 
-void GF_WIN_Window::AddVertex(vect3 v, clr c)
+void GF_WIN_Window::AddVertex(vect4 v, clr c)
 {
 	if (*buffI >= *buffLen)
 	{
@@ -125,7 +125,7 @@ void GF_WIN_Window::AddVertex(vect3 v, clr c)
 		return;
 	}
 
-	hBuff[*buffI] = vect4(v);
+	hBuff[*buffI] = v;
 	cBuff[(*buffI)++] = c;
 }
 

@@ -19,6 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="GameComponent.h" />
+    <ClInclude Include="TriangleRenderer.h" />
+    <ClInclude Include="View.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="Game_WIN.h" />
@@ -35,7 +39,7 @@
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="WindowsWindow.h" />
-    <ClInclude Include="Shapes.h" />
+    <ClInclude Include="Polygon.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Vect2.h" />
     <ClInclude Include="Vect3.h" />
@@ -43,6 +47,9 @@
     <ClInclude Include="WinLogger.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="TriangleRenderer.cpp" />
+    <ClCompile Include="View.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Game_WIN.cpp" />
     <ClCompile Include="GF_WIN_Window.cpp" />
@@ -52,7 +59,7 @@
     <ClCompile Include="Mtrx3.cpp" />
     <ClCompile Include="Mtrx4.cpp" />
     <ClCompile Include="Quaternion.cpp" />
-    <ClCompile Include="Shapes.cpp" />
+    <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="WindowsWindow.cpp" />
     <ClCompile Include="Vect2.cpp" />
     <ClCompile Include="Vect3.cpp" />

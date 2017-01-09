@@ -49,6 +49,21 @@
     <Filter Include="Source Files\Core\Input">
       <UniqueIdentifier>{2761dcca-7718-46cc-99e5-c39db130671d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\GameLogic">
+      <UniqueIdentifier>{045353c0-dce1-4330-9deb-706b9fe9f380}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameLogic">
+      <UniqueIdentifier>{02f6ea85-c242-4322-8260-389e4baab0d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Rendering">
+      <UniqueIdentifier>{c131ea34-741b-4a5d-81ac-99452c71af14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Rendering\Shapes">
+      <UniqueIdentifier>{1a9295ec-6558-47ba-b908-d92cb3841c39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Rendering">
+      <UniqueIdentifier>{7080ad3a-755a-4c69-bd99-6fcf5b17e57d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vect2.h">
@@ -72,9 +87,6 @@
     <ClInclude Include="Mtrx4.h">
       <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Shapes.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Utils.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
@@ -89,9 +101,6 @@
     </ClInclude>
     <ClInclude Include="GameTime.h">
       <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Game_WIN.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vertex.h">
       <Filter>Header Files\Graphics</Filter>
@@ -116,6 +125,24 @@
     </ClInclude>
     <ClInclude Include="MouseState.h">
       <Filter>Header Files\Core\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Polygon.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Game_WIN.h">
+      <Filter>Header Files\GameLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="View.h">
+      <Filter>Header Files\GameLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\GameLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="GameComponent.h">
+      <Filter>Header Files\GameLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="TriangleRenderer.h">
+      <Filter>Header Files\Graphics\Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -149,20 +176,29 @@
     <ClCompile Include="GF_WIN_Window.cpp">
       <Filter>Source Files\Window</Filter>
     </ClCompile>
-    <ClCompile Include="Game_WIN.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="WinLogger.cpp">
       <Filter>Source Files\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="Shapes.cpp">
-      <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="KeyboardState.cpp">
       <Filter>Source Files\Core\Input</Filter>
     </ClCompile>
     <ClCompile Include="MouseState.cpp">
       <Filter>Source Files\Core\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Polygon.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Game_WIN.cpp">
+      <Filter>Source Files\GameLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="View.cpp">
+      <Filter>Source Files\GameLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\GameLogic</Filter>
+    </ClCompile>
+    <ClCompile Include="TriangleRenderer.cpp">
+      <Filter>Source Files\Graphics\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

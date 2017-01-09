@@ -9,15 +9,18 @@ Game_WIN::Game_WIN(const char * title, uint width, uint height)
 	: gfWinWnd(title, width, height)
 	, inactiveSleepTime(0), accumelatedElapsedTime(0), previousTicks(0), timer(0), gameTime(GameTime()), updateFrameLag(0)
 	, IsFixedTimeStep(new bool(true))
-	, keyState(new kstate()), mouseState(new mstate()), frameBuffer(new std::queue<float>())
+	, keyState(new kstate()), mouseState(new mstate())
+	, frameBuffer(new std::queue<float>())
+	, components(new std::vector<gameComp*>())
 {
 	ResetZBuff();
 }
 
-Game_WIN::~Game_WIN(void)
+Game_WIN::~Game_WIN(void) 
 {
 	delete IsFixedTimeStep;
 	delete frameBuffer;
+	delete components;
 }
 
 void Game_WIN::OnInitialize(void)
@@ -25,6 +28,11 @@ void Game_WIN::OnInitialize(void)
 	LogMsg_Game("Initializing windows game.");
 	LogMsg_Game("\tFlags { ZBuffering: %s, Clipping: %s, VertexBuffering: %s }",
 		BOOL_STR(flags->zBuff), BOOL_STR(flags->clip));
+
+	for (size_t i = 0; i < components->size(); i++)
+	{
+		(*components)[i]->Initialize();
+	}
 }
 
 void Game_WIN::Run(void)
@@ -60,6 +68,11 @@ float Game_WIN::GetAvarageFPS(void) const
 	}
 
 	return sum / len;
+}
+
+void Game_WIN::AddComponent(GameComponent * comp)
+{
+	components->push_back(comp);
 }
 
 void Game_WIN::Tick(void)
@@ -123,6 +136,12 @@ void Game_WIN::DoUpdate(void)
 	}
 
 	OnUpdate(gameTime, *keyState, *mouseState);
+
+	for (size_t i = 0; i < components->size(); i++)
+	{
+		(*components)[i]->Update(gameTime, *keyState, *mouseState);
+	}
+
 	mouseState->DeltaReset();
 }
 
@@ -133,6 +152,12 @@ void Game_WIN::DoDraw(void)
 	if (frameBuffer->size() > buffLen) frameBuffer->pop();
 
 	OnRender();
+
+	for (size_t i = 0; i < components->size(); i++)
+	{
+		(*components)[i]->Draw();
+	}
+
 	ResetZBuff();
 	RedrawWindow(hwnd, NULL, NULL, RDW_INVALIDATE);
 }

@@ -79,6 +79,7 @@ typedef struct Vector4
 	static Vector4 SmoothStep(const Vector4 *v1, const Vector4 *v2, float a) __GPU;
 	static Vector4 Subtract(const Vector4 *v1, const Vector4 *v2) __GPU;
 	inline void ToNDC(void) __GPU { X /= W; Y /= W; Z /= W; }
+	inline static Vector3 ToNDC(Vector4 v) __GPU { return vect3(v.X / v.W, v.Y / v.W, v.Z / v.W); }
 	float Volume(void) const __GPU;
 	float Volume4D(void) const __GPU;
 } vect4;

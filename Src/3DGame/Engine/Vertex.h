@@ -25,16 +25,21 @@
 
 typedef struct Vertex
 {
-	vect3 v;
+	vect4 v;
 	Color c;
 
 	Vertex(void) __GPU : v(VECT3_ZERO), c(CLR_BLACK) { }
-	Vertex(vect3 v, clr c) __GPU : v(v), c(c) { }
-	Vertex(float x, float y, float z) __GPU : v(vect3(x, y, z)), c(CLR_BLACK) { }
-	Vertex(float x, float y, float z, clr c) __GPU : v(vect3(x, y, z)), c(c) { }
+	Vertex(vect4 v, clr c) __GPU : v(v), c(c) { }
+	Vertex(float x, float y, float z) __GPU : v(x, y, z, 1), c(CLR_BLACK) { }
+	Vertex(float x, float y, float z, clr c) __GPU : v(x, y, z, 1), c(c) { }
 
 	inline bool operator ==(const Vertex& r) __GPU { return r.v == v && r.c == c; }
 	inline bool operator !=(const Vertex& r) __GPU { return r.v != v || r.c != c; }
+
+	static Vertex Lerp(const Vertex *min, const Vertex *max, float a)
+	{
+		return Vertex(vect4::Lerp(&min->v, &max->v, a), clr::Lerp(min->c, max->c, a));
+	}
 
 	int ComputeMask(const ViewPort vp) const __GPU
 	{

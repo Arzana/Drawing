@@ -1,13 +1,13 @@
 #pragma once
 
-#include <Mtrx4.h>
+#include "Mtrx4.h"
 
-typedef struct Camera
+typedef struct View
 {
 public:
-	Camera(void);
-	Camera(const vect3 pos);
-	~Camera(void);
+	View(void);
+	View(const vect3 pos);
+	~View(void);
 
 	void SetYaw(float rads);
 	void SetPitch(float rads);
@@ -52,9 +52,10 @@ public:
 	const mtrx4* Update(void);
 	inline const mtrx4* GetView(void) const { return view; }
 
-private:
+protected:
 	vect3 *position, *rotation;
 	mtrx4 *view;
 
+private:
 	float GetClampedRads(float rads);
-} cam;
+} view;

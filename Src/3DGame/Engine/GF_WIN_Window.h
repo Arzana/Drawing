@@ -32,9 +32,7 @@ public:
 	void SetBufferLength(size_t length);
 	void Start(octet primitiveType);
 	bool End(void);
-	void AddVertex(vect3 v, clr c);
-	inline void AddVertex(float x, float y, float z, clr c) { AddVertex(vect3(x, y, z), c); }
-	inline void AddVertex(vrtx vtx) { AddVertex(vtx.v, vtx.c); }
+	void AddVertex(vect4 v, clr c);
 	void Clear(clr c);
 protected:
 	inline void SetFlag_ZBuffering(bool value) { flags->zBuff = value; }

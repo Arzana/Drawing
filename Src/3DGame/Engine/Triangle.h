@@ -15,9 +15,9 @@ typedef struct Triangle
 
 	bool IsInside(vrtx *v) const __GPU
 	{
-		vect2 *vs1 = &V3ToV2(v1.v - v0.v);
-		vect2 *vs2 = &V3ToV2(v2.v - v0.v);
-		vect2 *vs3 = &V3ToV2(v->v - v0.v);
+		vect2 *vs1 = &vect2(v1.v.X - v0.v.X, v1.v.Y - v0.v.Y);
+		vect2 *vs2 = &vect2(v2.v.X - v0.v.X, v2.v.Y - v0.v.Y);
+		vect2 *vs3 = &vect2(v->v.X - v0.v.X, v->v.Y - v0.v.Y);
 
 		float r = vect2::PrepDot(vs1, vs2);
 		float s = vect2::PrepDot(vs3, vs2) / r;
