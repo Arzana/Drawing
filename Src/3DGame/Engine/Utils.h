@@ -10,13 +10,15 @@
 #ifdef __cplusplus
 #include <cstdlib>
 #define malloc_s(t, l)			(t*)malloc(sizeof(t) * (l))
-#define delete_s(t)				delete t; t = NULL				
+#define delete_s(t)				delete t; t = NULL
+#define delete_s_check(t)		if (t) { delete_s(t); }
 #else
 #include <stdlib.h>
 #define malloc_s(t, l)			malloc(sizeof(t) * (l))
 #endif
 
 #define free_s(t)				free(t); t = NULL
+#define free_s_check(t)			if (t) { free_s(t); }
 
 #define xy2i(x, y, w)			((y) * (w) + (x))
 #define xyz2i(x, y, z, w, h)	((z) * (w) * (h) + xy2i((x), (y), (w)))

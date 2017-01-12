@@ -9,7 +9,7 @@ void CopyVertices(vrtx *from, poly *to, octet numVertices)
 
 void ClipPolyOnWAxis(poly *face)
 {
-	octet vrtxCount(0);
+	octet vrtxCount = 0;
 	vrtx result[MAX_VRTX_POLY];
 
 	vrtx *prevVrtx = face->Last();
@@ -36,7 +36,7 @@ void ClipPolyOnWAxis(poly *face)
 
 void ClipPolyOnAxis(poly *face, int axis)
 {
-	octet vrtxCount(0);
+	octet vrtxCount = 0;
 	vrtx result[MAX_VRTX_POLY];
 
 	// Clip against first plane

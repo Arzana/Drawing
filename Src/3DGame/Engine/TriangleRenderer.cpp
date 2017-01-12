@@ -1,46 +1,42 @@
 #include "TriangleRenderer.h"
 
-TriangleRenderer::TriangleRenderer(winGame * game, size_t length)
-	: game(game), len(length * 3), i(0)
+TriangleRenderer::TriangleRenderer(winGame * game)
+	: game(game), buff(new std::vector<vrtx>())
 {
-	if (length < 1) throw std::invalid_argument("length must be greater than zero!");
-
-	hBuff = malloc_s(vect4, len);
-	cBuff = malloc_s(clr, len);
-
 	game->AddComponent(this);
 }
 
 TriangleRenderer::~TriangleRenderer(void)
 {
-	free_s(hBuff);
-	free_s(cBuff);
+	delete_s(buff);
 	game = NULL;
 }
 
 void TriangleRenderer::Add(trgl trgl)
 {
-	if (i + 3 > len) throw std::bad_function_call();
+	buff->push_back(trgl.v0);
+	buff->push_back(trgl.v1);
+	buff->push_back(trgl.v2);
+}
 
-	hBuff[i] = trgl.v0.v;
-	cBuff[i++] = trgl.v0.c;
-
-	hBuff[i] = trgl.v1.v;
-	cBuff[i++] = trgl.v1.c;
-
-	hBuff[i] = trgl.v2.v;
-	cBuff[i++] = trgl.v2.c;
+void TriangleRenderer::Add(const geon *geon)
+{
+	for (size_t i = 0; i < geon->trglCount; i++)
+	{
+		Add(geon->GetTriangles()[i]);
+	}
 }
 
 void TriangleRenderer::Draw(void)
 {
 	game->Clear(CLR_BLACK);
 	game->Start(GF_TRIANGLES);
-	game->SetBufferLength(len);
+	game->SetBufferLength(buff->size());
 
-	for (size_t i = 0; i < len; i++)
+	for (size_t i = 0; i < buff->size(); i++)
 	{
-		game->AddVertex(hBuff[i], cBuff[i]);
+		vrtx cur = buff->at(i);
+		game->AddVertex(cur.v, cur.c);
 	}
 
 	if (!game->End()) game->Terminate();

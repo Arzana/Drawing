@@ -59,9 +59,8 @@ private:
 	mtrx4 model, view, proj;
 
 	void SetDepth(float front, float back);
-	void Raise(const char *msg);
 	void ResetZBuff(void);
-	static void ToScreen(vect4 *v, vect4 cp, bool proj) __GPU;
+	static vect4 ToScreen(const vect4 *v, vect4 cp, bool proj) __GPU;
 
 	void GF_Points(void);
 	void GF_LineFan(void);

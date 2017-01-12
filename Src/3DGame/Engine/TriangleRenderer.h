@@ -1,20 +1,20 @@
 #pragma once
 
+#include <vector>
 #include "Game_WIN.h"
-#include "Triangle.h"
+#include "Geon.h"
 
 typedef struct TriangleRenderer
 	: public GameComponent
 {
 public:
-	TriangleRenderer(winGame *game, size_t length);
+	TriangleRenderer(winGame *game);
 	~TriangleRenderer(void);
 
 	void Add(trgl trgl);
+	void Add(const geon *geon);
 	void Draw(void) override;
 private:
-	size_t len, i;
-	vect4 *hBuff;
-	clr *cBuff;
+	std::vector<vrtx> *buff;
 	winGame *game;
 } trglRndr;

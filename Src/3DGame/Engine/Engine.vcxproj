@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="GameComponent.h" />
+    <ClInclude Include="Geon.h" />
+    <ClInclude Include="Shapes.h" />
     <ClInclude Include="TriangleRenderer.h" />
     <ClInclude Include="View.h" />
     <ClInclude Include="Color.h" />
@@ -48,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Geon.cpp" />
     <ClCompile Include="TriangleRenderer.cpp" />
     <ClCompile Include="View.cpp" />
     <ClCompile Include="Color.cpp" />

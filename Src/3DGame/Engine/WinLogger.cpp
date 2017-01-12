@@ -11,7 +11,7 @@ void LogAs(const char * as, int clr, const char * format, ...)
 	HANDLE hndlConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(hndlConsole, clr);
 
-	time_t t = time(0);
+	const time_t t = time(0);
 	const struct tm *now = localtime(&t);
 	printf("[%.4u-%.2u-%.2u %.2u:%.2u:%.2u][%s] ", now->tm_year + 1900, now->tm_mon + 1, now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec, as);
 	

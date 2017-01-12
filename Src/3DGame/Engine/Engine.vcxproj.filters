@@ -64,6 +64,9 @@
     <Filter Include="Source Files\Graphics\Rendering">
       <UniqueIdentifier>{7080ad3a-755a-4c69-bd99-6fcf5b17e57d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Graphics\Rendering\Shapes">
+      <UniqueIdentifier>{103a67dc-b5fb-4593-8515-91d580bcdd3c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vect2.h">
@@ -144,6 +147,12 @@
     <ClInclude Include="TriangleRenderer.h">
       <Filter>Header Files\Graphics\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Geon.h">
+      <Filter>Header Files\Graphics\Rendering\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Shapes.h">
+      <Filter>Header Files\Graphics\Rendering\Shapes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vect2.cpp">
@@ -199,6 +208,9 @@
     </ClCompile>
     <ClCompile Include="TriangleRenderer.cpp">
       <Filter>Source Files\Graphics\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Geon.cpp">
+      <Filter>Source Files\Graphics\Rendering\Shapes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
