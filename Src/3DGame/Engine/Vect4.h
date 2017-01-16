@@ -53,8 +53,7 @@ typedef struct Vector4
 		float nW = -pW;
 		return X < nW || Y < nW || Z < nW || X > pW || Y > pW || Z > pW;
 	}
-	static float Distance(const Vector4 *v1, const Vector4 *v2) __CPU_ONLY;
-	static float Distance(const Vector4 *v1, const Vector4 *v2) __GPU_ONLY;
+	static float Distance(const Vector4 *v1, const Vector4 *v2) __GPU;
 	static float DistanceSquared(const Vector4 *v1, const Vector4 *v2) __GPU;
 	static Vector4 Divide(const Vector4 *v1, float v2) __GPU;
 	static Vector4 Divide(const Vector4 *v1, const Vector4 *v2) __GPU;
@@ -76,7 +75,7 @@ typedef struct Vector4
 	void Normalize(void) __GPU;
 	static Vector4 Normalize(const Vector4 *v) __GPU;
 	static Vector4 Reflect(const Vector4 *v, const Vector4 *n) __GPU;
-	static Vector4 SmoothStep(const Vector4 *v1, const Vector4 *v2, float a) __GPU;
+	static Vector4 SmoothStep(const Vector4 *min, const Vector4 *max, float a) __GPU;
 	static Vector4 Subtract(const Vector4 *v1, const Vector4 *v2) __GPU;
 	inline void ToNDC(void) __GPU { X /= W; Y /= W; Z /= W; }
 	inline static Vector3 ToNDC(Vector4 v) __GPU { return vect3(v.X / v.W, v.Y / v.W, v.Z / v.W); }

@@ -20,8 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Cylinder.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="Geon.h" />
+    <ClInclude Include="Segment.h" />
     <ClInclude Include="Shapes.h" />
     <ClInclude Include="TriangleRenderer.h" />
     <ClInclude Include="View.h" />
@@ -50,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Cylinder.cpp" />
     <ClCompile Include="Geon.cpp" />
     <ClCompile Include="TriangleRenderer.cpp" />
     <ClCompile Include="View.cpp" />

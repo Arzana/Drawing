@@ -68,23 +68,14 @@ Vector3 Vector3::Cross(const Vector3 * v1, const Vector3 * v2) __GPU
 	return Vector3(x, y, z);
 }
 
-float Vector3::Distance(const Vector3 * v1, const Vector3 * v2) __CPU_ONLY
+float Vector3::Distance(const Vector3 * v1, const Vector3 * v2) __GPU
 {
-	return sqrtf(DistanceSquared(v1, v2));
-}
-
-float Vector3::Distance(const Vector3 * v1, const Vector3 * v2) __GPU_ONLY
-{
-	return fast_math::sqrtf(DistanceSquared(v1, v2));
+	return (*v2 - *v1).Length();
 }
 
 float Vector3::DistanceSquared(const Vector3 * v1, const Vector3 * v2) __GPU
 {
-	float diffX = abs(v2->X - v1->X);
-	float diffY = abs(v2->Y - v1->Y);
-	float diffZ = abs(v2->Z - v1->Z);
-
-	return square(diffX) + square(diffY) + square(diffZ);
+	return (*v2 - *v1).LengthSquared();
 }
 
 Vector3 Vector3::Divide(const Vector3 * v1, float v2) __GPU
@@ -109,7 +100,7 @@ bool Vector3::Equals(const Vector3 * v1, const Vector3 * v2) __GPU
 
 Vector3 Vector3::Hermite(const Vector3 * v1, const Vector3 * t1, const Vector3 * v2, const Vector3 * t2, float a) __GPU
 {
-	float num = square(a);
+	float num = sqr(a);
 	float num2 = cube(a);
 	float num3 = num2 - num;
 	float num4 = (num2 - (2.0f * num) + a);
@@ -135,7 +126,7 @@ float Vector3::Length(void) const __GPU_ONLY
 
 float Vector3::LengthSquared(void) const __GPU
 {
-	return square(X) + square(Y) + square(Z);
+	return Dot(this, this);
 }
 
 Vector3 Vector3::Lerp(const Vector3 * mi, const Vector3 * ma, float a) __GPU
@@ -216,15 +207,10 @@ Vector3 Vector3::Reflect(const Vector3 * v, const Vector3 * n) __GPU
 	return *v - vect3(2) * (*v * *n) * *n;
 }
 
-Vector3 Vector3::SmoothStep(const Vector3 * v1, const Vector3 * v2, float a) __GPU
+Vector3 Vector3::SmoothStep(const Vector3 * mi, const Vector3 * ma, float a) __GPU
 {
-	a = square(a) * (3.0f - (2.0f * a));
-
-	float x = v1->X + ((v2->X - v1->X) * a);
-	float y = v1->Y + ((v2->Y - v1->Y) * a);
-	float z = v1->Z + ((v2->Z - v1->Z) * a);
-
-	return Vector3(x, y, z);
+	a = sqr(a) * (3.0f - (2.0f * a));
+	return Lerp(mi, ma, a);
 }
 
 Vector3 Vector3::Subtract(const Vector3 * v1, const Vector3 * v2) __GPU

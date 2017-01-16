@@ -67,6 +67,12 @@
     <Filter Include="Source Files\Graphics\Rendering\Shapes">
       <UniqueIdentifier>{103a67dc-b5fb-4593-8515-91d580bcdd3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GameLogic\Collision">
+      <UniqueIdentifier>{78113a5d-4e4e-4c4d-af25-3d4d601b2fcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GameLogic\Collision">
+      <UniqueIdentifier>{174ce8c4-307d-4ce4-a0f1-838dc87cf224}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vect2.h">
@@ -153,6 +159,12 @@
     <ClInclude Include="Shapes.h">
       <Filter>Header Files\Graphics\Rendering\Shapes</Filter>
     </ClInclude>
+    <ClInclude Include="Cylinder.h">
+      <Filter>Header Files\GameLogic\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Segment.h">
+      <Filter>Header Files\GameLogic\Collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vect2.cpp">
@@ -211,6 +223,9 @@
     </ClCompile>
     <ClCompile Include="Geon.cpp">
       <Filter>Source Files\Graphics\Rendering\Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="Cylinder.cpp">
+      <Filter>Source Files\GameLogic\Collision</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -3,3 +3,4 @@ Triangle rasterization:	http://www.sunshine2k.de/coding/java/TriangleRasterizati
 Initial idea:		https://www.youtube.com/watch?v=HQYsFshbkYw&t=912s
 Line clipping:		https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
 Matrix math:		http://songho.ca/opengl/index.html
+Collision:		http://www.realtimerendering.com/intersections.html

@@ -92,7 +92,7 @@ float Quaternion::Length(void) const __GPU_ONLY
 
 float Quaternion::LengthSquared(void) const __GPU
 {
-	return square(X) + square(Y) + square(Z) + square(W);
+	return sqr(X) + sqr(Y) + sqr(Z) + sqr(W);
 }
 
 Quaternion Quaternion::Lerp(const Quaternion * min, const Quaternion * max, float a) __CPU_ONLY
@@ -115,7 +115,7 @@ Quaternion Quaternion::Lerp(const Quaternion * min, const Quaternion * max, floa
 		qr.W = (a2 * min->W) - (a * max->W);
 	}
 
-	float a3 = 1.0f / sqrtf(((square(qr.X) + square(qr.Y)) + square(qr.Z)) + square(qr.W));
+	float a3 = 1.0f / qr.Length();
 	qr.X *= a3;
 	qr.Y *= a3;
 	qr.Z *= a3;
@@ -143,7 +143,7 @@ Quaternion Quaternion::Lerp(const Quaternion * min, const Quaternion * max, floa
 		qr.W = (a2 * min->W) - (a * max->W);
 	}
 
-	float a3 = 1.0f / fast_math::sqrtf(((square(qr.X) + square(qr.Y)) + square(qr.Z)) + square(qr.W));
+	float a3 = 1.0f / qr.Length();
 	qr.X *= a3;
 	qr.Y *= a3;
 	qr.Z *= a3;

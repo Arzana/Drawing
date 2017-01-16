@@ -53,8 +53,7 @@ typedef struct Vector2
 	static Vector2 CatmullRom(const Vector2 *v1, const Vector2 *v2, const Vector2 *v3, const Vector2 *v4, float a) __GPU;
 	static Vector2 Clamp(const Vector2 *min, const Vector2 *max, const Vector2 *v) __GPU;
 	void Clamp(const Vector2 *min, const Vector2 *max) __GPU;
-	static float Distance(const Vector2 *v1, const Vector2 *v2) __CPU_ONLY;
-	static float Distance(const Vector2 *v1, const Vector2 *v2) __GPU_ONLY;
+	static float Distance(const Vector2 *v1, const Vector2 *v2) __GPU;
 	static float DistanceSquared(const Vector2 *v1, const Vector2 *v2) __GPU;
 	static Vector2 Divide(const Vector2 *v1, const Vector2 *v2) __GPU;
 	static Vector2 Divide(const Vector2 *v1, float v2) __GPU;
@@ -77,6 +76,6 @@ typedef struct Vector2
 	static Vector2 Normalize(const Vector2 *v) __GPU;
 	static float PrepDot(const Vector2 *v1, const Vector2 *v2) __GPU { return v1->X * v2->Y - v1->Y * v2->X; }
 	static Vector2 Reflect(const Vector2 *v, const Vector2 *n) __GPU;
-	static Vector2 SmoothStep(const Vector2 *v1, const Vector2 *v2, float a) __GPU;
+	static Vector2 SmoothStep(const Vector2 *min, const Vector2 *max, float a) __GPU;
 	static Vector2 Subtract(const Vector2 *v1, const Vector2 *v2) __GPU;
 } vect2;

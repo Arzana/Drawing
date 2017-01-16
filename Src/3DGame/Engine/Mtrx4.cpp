@@ -95,12 +95,12 @@ Matrix4 Matrix4::CreateRotation(const Vector3 * axis, float rads) __CPU_ONLY
 {
 	float c = cosf(rads);
 	float s = sinf(rads);
-	float xx = square(axis->X);
+	float xx = sqr(axis->X);
 	float xy = axis->X * axis->Y;
 	float xz = axis->X * axis->Z;
 	float yy = sqrt(axis->Y);
 	float yz = axis->Y * axis->Z;
-	float zz = square(axis->Z);
+	float zz = sqr(axis->Z);
 	float omc = 1 - c;
 
 	float m11 = xx * omc + c;
@@ -124,12 +124,12 @@ Matrix4 Matrix4::CreateRotation(const Vector3 * axis, float rads) __GPU_ONLY
 {
 	float c = fast_math::cosf(rads);
 	float s = fast_math::sinf(rads);
-	float xx = square(axis->X);
+	float xx = sqr(axis->X);
 	float xy = axis->X * axis->Y;
 	float xz = axis->X * axis->Z;
 	float yy = fast_math::sqrt(axis->Y);
 	float yz = axis->Y * axis->Z;
-	float zz = square(axis->Z);
+	float zz = sqr(axis->Z);
 	float omc = 1 - c;
 
 	float m11 = xx * omc + c;
@@ -223,9 +223,9 @@ Matrix4 Matrix4::CreateRotationZ(float rads) __GPU_ONLY
 
 Matrix4 Matrix4::CreateRotationQ(const Quaternion * q) __GPU
 {
-	float xx = square(q->X);
-	float yy = square(q->Y);
-	float zz = square(q->Z);
+	float xx = sqr(q->X);
+	float yy = sqr(q->Y);
+	float zz = sqr(q->Z);
 	float xy = q->X * q->Y;
 	float zw = q->Z * q->W;
 	float zx = q->Z * q->X;

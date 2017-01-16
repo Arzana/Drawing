@@ -63,24 +63,14 @@ void Vector4::Clamp(const Vector4 * mi, const Vector4 * ma) __GPU
 	W = clamp(mi->W, ma->W, W);
 }
 
-float Vector4::Distance(const Vector4 * v1, const Vector4 * v2) __CPU_ONLY
+float Vector4::Distance(const Vector4 * v1, const Vector4 * v2) __GPU
 {
-	return sqrtf(DistanceSquared(v1, v2));
-}
-
-float Vector4::Distance(const Vector4 * v1, const Vector4 * v2) __GPU_ONLY
-{
-	return fast_math::sqrtf(DistanceSquared(v1, v2));
+	return (*v2 - *v1).Length();
 }
 
 float Vector4::DistanceSquared(const Vector4 * v1, const Vector4 * v2) __GPU
 {
-	float diffX = abs(v2->X - v1->X);
-	float diffY = abs(v2->Y - v1->Y);
-	float diffZ = abs(v2->Z - v1->Z);
-	float diffW = abs(v2->W - v1->W);
-
-	return square(diffX) + square(diffY) + square(diffZ) + square(diffW);
+	return (*v2 - *v1).LengthSquared();
 }
 
 Vector4 Vector4::Divide(const Vector4 * v1, float v2) __GPU
@@ -105,7 +95,7 @@ bool Vector4::Equals(const Vector4 * v1, const Vector4 * v2) __GPU
 
 Vector4 Vector4::Hermite(const Vector4 * v1, const Vector4 * t1, const Vector4 * v2, const Vector4 * t2, float a) __GPU
 {
-	float num = square(a);
+	float num = sqr(a);
 	float num2 = cube(a);
 	float num3 = num2 - num;
 	float num4 = (num2 - (2.0f * num) + a);
@@ -132,7 +122,7 @@ float Vector4::Length(void) const __GPU_ONLY
 
 float Vector4::LengthSquared(void) const __GPU
 {
-	return square(X) + square(Y) + square(Z) + square(W);
+	return Dot(this, this);
 }
 
 Vector4 Vector4::Lerp(const Vector4 * mi, const Vector4 * ma, float a) __GPU
@@ -217,16 +207,10 @@ Vector4 Vector4::Reflect(const Vector4 * v, const Vector4 * n) __GPU
 	return *v - vect4(2) * (*v * *n) * *n;
 }
 
-Vector4 Vector4::SmoothStep(const Vector4 * v1, const Vector4 * v2, float a) __GPU
+Vector4 Vector4::SmoothStep(const Vector4 * mi, const Vector4 * ma, float a) __GPU
 {
-	a = square(a) * (3.0f - (2.0f * a));
-
-	float x = v1->X + ((v2->X - v1->X) * a);
-	float y = v1->Y + ((v2->Y - v1->Y) * a);
-	float z = v1->Z + ((v2->Z - v1->Z) * a);
-	float w = v1->W + ((v2->W - v1->W) * a);
-
-	return Vector4(x, y, z, w);
+	a = sqr(a) * (3.0f - (2.0f * a));
+	return Lerp(mi, ma, a);
 }
 
 Vector4 Vector4::Subtract(const Vector4 * v1, const Vector4 * v2) __GPU

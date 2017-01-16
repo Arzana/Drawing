@@ -17,8 +17,8 @@
 
 /* Simple functions */
 #define ipart(x)							int(x)
-#define square(x)							((x) * (x))
-#define cube(x)								(square(x) * (x))
+#define sqr(x)								((x) * (x))
+#define cube(x)								(sqr(x) * (x))
 #define abs(x)								((x) < 0 ? -(x) : (x))
 #define min2(x, y)							((x) < (y) ? (x) : (y))
 #define max2(x, y)							((x) > (y) ? (x) : (y))

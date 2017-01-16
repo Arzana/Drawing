@@ -60,19 +60,14 @@ void Vector2::Clamp(const Vector2 * mi, const Vector2 * ma) __GPU
 	Y = clamp(mi->Y, ma->Y, Y);
 }
 
-float Vector2::Distance(const Vector2 * v1, const Vector2 * v2) __CPU_ONLY
+float Vector2::Distance(const Vector2 * v1, const Vector2 * v2) __GPU
 {
-	return sqrtf(DistanceSquared(v1, v2));
-}
-
-float Vector2::Distance(const Vector2 * v1, const Vector2 * v2) __GPU_ONLY
-{
-	return fast_math::sqrtf(DistanceSquared(v1, v2));
+	return (*v2 - *v1).Length();
 }
 
 float Vector2::DistanceSquared(const Vector2 * v1, const Vector2 * v2) __GPU
 {
-	return square(abs(v2->X - v1->X)) + square(abs(v2->Y - v1->Y));
+	return (*v2 - *v1).LengthSquared();
 }
 
 Vector2 Vector2::Divide(const Vector2 * v1, const Vector2 * v2) __GPU
@@ -97,7 +92,7 @@ bool Vector2::Equals(const Vector2 * v1, const Vector2 * v2) __GPU
 
 Vector2 Vector2::Hermite(const Vector2 * v1, const Vector2 * t1, const Vector2 * v2, const Vector2 * t2, float a) __GPU
 {
-	float num = square(a);
+	float num = sqr(a);
 	float num2 = cube(a);
 	float num3 = num2 - num;
 	float num4 = (num2 - (2.0f * num) + a);
@@ -122,7 +117,7 @@ float Vector2::Length(void) const __GPU_ONLY
 
 float Vector2::LengthSquared(void) const __GPU
 {
-	return square(X) + square(Y);
+	return Dot(this, this);
 }
 
 Vector2 Vector2::Lerp(const Vector2 * mi, const Vector2 * ma, float a) __GPU
@@ -187,14 +182,10 @@ Vector2 Vector2::Reflect(const Vector2 * v, const Vector2 * n) __GPU
 	return *v - vect2(2) * (*v * *n) * *n;
 }
 
-Vector2 Vector2::SmoothStep(const Vector2 * v1, const Vector2 * v2, float a) __GPU
+Vector2 Vector2::SmoothStep(const Vector2 * mi, const Vector2 * ma, float a) __GPU
 {
-	a = square(a) * (3.0f - (2.0f * a));
-
-	float x = v1->X + ((v2->X - v1->X) * a);
-	float y = v1->Y + ((v2->Y - v1->Y) * a);
-
-	return vect2(x, y);
+	a = sqr(a) * (3.0f - (2.0f * a));
+	return Lerp(mi, ma, a);
 }
 
 Vector2 Vector2::Subtract(const Vector2 * v1, const Vector2 * v2) __GPU

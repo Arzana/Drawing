@@ -56,8 +56,7 @@ typedef struct Vector3
 	static Vector3 Clamp(const Vector3 *min, const Vector3 *max, const Vector3 *v) __GPU;
 	void Clamp(const Vector3 *min, const Vector3 *max) __GPU;
 	static Vector3 Cross(const Vector3 *v1, const Vector3 *v2) __GPU;
-	static float Distance(const Vector3 *v1, const Vector3 *v2) __CPU_ONLY;
-	static float Distance(const Vector3 *v1, const Vector3 *v2) __GPU_ONLY;
+	static float Distance(const Vector3 *v1, const Vector3 *v2) __GPU;
 	static float DistanceSquared(const Vector3 *v1, const Vector3 *v2) __GPU;
 	static Vector3 Divide(const Vector3 *v1, float v2) __GPU;
 	static Vector3 Divide(const Vector3 *v1, const Vector3 *v2) __GPU;
@@ -79,7 +78,7 @@ typedef struct Vector3
 	void Normalize(void) __GPU;
 	static Vector3 Normalize(const Vector3 *v) __GPU;
 	static Vector3 Reflect(const Vector3 *v, const Vector3 *n) __GPU;
-	static Vector3 SmoothStep(const Vector3 *v1, const Vector3 *v2, float a) __GPU;
+	static Vector3 SmoothStep(const Vector3 *min, const Vector3 *max, float a) __GPU;
 	static Vector3 Subtract(const Vector3 *v1, const Vector3 *v2) __GPU;
 	float Volume(void) const __GPU;
 } vect3;
