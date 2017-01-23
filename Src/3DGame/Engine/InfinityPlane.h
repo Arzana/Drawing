@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Segment.h"
+#include "Cylinder.h"
 
 typedef struct InfinityPlane
 {
@@ -9,5 +9,6 @@ typedef struct InfinityPlane
 	InfinityPlane(void) : p(VECT3_ZERO), n(VECT3_ZERO) { }
 	InfinityPlane(vect3 a, vect3 b, vect3 c);
 
-	bool IntersectSegment(seg s);
+	bool IntersectSegment(seg s) const;
+	bool IntersectVCylinder(cyldr c) const;
 } infplane;

@@ -3,7 +3,7 @@
 #include "MathEx.h"
 #include "Cylinder.h"
 
-bool Cylinder::IntersectSegment(seg s, float * t)
+bool Cylinder::IntersectSegment(seg s, float * t) const
 {
 	vect3 d = q - p;
 	vect3 m = s.a - p;
