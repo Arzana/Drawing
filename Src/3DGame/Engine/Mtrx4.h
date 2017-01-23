@@ -126,6 +126,7 @@ typedef struct Matrix4
 	static Matrix4 CreateRotationZ(float rads) __GPU_ONLY;
 	static Matrix4 CreateRotationQ(const Quaternion *q) __GPU;
 	inline static Matrix4 CreateRotationQ(float yaw, float pitch, float roll) __GPU { return CreateRotationQ(&Quaternion::CreateYawPitchRoll(yaw, pitch, roll)); }
+	inline static Matrix4 CreateRotationQ(const Vector3 *rot) __GPU { return CreateRotationQ(rot->X, rot->Y, rot->Z); }
 	static Matrix4 CreateScale(float scale) __GPU;
 	static Matrix4 CreateScale(const Vector3 *scale) __GPU;
 	static Matrix4 CreateTranslation(const Vector3 *pos) __GPU;

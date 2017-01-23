@@ -23,6 +23,7 @@
     <ClInclude Include="Cylinder.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="Geon.h" />
+    <ClInclude Include="InfinityPlane.h" />
     <ClInclude Include="Segment.h" />
     <ClInclude Include="Shapes.h" />
     <ClInclude Include="TriangleRenderer.h" />
@@ -54,6 +55,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cylinder.cpp" />
     <ClCompile Include="Geon.cpp" />
+    <ClCompile Include="InfinityPlane.cpp" />
     <ClCompile Include="TriangleRenderer.cpp" />
     <ClCompile Include="View.cpp" />
     <ClCompile Include="Color.cpp" />

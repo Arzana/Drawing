@@ -4,6 +4,7 @@
 #include <Camera.h>
 #include <TriangleRenderer.h>
 #include <Shapes.h>
+#include "Player.h"
 
 const float lookScalar = 0.1f,
 			moveScalar = 0.01f,
@@ -16,10 +17,9 @@ public:
 	RoomGame(const uint w, const uint h);
 	~RoomGame(void);
 private:
+	Player *plr;
 	Camera *cam;
 	TriangleRenderer *renderer;
-
-	vect3 ppos, prot;
 
 	const vrtx vertices[32] =
 	{

@@ -2,7 +2,7 @@
 #include <string.h>
 #include "Geon.h"
 
-Geon::Geon(int len, ...)
+Geon::Geon(size_t len, ...)
 	: trglCount(len)
 {
 	trgls = malloc_s(trgl, len);

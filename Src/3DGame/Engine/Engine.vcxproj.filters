@@ -165,6 +165,9 @@
     <ClInclude Include="Segment.h">
       <Filter>Header Files\GameLogic\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="InfinityPlane.h">
+      <Filter>Header Files\GameLogic\Collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vect2.cpp">
@@ -225,6 +228,9 @@
       <Filter>Source Files\Graphics\Rendering\Shapes</Filter>
     </ClCompile>
     <ClCompile Include="Cylinder.cpp">
+      <Filter>Source Files\GameLogic\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="InfinityPlane.cpp">
       <Filter>Source Files\GameLogic\Collision</Filter>
     </ClCompile>
   </ItemGroup>
