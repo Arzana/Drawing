@@ -3,11 +3,11 @@
 #include <Game_WIN.h>
 #include <Camera.h>
 #include <TriangleRenderer.h>
-#include "Wall.h"
+#include <LineFanRenderer.h>
+#include "Laser.h"
 #include "Player.h"
 
-const float lookScalar = 0.1f,
-			moveScalar = 0.01f,
+const float moveScalar = 0.1f,
 			eyeHeight = 0.5f;
 
 typedef struct RoomGame
@@ -19,7 +19,7 @@ public:
 private:
 	Player *plr;
 	Camera *cam;
-	TriangleRenderer *renderer;
+	TriangleRenderer *sceneRenderer;
 
 	const vrtx vertices[32] =
 	{

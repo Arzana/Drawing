@@ -24,6 +24,7 @@
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="Geon.h" />
     <ClInclude Include="InfinityPlane.h" />
+    <ClInclude Include="LineFanRenderer.h" />
     <ClInclude Include="Segment.h" />
     <ClInclude Include="Shapes.h" />
     <ClInclude Include="TriangleRenderer.h" />
@@ -56,6 +57,7 @@
     <ClCompile Include="Cylinder.cpp" />
     <ClCompile Include="Geon.cpp" />
     <ClCompile Include="InfinityPlane.cpp" />
+    <ClCompile Include="LineFanRenderer.cpp" />
     <ClCompile Include="TriangleRenderer.cpp" />
     <ClCompile Include="View.cpp" />
     <ClCompile Include="Color.cpp" />

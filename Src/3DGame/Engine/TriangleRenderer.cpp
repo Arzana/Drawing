@@ -29,15 +29,17 @@ void TriangleRenderer::Add(const geon *geon)
 
 void TriangleRenderer::Draw(void)
 {
-	game->Clear(CLR_BLACK);
-	game->Start(GF_TRIANGLES);
-	game->SetBufferLength(buff->size());
-
-	for (size_t i = 0; i < buff->size(); i++)
+	if (buff->size() > 0)
 	{
-		vrtx cur = buff->at(i);
-		game->AddVertex(cur.v, cur.c);
-	}
+		game->Start(GF_TRIANGLES);
+		game->SetBufferLength(buff->size());
 
-	if (!game->End()) game->Terminate();
+		for (size_t i = 0; i < buff->size(); i++)
+		{
+			vrtx cur = buff->at(i);
+			game->AddVertex(cur.v, cur.c);
+		}
+
+		if (!game->End()) game->Terminate();
+	}
 }

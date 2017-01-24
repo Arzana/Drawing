@@ -19,5 +19,5 @@ bool InfinityPlane::IntersectVCylinder(cyldr c) const
 {
 	mtrx4 m = mtrx4::CreateRotationQ(&(n - VECT3_RIGHT));
 	c.p = vect4::ToNDC(m * c.p) - p;
-	return c.p.X + c.r > 0 || c.p.X - c.r < 0;
+	return (c.p.X - c.r < 0 && c.p.X + c.r > 0) || (c.p.X - c.r > 0 && c.p.X + c.r < 0);
 }

@@ -168,6 +168,9 @@
     <ClInclude Include="InfinityPlane.h">
       <Filter>Header Files\GameLogic\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="LineFanRenderer.h">
+      <Filter>Header Files\Graphics\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vect2.cpp">
@@ -232,6 +235,9 @@
     </ClCompile>
     <ClCompile Include="InfinityPlane.cpp">
       <Filter>Source Files\GameLogic\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="LineFanRenderer.cpp">
+      <Filter>Source Files\Graphics\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
