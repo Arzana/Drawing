@@ -13,10 +13,10 @@
 typedef struct Geon
 {
 public:
-	const int trglCount;
+	const size_t trglCount;
 
 	Geon(void) : trglCount(0), trgls(NULL) { }
-	Geon(int len, ...);
+	Geon(size_t len, ...);
 	~Geon(void);
 
 	inline Geon operator +(const Geon &r) { return Geon(this, &r); }

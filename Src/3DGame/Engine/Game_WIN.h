@@ -11,6 +11,7 @@ typedef struct Game_WIN
 	: private gfWinWnd
 {
 	friend struct TriangleRenderer;
+	friend struct LineFanRenderer;
 	friend struct Camera;
 
 public:

@@ -13,10 +13,10 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Games">
+    <Filter Include="Header Files\NHTV">
       <UniqueIdentifier>{3477853d-b02f-4107-94d1-4827ae0317ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Games">
+    <Filter Include="Source Files\NHTV">
       <UniqueIdentifier>{dce278c3-9587-443e-abbe-55b43755f8f9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -25,7 +25,13 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Room.cpp">
-      <Filter>Source Files\Games</Filter>
+      <Filter>Source Files\NHTV</Filter>
+    </ClCompile>
+    <ClCompile Include="Wall.cpp">
+      <Filter>Source Files\NHTV</Filter>
+    </ClCompile>
+    <ClCompile Include="Laser.cpp">
+      <Filter>Source Files\NHTV</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -33,7 +39,16 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Room.h">
-      <Filter>Header Files\Games</Filter>
+      <Filter>Header Files\NHTV</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Wall.h">
+      <Filter>Header Files\NHTV</Filter>
+    </ClInclude>
+    <ClInclude Include="Laser.h">
+      <Filter>Header Files\NHTV</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

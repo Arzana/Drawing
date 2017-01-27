@@ -10,7 +10,7 @@
 #include "WinLogger.h"
 
 #define vrtxat(name, x)	vrtx vrtx##name(gfWinWnd::ToScreen(&p.vertexes[x].v, *cp, flags->proj), p.vertexes[x].c)
-#define raise(msg, ...)	LogErr_GF(msg, __VA_ARGS__); *isRunning = false
+#define raise(msg, ...)	{ LogErr_GF(msg, __VA_ARGS__); *isRunning = false; }
 
 using namespace concurrency;
 
@@ -55,8 +55,8 @@ void GF_WIN_Window::SetBufferLength(size_t length)
 {
 	if (length < 0 || *buffLen > 0)
 	{
-		if (length < 1) { raise("Length must be greater than zero!"); }
-		if (*buffLen != 0) { raise("EndRender must be called before respecifying the buffer length!"); }
+		if (length < 1) raise("Length must be greater than zero!");
+		if (*buffLen != 0) raise("EndRender must be called before respecifying the buffer length!");
 		return;
 	}
 
@@ -81,8 +81,8 @@ bool GF_WIN_Window::End(void)
 {
 	if (!flags->start || *buffI < *buffLen)
 	{
-		if (!flags->start) { raise("GF_WIN_Window::Start must be called before calling %s!", __FUNCTION__); }
-		if (*buffI < *buffLen) { raise("Not all vertices in the buffer have been set!"); }
+		if (!flags->start) raise("GF_WIN_Window::Start must be called before calling %s!", __FUNCTION__);
+		if (*buffI < *buffLen) raise("Not all vertices in the buffer have been set!");
 		return false;
 	}
 
@@ -119,8 +119,8 @@ void GF_WIN_Window::AddVertex(vect4 v, clr c)
 {
 	if (*buffI >= *buffLen)
 	{
-		if (*buffLen < 1) { raise("GF_WIN_Window::SetBufferLength must be called before calling %s!", __FUNCTION__); }
-		if (*buffI >= *buffLen) { raise("Cannot add any more vertices to the buffer!"); }
+		if (*buffLen < 1) raise("GF_WIN_Window::SetBufferLength must be called before calling %s!", __FUNCTION__);
+		if (*buffI >= *buffLen) raise("Cannot add any more vertices to the buffer!");
 		return;
 	}
 

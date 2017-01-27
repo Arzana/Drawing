@@ -151,6 +151,7 @@ void Game_WIN::DoDraw(void)
 	frameBuffer->push(curFps);
 	if (frameBuffer->size() > buffLen) frameBuffer->pop();
 
+	Clear(CLR_BLACK);
 	OnRender();
 
 	for (size_t i = 0; i < components->size(); i++)

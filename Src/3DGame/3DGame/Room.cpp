@@ -1,39 +1,26 @@
 #include "Room.h"
-#include "Utils.h"
 
 RoomGame::RoomGame(const uint w, const uint h)
-	: winGame("RoomTest", w, h), ppos(0, eyeHeight, -10), prot(VECT3_ZERO)
+	: winGame("RoomTest", w, h), plr(new Player(vect3(0, eyeHeight, -10)))
 {
-	renderer = new TriangleRenderer(this);
+	sceneRenderer = new TriangleRenderer(this);
 	cam = new Camera(this, 45.0f, 0.1f, 100.0f);
 }
 
 RoomGame::~RoomGame(void)
 {
 	delete_s(cam);
-	delete_s(renderer);
+	delete_s(plr);
+	delete_s(sceneRenderer);
 }
 
 void RoomGame::OnInitialize(void)
 {
-	cam->Bind(&ppos, &prot);
-
-	/* Floor */
-	renderer->Add(&plane(vertices[0], vertices[1], vertices[13], vertices[12]));
-	renderer->Add(&plane(vertices[2], vertices[3], vertices[14], vertices[15]));
-	renderer->Add(&plane(vertices[1], vertices[2], vertices[5], vertices[4]));
-	renderer->Add(&plane(vertices[10], vertices[11], vertices[14], vertices[13]));
-	renderer->Add(&plane(vertices[6], vertices[7], vertices[9], vertices[8]));
-
-	/* Ceiling */
-	renderer->Add(&plane(vertices[16], vertices[17], vertices[29], vertices[28]));
-	renderer->Add(&plane(vertices[18], vertices[19], vertices[30], vertices[31]));
-	renderer->Add(&plane(vertices[17], vertices[18], vertices[21], vertices[20]));
-	renderer->Add(&plane(vertices[26], vertices[27], vertices[30], vertices[29]));
-	renderer->Add(&plane(vertices[22], vertices[23], vertices[25], vertices[24]));
-
-	/* Walls */
-	renderer->Add(&plane(vertices[16], vertices[19], vertices[3], vertices[0]));
+	cam->Bind(&plr->pos, &plr->rot);
+	for (size_t i = 0; i < plane_len; i++)
+	{
+		sceneRenderer->Add(&planes[i].model);
+	}
 }
 
 void RoomGame::OnRender(void)
@@ -41,19 +28,32 @@ void RoomGame::OnRender(void)
 	printf("FPS: %7.3f|%7.3f\n", GetAvarageFPS(), GetFps());
 }
 
-void Move(vect3 *old, vect3 *rot, vect3 dir)
-{
-	(*old) += vect4::ToNDC(mtrx4::CreateRotationQ(rot->X, 0, rot->Z) * dir);
-}
-
 void RoomGame::OnUpdate(GameTime gameTime, const KeyboardState& kstate, const MouseState& mstate)
 {
-	/* Update player movement. */
 	if (kstate[Keys::Escape]) Terminate();
-	if (kstate[Keys::W]) Move(&ppos, &prot, VECT3_FORWARD * moveScalar);
-	if (kstate[Keys::S]) Move(&ppos, &prot, VECT3_BACK * moveScalar);
-	if (kstate[Keys::A]) Move(&ppos, &prot, VECT3_LEFT * moveScalar);
-	if (kstate[Keys::D]) Move(&ppos, &prot, VECT3_RIGHT * moveScalar);
-	prot.X += (mstate.dx * lookScalar) * M_DEG2RAD;
-	prot.Y += (mstate.dy * lookScalar) * M_DEG2RAD;
+	plr->Look(mstate.dx * moveScalar * M_DEG2RAD, mstate.dy * moveScalar * M_DEG2RAD);
+
+	/* Update player movement. */
+	vect3 dir = VECT3_ZERO;
+	if (plr->pos.Y - eyeHeight > 0) plr->Move(VECT3_UP * gameTime.GetDeltaTime());
+	else
+	{
+		if (kstate[Keys::W]) dir.Z += moveScalar * gameTime.GetDeltaTime();
+		if (kstate[Keys::S]) dir.Z -= moveScalar * gameTime.GetDeltaTime();
+		if (kstate[Keys::A]) dir.X -= moveScalar * gameTime.GetDeltaTime();
+		if (kstate[Keys::D]) dir.X += moveScalar * gameTime.GetDeltaTime();
+	}
+
+	/* Collision detection */
+	plr->Move(dir);
+	bool collided = false;
+	for (size_t i = 2; i < plane_len; i++)
+	{
+		if (planes[i].CheckCollision(plr))
+		{
+			collided = true;
+			break;
+		}
+	}
+	if (collided) plr->Move(-dir);
 }
