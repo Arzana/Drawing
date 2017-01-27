@@ -110,6 +110,8 @@ enum class Keys
 	RightShift = 161,
 	LeftControl = 162,
 	RightControl = 163,
+	LeftAlt = 164,
+	RightAlt = 165,
 	BrowserBack = 166,
 	BrowserForward = 167,
 	BrowserRefresh = 168,

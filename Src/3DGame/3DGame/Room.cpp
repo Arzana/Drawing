@@ -17,9 +17,10 @@ RoomGame::~RoomGame(void)
 void RoomGame::OnInitialize(void)
 {
 	cam->Bind(&plr->pos, &plr->rot);
-	sceneRenderer->Add(&planes[0].model);
-	sceneRenderer->Add(&planes[1].model);
-	sceneRenderer->Add(&planes[2].model);
+	for (size_t i = 0; i < plane_len; i++)
+	{
+		sceneRenderer->Add(&planes[i].model);
+	}
 }
 
 void RoomGame::OnRender(void)
@@ -46,7 +47,7 @@ void RoomGame::OnUpdate(GameTime gameTime, const KeyboardState& kstate, const Mo
 	/* Collision detection */
 	plr->Move(dir);
 	bool collided = false;
-	for (size_t i = 2; i < 3; i++)
+	for (size_t i = 2; i < plane_len; i++)
 	{
 		if (planes[i].CheckCollision(plr))
 		{
