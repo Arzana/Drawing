@@ -167,19 +167,17 @@ Vector2 Vector2::Negate(const Vector2 * v) __GPU
 
 void Vector2::Normalize(void) __GPU
 {
-	float l = Length();
-	operator/=(l);
+	operator/=(Length());
 }
 
 Vector2 Vector2::Normalize(const Vector2 * v) __GPU
 {
-	float l = v->Length();
-	return Divide(v, l);
+	return Divide(v, v->Length());
 }
 
 Vector2 Vector2::Reflect(const Vector2 * v, const Vector2 * n) __GPU
 {
-	return *v - vect2(2) * (*v * *n) * *n;
+	return *v - vect2(2) * Dot(v, n) * *n;
 }
 
 Vector2 Vector2::SmoothStep(const Vector2 * mi, const Vector2 * ma, float a) __GPU

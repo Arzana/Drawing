@@ -192,19 +192,17 @@ Vector4 Vector4::Negate(const Vector4 * v) __GPU
 
 void Vector4::Normalize(void) __GPU
 {
-	float l = Length();
-	operator/=(l);
+	operator/=(Length());
 }
 
 Vector4 Vector4::Normalize(const Vector4 * v) __GPU
 {
-	float l = v->Length();
-	return Divide(v, l);
+	return Divide(v, v->Length());
 }
 
 Vector4 Vector4::Reflect(const Vector4 * v, const Vector4 * n) __GPU
 {
-	return *v - vect4(2) * (*v * *n) * *n;
+	return *v - vect4(2) * Dot(v, n) * *n;
 }
 
 Vector4 Vector4::SmoothStep(const Vector4 * mi, const Vector4 * ma, float a) __GPU

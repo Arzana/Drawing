@@ -61,9 +61,9 @@ void Vector3::Clamp(const Vector3 * mi, const Vector3 * ma) __GPU
 
 Vector3 Vector3::Cross(const Vector3 * v1, const Vector3 * v2) __GPU
 {
-	float x = (v1->Y * v2->Z) - (v1->Z * v2->Y);
-	float y = (v1->Z * v2->X) - (v1->X * v2->Z);
-	float z = (v1->X * v2->Y) - (v1->Y * v2->X);
+	float x = v1->Y * v2->Z - v1->Z * v2->Y;
+	float y = v1->Z * v2->X - v1->X * v2->Z;
+	float z = v1->X * v2->Y - v1->Y * v2->X;
 
 	return Vector3(x, y, z);
 }
@@ -192,19 +192,17 @@ Vector3 Vector3::Negate(const Vector3 * v) __GPU
 
 void Vector3::Normalize(void) __GPU
 {
-	float l = Length();
-	operator/=(l);
+	operator/=(Length());
 }
 
 Vector3 Vector3::Normalize(const Vector3 * v) __GPU
 {
-	float l = v->Length();
-	return Divide(v, l);
+	return Divide(v, v->Length());
 }
 
 Vector3 Vector3::Reflect(const Vector3 * v, const Vector3 * n) __GPU
 {
-	return *v - vect3(2) * (*v * *n) * *n;
+	return *v - vect3(2) * Dot(v, n) * *n;
 }
 
 Vector3 Vector3::SmoothStep(const Vector3 * mi, const Vector3 * ma, float a) __GPU
